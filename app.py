@@ -10,20 +10,13 @@ from dotenv import load_dotenv
 # ------------------ Load environment ------------------ #
 load_dotenv()
 API_KEY = os.getenv("OPENROUTER_API_KEY")
-JOBS_API_KEY = os.getenv("JOBS_API_KEY")  # updated key for Jobs API
 
 BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
-JOBS_SEARCH_URL = "https://jobs-api14.p.rapidapi.com/v1/jobs/search"
-JOBS_DETAIL_URL = "https://jobs-api14.p.rapidapi.com/v2/bing/get"
+REMOTIVE_URL = "https://remotive.io/api/remote-jobs"
 
 HEADERS = {
     "Authorization": f"Bearer {API_KEY}",
     "Content-Type": "application/json"
-}
-
-JOBS_HEADERS = {
-    "X-RapidAPI-Key": JOBS_API_KEY,
-    "X-RapidAPI-Host": "jobs-api14.p.rapidapi.com"
 }
 
 # ------------------ SYSTEM PROMPTS ------------------ #
@@ -78,26 +71,19 @@ def call_mistral(system_msg, user_msg):
         print("Error calling Mistral:", e)
         return "Error: Could not call model."
 
-def get_jobs_from_jobsapi(job_title, location="India"):
-    jobs = []
+def get_jobs_from_remotive(job_title):
     try:
-        # Step 1: Search jobs
-        params = {"query": job_title, "location": location, "page": "1"}
-        search_response = requests.get(JOBS_SEARCH_URL, headers=JOBS_HEADERS, params=params, timeout=10)
-        search_data = search_response.json()
-
-        if "data" in search_data and len(search_data["data"]) > 0:
-            for job_item in search_data["data"][:5]:  # take top 5
-                job_id = job_item.get("id")
-                if job_id:
-                    # Step 2: Get job details
-                    detail_response = requests.get(JOBS_DETAIL_URL, headers=JOBS_HEADERS, params={"id": job_id}, timeout=10)
-                    detail_data = detail_response.json().get("data", {})
-                    if detail_data and detail_data.get("title"):
-                        jobs.append(f"{detail_data.get('title')} at {detail_data.get('companyName')} ({detail_data.get('location')})")
+        params = {"search": job_title}
+        response = requests.get(REMOTIVE_URL, params=params, timeout=10)
+        data = response.json()
+        jobs = []
+        if "jobs" in data and len(data["jobs"]) > 0:
+            for job in data["jobs"][:5]:
+                jobs.append(f"{job['title']} at {job['company_name']} ({job['candidate_required_location']})")
+        return jobs
     except Exception as e:
-        print("Error calling Jobs API:", e)
-    return jobs
+        print("Error calling Remotive:", e)
+        return []
 
 # ------------------ FastAPI Setup ------------------ #
 app = FastAPI(title="Career Bot API")
@@ -118,7 +104,7 @@ def career_bot(request: CareerRequest):
 
     for i in interests_text.split(","):
         i = i.lower().replace("interests:", "").strip()
-        i = interest_map.get(i, i)  # normalize
+        i = interest_map.get(i, i)
         interests_list.append(i)
 
     # Step 2: Map to career category
@@ -129,12 +115,12 @@ def career_bot(request: CareerRequest):
     explain_prompt = f"Explain why {career_category.strip()} is a good fit for someone interested in {', '.join(interests_list)}."
     explanation = call_mistral(system_explain, explain_prompt)
 
-    # Step 4: Get job recommendations
+    # Step 4: Get job recommendations using Remotive
     all_jobs = []
     for interest in interests_list:
         job_titles = interest_to_jobs.get(interest, [])
         for title in job_titles:
-            jobs = get_jobs_from_jobsapi(title)
+            jobs = get_jobs_from_remotive(title)
             if jobs:
                 all_jobs += jobs
 
