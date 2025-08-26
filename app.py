@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import os
 import requests
@@ -22,22 +23,6 @@ system_extract = "You are an assistant that extracts main interests from user co
 system_map = "You are a helpful assistant that maps interests to career paths from: STEM, Arts, Sports. Answer with only the category."
 system_explain = "You are a career guide. Give a concise 1-2 sentence explanation for the recommended career path."
 system_job_titles = "You are a career assistant. Generate 5-10 relevant job titles for a person interested in these topics."
-
-# ------------------ Optional interest map ------------------ #
-interest_map = {
-    "programming": "coding",
-    "computer programming": "coding",
-    "software development": "coding",
-    "painting": "painting",
-    "music": "music",
-    "singing": "music",
-    "composing": "music",
-    "football": "football",
-    "basketball": "basketball",
-    "fitness": "fitness",
-    "web design": "web_design",
-    "web designing": "web_design"
-}
 
 # ------------------ Helper Functions ------------------ #
 def call_mistral(system_msg, user_msg):
@@ -62,11 +47,41 @@ def call_mistral(system_msg, user_msg):
 
 # ------------------ FastAPI Setup ------------------ #
 app = FastAPI(title="Career Bot API")
+
+# Enable CORS for frontend requests
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # allow all origins, or set your frontend URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 class CareerRequest(BaseModel):
     user_input: str
+
+# ------------------ Mapping common interests ------------------ #
+interest_map = {
+    "dashboard": "dashboards",
+    "dashboards": "dashboards",
+    "coding": "coding",
+    "programming": "coding",
+    "fitness": "fitness",
+    "exercise": "fitness",
+    "painting": "painting",
+    "music": "music",
+    "singing": "music",
+    "composing music": "music",
+    "football": "football",
+    "basketball": "basketball",
+    "web designing": "web_design",
+    "web design": "web_design",
+    "software development": "coding",
+    "computer programming": "coding"
+}
 
 # ------------------ API Endpoint ------------------ #
 @app.post("/career-bot")
@@ -79,8 +94,7 @@ def career_bot(request: CareerRequest):
     for i in interests_text.split(","):
         i = i.lower().replace("interests:", "").strip()
         i = interest_map.get(i, i)
-        if i:
-            interests_list.append(i)
+        interests_list.append(i)
 
     # Step 2: Map to career category
     map_prompt = f"The following are the user interests: {', '.join(interests_list)}. Which category do they best fit into among STEM, Arts, Sports?"
@@ -92,8 +106,8 @@ def career_bot(request: CareerRequest):
 
     # Step 4: Generate job titles using LLM
     job_titles_prompt = f"Suggest 5-10 realistic job titles for someone interested in {', '.join(interests_list)}."
-    job_titles_text = call_mistral(system_job_titles, job_titles_prompt)
-    job_titles_list = [jt.strip() for jt in job_titles_text.replace("\n", ",").split(",") if jt.strip()]
+    job_titles = call_mistral(system_job_titles, job_titles_prompt)
+    job_titles_list = [jt.strip() for jt in job_titles.replace("\n","").split(",") if jt.strip()]
 
     return {
         "interests": interests_list,
