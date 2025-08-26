@@ -10,10 +10,11 @@ from dotenv import load_dotenv
 # ------------------ Load environment ------------------ #
 load_dotenv()
 API_KEY = os.getenv("OPENROUTER_API_KEY")
-JSEARCH_KEY = os.getenv("JSEARCH_API_KEY")
+INDEED_KEY = os.getenv("INDEED_API_KEY")
+INDEED_HOST = os.getenv("INDEED_API_HOST", "indeed11.p.rapidapi.com")
+INDEED_URL = os.getenv("INDEED_API_URL", "https://indeed11.p.rapidapi.com/")
 
 BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
-JSEARCH_URL = "https://jsearch.p.rapidapi.com/search"
 
 HEADERS = {
     "Authorization": f"Bearer {API_KEY}",
@@ -72,22 +73,35 @@ def call_mistral(system_msg, user_msg):
         print("Error calling Mistral:", e)
         return "Error: Could not call model."
 
-def get_jobs_from_jsearch(job_title, location="India"):
+
+def get_jobs_from_indeed(job_title, location="India"):
     try:
         headers = {
-            "X-RapidAPI-Key": JSEARCH_KEY,
-            "X-RapidAPI-Host": "jsearch.p.rapidapi.com"
+            "X-RapidAPI-Key": INDEED_KEY,
+            "X-RapidAPI-Host": INDEED_HOST
         }
-        params = {"query": job_title, "num_pages": "1", "location": location, "country":"IN","language":"en"}
-        response = requests.get(JSEARCH_URL, headers=headers, params=params, timeout=10)
+        params = {
+            "query": job_title,
+            "location": location,
+            "page": "1"
+        }
+
+        url = INDEED_URL + "jobs/search"
+        response = requests.get(url, headers=headers, params=params, timeout=10)
         data = response.json()
+
         jobs = []
-        if "data" in data and len(data["data"]) > 0:
-            for job in data["data"][:5]:
-                jobs.append(f"{job['job_title']} at {job['employer_name']} ({job['job_city']})")
+        # Adjusting parsing for Indeed API response
+        if "results" in data and len(data["results"]) > 0:
+            for job in data["results"][:5]:
+                title = job.get("title", "Unknown Title")
+                company = job.get("company", "Unknown Company")
+                city = job.get("location", "Unknown Location")
+                jobs.append(f"{title} at {company} ({city})")
+
         return jobs
     except Exception as e:
-        print("Error calling JSearch:", e)
+        print("Error calling Indeed API:", e)
         return []
 
 # ------------------ FastAPI Setup ------------------ #
@@ -128,7 +142,7 @@ def career_bot(request: CareerRequest):
     for interest in interests_list:
         job_titles = interest_to_jobs.get(interest, [])
         for title in job_titles:
-            jobs = get_jobs_from_jsearch(title)
+            jobs = get_jobs_from_indeed(title)
             if jobs:
                 all_jobs += jobs
 
