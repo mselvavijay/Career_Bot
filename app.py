@@ -22,9 +22,12 @@ HEADERS = {
 system_extract = "You are an assistant that extracts main interests from user conversations. Answer in 1-2 short phrases separated by commas."
 system_map = "You are a helpful assistant that maps interests to career paths from: STEM, Arts, Sports. Answer with only the category."
 system_explain = "You are a career guide. Give a concise 1-2 sentence explanation for the recommended career path."
-system_job = "You are a career guide that suggests 5-10 job titles suitable for the user interests in India. Answer as a comma-separated list only."
+system_job = """
+You are a career guide that suggests 5-10 job titles suitable for the user interests in India.
+Output ONLY the job titles, separated strictly by commas, with NO extra text.
+"""
 
-# ------------------ Interest mapping ------------------ #
+# ------------------ Interest normalization ------------------ #
 interest_map = {
     "dashboard": "dashboards",
     "dashboards": "dashboards",
@@ -44,7 +47,6 @@ interest_map = {
 
 # ------------------ Helper Functions ------------------ #
 def call_mistral(system_msg, user_msg):
-    """Call Mistral LLM with a system and user prompt"""
     try:
         data = {
             "model": "mistralai/mistral-7b-instruct",
@@ -55,7 +57,7 @@ def call_mistral(system_msg, user_msg):
         }
         response = requests.post(BASE_URL, headers=HEADERS, json=data, timeout=30)
         result = response.json()
-        if "choices" in result and len(result["choices"]) > 0:
+        if "choices" in result:
             return result["choices"][0]["message"]["content"].strip()
         else:
             return "Error: No response from model."
@@ -64,9 +66,12 @@ def call_mistral(system_msg, user_msg):
         return "Error: Could not call model."
 
 def generate_jobs_with_llm(interests_list):
-    """Generate job recommendations using LLM"""
-    prompt = f"Suggest 5-10 job titles in India for someone interested in: {', '.join(interests_list)}. Only return job titles separated by commas."
+    # Join interests and prompt LLM
+    prompt = f"Suggest 5-10 job titles in India for someone interested in: {', '.join(interests_list)}."
     jobs_text = call_mistral(system_job, prompt)
+
+    # Clean LLM output
+    jobs_text = jobs_text.replace("\n", "").replace("-", "").replace(".", "")
     jobs = [j.strip() for j in jobs_text.split(",") if j.strip()]
     return jobs if jobs else ["No jobs found right now. Try another query."]
 
@@ -86,6 +91,7 @@ def career_bot(request: CareerRequest):
     # Step 1: Extract interests
     interests_text = call_mistral(system_extract, user_input)
     interests_list = []
+
     for i in interests_text.split(","):
         i = i.lower().replace("interests:", "").strip()
         i = interest_map.get(i, i)
@@ -99,14 +105,14 @@ def career_bot(request: CareerRequest):
     explain_prompt = f"Explain why {career_category.strip()} is a good fit for someone interested in {', '.join(interests_list)}."
     explanation = call_mistral(system_explain, explain_prompt)
 
-    # Step 4: Generate job recommendations using LLM
-    all_jobs = generate_jobs_with_llm(interests_list)
+    # Step 4: Get job recommendations via LLM
+    job_recommendations = generate_jobs_with_llm(interests_list)
 
     return {
         "interests": interests_list,
         "career_category": career_category,
         "explanation": explanation,
-        "job_recommendations": all_jobs
+        "job_recommendations": job_recommendations
     }
 
 # ------------------ Web Page ------------------ #
