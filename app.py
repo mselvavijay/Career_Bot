@@ -10,11 +10,9 @@ from dotenv import load_dotenv
 # ------------------ Load environment ------------------ #
 load_dotenv()
 API_KEY = os.getenv("OPENROUTER_API_KEY")
-JSEARCH_KEY = os.getenv("JSEARCH_API_KEY")
 INDEED_KEY = os.getenv("INDEED_API_KEY")
 
 BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
-JSEARCH_URL = "https://jsearch.p.rapidapi.com/search"
 INDEED_URL = "https://indeed12.p.rapidapi.com/jobs/search"
 
 HEADERS = {
@@ -75,25 +73,6 @@ def call_mistral(system_msg, user_msg):
         return "Error: Could not call model."
 
 
-def get_jobs_from_jsearch(job_title, location="India"):
-    try:
-        headers = {
-            "X-RapidAPI-Key": JSEARCH_KEY,
-            "X-RapidAPI-Host": "jsearch.p.rapidapi.com"
-        }
-        params = {"query": job_title, "num_pages": "1", "location": location, "country": "IN", "language": "en"}
-        response = requests.get(JSEARCH_URL, headers=headers, params=params, timeout=10)
-        data = response.json()
-        jobs = []
-        if "data" in data and len(data["data"]) > 0:
-            for job in data["data"][:5]:
-                jobs.append(f"{job['job_title']} at {job['employer_name']} ({job['job_city']})")
-        return jobs
-    except Exception as e:
-        print("Error calling JSearch:", e)
-        return []
-
-
 def get_jobs_from_indeed(job_title, location="India"):
     try:
         headers = {
@@ -111,7 +90,6 @@ def get_jobs_from_indeed(job_title, location="India"):
     except Exception as e:
         print("Error calling Indeed:", e)
         return []
-
 
 # ------------------ FastAPI Setup ------------------ #
 app = FastAPI(title="Career Bot API")
@@ -143,17 +121,12 @@ def career_bot(request: CareerRequest):
     explain_prompt = f"Explain why {career_category.strip()} is a good fit for someone interested in {', '.join(interests_list)}."
     explanation = call_mistral(system_explain, explain_prompt)
 
-    # Step 4: Get job recommendations
+    # Step 4: Get job recommendations (Indeed only)
     all_jobs = []
     for interest in interests_list:
         job_titles = interest_to_jobs.get(interest, [])
         for title in job_titles:
-            jobs = []
-            if INDEED_KEY:  # Prefer Indeed if key available
-                jobs = get_jobs_from_indeed(title)
-            elif JSEARCH_KEY:
-                jobs = get_jobs_from_jsearch(title)
-
+            jobs = get_jobs_from_indeed(title)
             if jobs:
                 all_jobs += jobs
 
@@ -168,7 +141,6 @@ def career_bot(request: CareerRequest):
         "explanation": explanation,
         "job_recommendations": all_jobs
     }
-
 
 # ------------------ Web Page ------------------ #
 @app.get("/", response_class=HTMLResponse)
