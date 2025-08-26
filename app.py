@@ -23,6 +23,26 @@ system_map = "You are a helpful assistant that maps interests to career paths fr
 system_explain = "You are a career guide. Give a concise 1-2 sentence explanation for the recommended career path."
 system_job_titles = "You are a career assistant. Generate 5-10 relevant job titles for a person interested in these topics."
 
+# ------------------ Interest Mapping ------------------ #
+interest_map = {
+    "dashboard": "dashboards",
+    "dashboards": "dashboards",
+    "coding": "coding",
+    "programming": "coding",
+    "computer programming": "coding",
+    "software development": "coding",
+    "fitness": "fitness",
+    "exercise": "fitness",
+    "painting": "painting",
+    "music": "music",
+    "singing": "music",
+    "composing music": "music",
+    "football": "football",
+    "basketball": "basketball",
+    "web designing": "web_design",
+    "web design": "web_design"
+}
+
 # ------------------ Helper Functions ------------------ #
 def call_mistral(system_msg, user_msg):
     """Call Mistral LLM via OpenRouter."""
@@ -59,21 +79,24 @@ def career_bot(request: CareerRequest):
 
     # Step 1: Extract interests
     interests_text = call_mistral(system_extract, user_input)
-    interests_list = [i.strip().lower() for i in interests_text.split(",")]
+    interests_list = []
+    for i in interests_text.split(","):
+        i = i.lower().replace("interests:", "").strip()
+        i = interest_map.get(i, i)
+        interests_list.append(i)
 
     # Step 2: Map to career category
     map_prompt = f"The following are the user interests: {', '.join(interests_list)}. Which category do they best fit into among STEM, Arts, Sports?"
     career_category = call_mistral(system_map, map_prompt)
 
-    # Step 3: Explain career category
+    # Step 3: Explain
     explain_prompt = f"Explain why {career_category.strip()} is a good fit for someone interested in {', '.join(interests_list)}."
     explanation = call_mistral(system_explain, explain_prompt)
 
     # Step 4: Generate job titles using LLM
-    jobs_prompt = f"Generate 5-10 job titles for someone interested in: {', '.join(interests_list)}."
-    job_titles_text = call_mistral(system_job_titles, jobs_prompt)
-    # Convert to list by splitting on newlines or commas
-    job_titles_list = [j.strip("- ").strip() for j in job_titles_text.replace("\n", ",").split(",") if j.strip()]
+    job_titles_prompt = f"Suggest 5-10 realistic job titles for someone interested in {', '.join(interests_list)}."
+    job_titles = call_mistral(system_job_titles, job_titles_prompt)
+    job_titles_list = [jt.strip() for jt in job_titles.replace("\n", ",").split(",") if jt.strip()]
 
     return {
         "interests": interests_list,
