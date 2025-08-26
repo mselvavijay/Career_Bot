@@ -10,18 +10,19 @@ from dotenv import load_dotenv
 # ------------------ Load environment ------------------ #
 load_dotenv()
 API_KEY = os.getenv("OPENROUTER_API_KEY")
-JOBAPI_KEY = os.getenv("JOBAPI_KEY")  # New API key for Jobs API
+JOBS_API_KEY = os.getenv("JOBS_API_KEY")  # updated key for Jobs API
 
 BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
-JOBAPI_URL = "https://jobs-api14.p.rapidapi.com/v2/bing/get"
+JOBS_SEARCH_URL = "https://jobs-api14.p.rapidapi.com/v1/jobs/search"
+JOBS_DETAIL_URL = "https://jobs-api14.p.rapidapi.com/v2/bing/get"
 
 HEADERS = {
     "Authorization": f"Bearer {API_KEY}",
     "Content-Type": "application/json"
 }
 
-jobapi_headers = {
-    "X-RapidAPI-Key": JOBAPI_KEY,
+JOBS_HEADERS = {
+    "X-RapidAPI-Key": JOBS_API_KEY,
     "X-RapidAPI-Host": "jobs-api14.p.rapidapi.com"
 }
 
@@ -77,20 +78,26 @@ def call_mistral(system_msg, user_msg):
         print("Error calling Mistral:", e)
         return "Error: Could not call model."
 
-
-def get_jobs_from_jobapi(location_id="india"):
+def get_jobs_from_jobsapi(job_title, location="India"):
+    jobs = []
     try:
-        params = {"id": location_id}  # Required param
-        response = requests.get(JOBAPI_URL, headers=jobapi_headers, params=params, timeout=10)
-        data = response.json()
-        jobs = []
-        if "jobs" in data and len(data["jobs"]) > 0:
-            for job in data["jobs"][:5]:
-                jobs.append(f"{job['title']} at {job['company']} ({job['location']})")
-        return jobs
+        # Step 1: Search jobs
+        params = {"query": job_title, "location": location, "page": "1"}
+        search_response = requests.get(JOBS_SEARCH_URL, headers=JOBS_HEADERS, params=params, timeout=10)
+        search_data = search_response.json()
+
+        if "data" in search_data and len(search_data["data"]) > 0:
+            for job_item in search_data["data"][:5]:  # take top 5
+                job_id = job_item.get("id")
+                if job_id:
+                    # Step 2: Get job details
+                    detail_response = requests.get(JOBS_DETAIL_URL, headers=JOBS_HEADERS, params={"id": job_id}, timeout=10)
+                    detail_data = detail_response.json().get("data", {})
+                    if detail_data and detail_data.get("title"):
+                        jobs.append(f"{detail_data.get('title')} at {detail_data.get('companyName')} ({detail_data.get('location')})")
     except Exception as e:
-        print("Error calling JobAPI:", e)
-        return []
+        print("Error calling Jobs API:", e)
+    return jobs
 
 # ------------------ FastAPI Setup ------------------ #
 app = FastAPI(title="Career Bot API")
@@ -127,7 +134,7 @@ def career_bot(request: CareerRequest):
     for interest in interests_list:
         job_titles = interest_to_jobs.get(interest, [])
         for title in job_titles:
-            jobs = get_jobs_from_jobapi()  # Fetch jobs from new API
+            jobs = get_jobs_from_jobsapi(title)
             if jobs:
                 all_jobs += jobs
 
