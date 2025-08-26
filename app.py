@@ -5,6 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import os
 import requests
+import re
 from dotenv import load_dotenv
 
 # ------------------ Load environment ------------------ #
@@ -25,8 +26,6 @@ system_job_titles = "You are a career assistant. Generate 5-10 relevant job titl
 
 # ------------------ Interest Mapping ------------------ #
 interest_map = {
-    "dashboard": "dashboards",
-    "dashboards": "dashboards",
     "coding": "coding",
     "programming": "coding",
     "computer programming": "coding",
@@ -80,10 +79,16 @@ def career_bot(request: CareerRequest):
     # Step 1: Extract interests
     interests_text = call_mistral(system_extract, user_input)
     interests_list = []
+
     for i in interests_text.split(","):
-        i = i.lower().replace("interests:", "").strip()
+        i = i.lower()
+        i = re.sub(r"[()]", "", i)          # remove parentheses
+        i = i.replace("interests:", "").strip()
         i = interest_map.get(i, i)
         interests_list.append(i)
+
+    # Remove duplicates
+    interests_list = list(dict.fromkeys(interests_list))
 
     # Step 2: Map to career category
     map_prompt = f"The following are the user interests: {', '.join(interests_list)}. Which category do they best fit into among STEM, Arts, Sports?"
@@ -96,7 +101,7 @@ def career_bot(request: CareerRequest):
     # Step 4: Generate job titles using LLM
     job_titles_prompt = f"Suggest 5-10 realistic job titles for someone interested in {', '.join(interests_list)}."
     job_titles = call_mistral(system_job_titles, job_titles_prompt)
-    job_titles_list = [jt.strip() for jt in job_titles.replace("\n", ",").split(",") if jt.strip()]
+    job_titles_list = [jt.strip() for jt in re.split(r",|\n|-", job_titles) if jt.strip()]
 
     return {
         "interests": interests_list,
