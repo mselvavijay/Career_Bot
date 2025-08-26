@@ -10,14 +10,19 @@ from dotenv import load_dotenv
 # ------------------ Load environment ------------------ #
 load_dotenv()
 API_KEY = os.getenv("OPENROUTER_API_KEY")
-INDEED_KEY = os.getenv("INDEED_API_KEY")
+JOBAPI_KEY = os.getenv("JOBAPI_KEY")  # New API key for Jobs API
 
 BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
-INDEED_URL = "https://indeed12.p.rapidapi.com/jobs/search"
+JOBAPI_URL = "https://jobs-api14.p.rapidapi.com/v2/bing/get"
 
 HEADERS = {
     "Authorization": f"Bearer {API_KEY}",
     "Content-Type": "application/json"
+}
+
+jobapi_headers = {
+    "X-RapidAPI-Key": JOBAPI_KEY,
+    "X-RapidAPI-Host": "jobs-api14.p.rapidapi.com"
 }
 
 # ------------------ SYSTEM PROMPTS ------------------ #
@@ -72,22 +77,19 @@ def call_mistral(system_msg, user_msg):
         print("Error calling Mistral:", e)
         return "Error: Could not call model."
 
-def get_jobs_from_indeed(job_title, location="India"):
+
+def get_jobs_from_jobapi(location_id="india"):
     try:
-        headers = {
-            "X-RapidAPI-Key": INDEED_KEY,
-            "X-RapidAPI-Host": "indeed12.p.rapidapi.com"
-        }
-        params = {"query": job_title, "location": location, "page_id": "1"}
-        response = requests.get(INDEED_URL, headers=headers, params=params, timeout=10)
+        params = {"id": location_id}  # Required param
+        response = requests.get(JOBAPI_URL, headers=jobapi_headers, params=params, timeout=10)
         data = response.json()
         jobs = []
-        if "hits" in data and len(data["hits"]) > 0:
-            for job in data["hits"][:5]:
-                jobs.append(f"{job['title']} at {job['company_name']} ({job['location']}) — https://www.indeed.com{job['link']}")
+        if "jobs" in data and len(data["jobs"]) > 0:
+            for job in data["jobs"][:5]:
+                jobs.append(f"{job['title']} at {job['company']} ({job['location']})")
         return jobs
     except Exception as e:
-        print("Error calling Indeed:", e)
+        print("Error calling JobAPI:", e)
         return []
 
 # ------------------ FastAPI Setup ------------------ #
@@ -125,9 +127,7 @@ def career_bot(request: CareerRequest):
     for interest in interests_list:
         job_titles = interest_to_jobs.get(interest, [])
         for title in job_titles:
-            jobs = []
-            if INDEED_KEY:  # Use Indeed API if key available
-                jobs = get_jobs_from_indeed(title)
+            jobs = get_jobs_from_jobapi()  # Fetch jobs from new API
             if jobs:
                 all_jobs += jobs
 
