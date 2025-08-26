@@ -26,46 +26,69 @@ system_map = "You are a helpful assistant that maps interests to career paths fr
 system_explain = "You are a career guide. Give a concise 1-2 sentence explanation for the recommended career path."
 
 # ------------------ Interest to job titles ------------------ #
+interest_map = {
+    "dashboard": "dashboards",
+    "dashboards": "dashboards",
+    "coding": "coding",
+    "programming": "coding",
+    "fitness": "fitness",
+    "exercise": "fitness",
+    "painting": "painting",
+    "music": "music",
+    "football": "football",
+    "basketball": "basketball",
+    "web designing": "web_design",
+    "web design": "web_design"
+}
+
 interest_to_jobs = {
     "coding": ["Software Engineer", "Backend Developer", "Full Stack Developer", "Data Analyst"],
     "dashboards": ["Data Analyst", "BI Developer", "Dashboard Developer", "UI/UX Designer"],
-    "programming": ["Software Engineer", "Mobile App Developer", "Data Engineer"],
     "painting": ["Graphic Designer", "Illustrator", "Animator", "Art Teacher"],
     "music": ["Music Teacher", "Composer", "Sound Designer", "Performer"],
     "football": ["Football Coach", "Sports Analyst", "Physical Trainer"],
     "fitness": ["Personal Trainer", "Fitness Coach", "Yoga Instructor"],
-    "basketball": ["Basketball Coach", "Sports Analyst", "Athletic Trainer"]
+    "basketball": ["Basketball Coach", "Sports Analyst", "Athletic Trainer"],
+    "web_design": ["Web Designer", "Front-End Developer", "UI/UX Designer"]
 }
 
 # ------------------ Helper Functions ------------------ #
 def call_mistral(system_msg, user_msg):
-    data = {
-        "model": "mistralai/mistral-7b-instruct",
-        "messages": [
-            {"role": "system", "content": system_msg},
-            {"role": "user", "content": user_msg}
-        ]
-    }
-    response = requests.post(BASE_URL, headers=HEADERS, json=data)
-    result = response.json()
-    if "choices" in result:
-        return result["choices"][0]["message"]["content"].strip()
-    else:
-        return "Error: No response from model."
+    try:
+        data = {
+            "model": "mistralai/mistral-7b-instruct",
+            "messages": [
+                {"role": "system", "content": system_msg},
+                {"role": "user", "content": user_msg}
+            ]
+        }
+        response = requests.post(BASE_URL, headers=HEADERS, json=data, timeout=30)
+        result = response.json()
+        if "choices" in result:
+            return result["choices"][0]["message"]["content"].strip()
+        else:
+            return "Error: No response from model."
+    except Exception as e:
+        print("Error calling Mistral:", e)
+        return "Error: Could not call model."
 
 def get_jobs_from_jsearch(job_title, location="India"):
-    headers = {
-        "X-RapidAPI-Key": JSEARCH_KEY,
-        "X-RapidAPI-Host": "jsearch.p.rapidapi.com"
-    }
-    params = {"query": job_title, "num_pages": "1", "location": location, "country":"IN","language":"en"}
-    response = requests.get(JSEARCH_URL, headers=headers, params=params)
-    data = response.json()
-    jobs = []
-    if "data" in data and len(data["data"])>0:
-        for job in data["data"][:5]:
-            jobs.append(f"{job['job_title']} at {job['employer_name']} ({job['job_city']})")
-    return jobs
+    try:
+        headers = {
+            "X-RapidAPI-Key": JSEARCH_KEY,
+            "X-RapidAPI-Host": "jsearch.p.rapidapi.com"
+        }
+        params = {"query": job_title, "num_pages": "1", "location": location, "country":"IN","language":"en"}
+        response = requests.get(JSEARCH_URL, headers=headers, params=params, timeout=10)
+        data = response.json()
+        jobs = []
+        if "data" in data and len(data["data"]) > 0:
+            for job in data["data"][:5]:
+                jobs.append(f"{job['job_title']} at {job['employer_name']} ({job['job_city']})")
+        return jobs
+    except Exception as e:
+        print("Error calling JSearch:", e)
+        return []
 
 # ------------------ FastAPI Setup ------------------ #
 app = FastAPI(title="Career Bot API")
@@ -80,36 +103,46 @@ class CareerRequest(BaseModel):
 def career_bot(request: CareerRequest):
     user_input = request.user_input
 
+    # Step 1: Extract interests using Mistral
     interests_text = call_mistral(system_extract, user_input)
     interests_list = []
+
     for i in interests_text.split(","):
         i = i.lower().replace("interests:", "").strip()
-        if "dashboard" in i:
-            i = "dashboards"
-        if "coding" in i or "programming" in i:
-            i = "coding"
-        if "fitness" in i or "exercise" in i:
-            i = "fitness"
+        i = interest_map.get(i, i)  # normalize using mapping
         interests_list.append(i)
 
+    print("Extracted interests:", interests_text)
+    print("Normalized interests:", interests_list)
+
+    # Step 2: Map to career category
     map_prompt = f"The following are the user interests: {', '.join(interests_list)}. Which category do they best fit into among STEM, Arts, Sports?"
     career_category = call_mistral(system_map, map_prompt)
 
+    # Step 3: Explain career choice
     explain_prompt = f"Explain why {career_category.strip()} is a good fit for someone interested in {', '.join(interests_list)}."
     explanation = call_mistral(system_explain, explain_prompt)
 
+    # Step 4: Get job recommendations
     all_jobs = []
     for interest in interests_list:
         job_titles = interest_to_jobs.get(interest, [])
         for title in job_titles:
-            all_jobs += get_jobs_from_jsearch(title)
+            jobs = get_jobs_from_jsearch(title)
+            if jobs:
+                all_jobs += jobs
+
+    # Remove duplicates
     all_jobs = list(dict.fromkeys(all_jobs))
+
+    if not all_jobs:
+        all_jobs = ["No jobs found right now. Try another query."]
 
     return {
         "interests": interests_list,
         "career_category": career_category,
         "explanation": explanation,
-        "job_recommendations": all_jobs or ["No jobs found right now. Try another query."]
+        "job_recommendations": all_jobs
     }
 
 # ------------------ Web Page ------------------ #
