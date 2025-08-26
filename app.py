@@ -71,15 +71,17 @@ def call_mistral(system_msg, user_msg):
         print("Error calling Mistral:", e)
         return "Error: Could not call model."
 
-def get_jobs_from_remotive(job_title):
+def get_jobs_from_remotive(job_title, location="India"):
     try:
         params = {"search": job_title}
         response = requests.get(REMOTIVE_URL, params=params, timeout=10)
         data = response.json()
         jobs = []
         if "jobs" in data and len(data["jobs"]) > 0:
-            for job in data["jobs"][:5]:
-                jobs.append(f"{job['title']} at {job['company_name']} ({job['candidate_required_location']})")
+            for job in data["jobs"][:10]:  # top 10 results
+                job_location = job.get("candidate_required_location", "").lower()
+                if location.lower() in job_location or location.lower() == "anywhere":
+                    jobs.append(f"{job['title']} at {job['company_name']} ({job['candidate_required_location']})")
         return jobs
     except Exception as e:
         print("Error calling Remotive:", e)
@@ -115,17 +117,16 @@ def career_bot(request: CareerRequest):
     explain_prompt = f"Explain why {career_category.strip()} is a good fit for someone interested in {', '.join(interests_list)}."
     explanation = call_mistral(system_explain, explain_prompt)
 
-    # Step 4: Get job recommendations using Remotive
+    # Step 4: Get job recommendations using Remotive (India only)
     all_jobs = []
     for interest in interests_list:
         job_titles = interest_to_jobs.get(interest, [])
         for title in job_titles:
-            jobs = get_jobs_from_remotive(title)
+            jobs = get_jobs_from_remotive(title, location="India")
             if jobs:
                 all_jobs += jobs
 
     all_jobs = list(dict.fromkeys(all_jobs))  # remove duplicates
-
     if not all_jobs:
         all_jobs = ["No jobs found right now. Try another query."]
 
