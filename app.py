@@ -10,11 +10,12 @@ from dotenv import load_dotenv
 # ------------------ Load environment ------------------ #
 load_dotenv()
 API_KEY = os.getenv("OPENROUTER_API_KEY")
+JSEARCH_KEY = os.getenv("JSEARCH_API_KEY")
 INDEED_KEY = os.getenv("INDEED_API_KEY")
-INDEED_HOST = os.getenv("INDEED_API_HOST", "indeed11.p.rapidapi.com")
-INDEED_URL = os.getenv("INDEED_API_URL", "https://indeed11.p.rapidapi.com/")
 
 BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
+JSEARCH_URL = "https://jsearch.p.rapidapi.com/search"
+INDEED_URL = "https://indeed12.p.rapidapi.com/jobs/search"
 
 HEADERS = {
     "Authorization": f"Bearer {API_KEY}",
@@ -74,35 +75,43 @@ def call_mistral(system_msg, user_msg):
         return "Error: Could not call model."
 
 
+def get_jobs_from_jsearch(job_title, location="India"):
+    try:
+        headers = {
+            "X-RapidAPI-Key": JSEARCH_KEY,
+            "X-RapidAPI-Host": "jsearch.p.rapidapi.com"
+        }
+        params = {"query": job_title, "num_pages": "1", "location": location, "country": "IN", "language": "en"}
+        response = requests.get(JSEARCH_URL, headers=headers, params=params, timeout=10)
+        data = response.json()
+        jobs = []
+        if "data" in data and len(data["data"]) > 0:
+            for job in data["data"][:5]:
+                jobs.append(f"{job['job_title']} at {job['employer_name']} ({job['job_city']})")
+        return jobs
+    except Exception as e:
+        print("Error calling JSearch:", e)
+        return []
+
+
 def get_jobs_from_indeed(job_title, location="India"):
     try:
         headers = {
             "X-RapidAPI-Key": INDEED_KEY,
-            "X-RapidAPI-Host": INDEED_HOST
+            "X-RapidAPI-Host": "indeed12.p.rapidapi.com"
         }
-        params = {
-            "query": job_title,
-            "location": location,
-            "page": "1"
-        }
-
-        url = INDEED_URL + "jobs/search"
-        response = requests.get(url, headers=headers, params=params, timeout=10)
+        params = {"query": job_title, "location": location, "page_id": "1"}
+        response = requests.get(INDEED_URL, headers=headers, params=params, timeout=10)
         data = response.json()
-
         jobs = []
-        # Adjusting parsing for Indeed API response
-        if "results" in data and len(data["results"]) > 0:
-            for job in data["results"][:5]:
-                title = job.get("title", "Unknown Title")
-                company = job.get("company", "Unknown Company")
-                city = job.get("location", "Unknown Location")
-                jobs.append(f"{title} at {company} ({city})")
-
+        if "jobs" in data and len(data["jobs"]) > 0:
+            for job in data["jobs"][:5]:
+                jobs.append(f"{job['title']} at {job['company']} ({job['location']})")
         return jobs
     except Exception as e:
-        print("Error calling Indeed API:", e)
+        print("Error calling Indeed:", e)
         return []
+
 
 # ------------------ FastAPI Setup ------------------ #
 app = FastAPI(title="Career Bot API")
@@ -117,23 +126,20 @@ class CareerRequest(BaseModel):
 def career_bot(request: CareerRequest):
     user_input = request.user_input
 
-    # Step 1: Extract interests using Mistral
+    # Step 1: Extract interests
     interests_text = call_mistral(system_extract, user_input)
     interests_list = []
 
     for i in interests_text.split(","):
         i = i.lower().replace("interests:", "").strip()
-        i = interest_map.get(i, i)  # normalize using mapping
+        i = interest_map.get(i, i)  # normalize
         interests_list.append(i)
-
-    print("Extracted interests:", interests_text)
-    print("Normalized interests:", interests_list)
 
     # Step 2: Map to career category
     map_prompt = f"The following are the user interests: {', '.join(interests_list)}. Which category do they best fit into among STEM, Arts, Sports?"
     career_category = call_mistral(system_map, map_prompt)
 
-    # Step 3: Explain career choice
+    # Step 3: Explain
     explain_prompt = f"Explain why {career_category.strip()} is a good fit for someone interested in {', '.join(interests_list)}."
     explanation = call_mistral(system_explain, explain_prompt)
 
@@ -142,12 +148,16 @@ def career_bot(request: CareerRequest):
     for interest in interests_list:
         job_titles = interest_to_jobs.get(interest, [])
         for title in job_titles:
-            jobs = get_jobs_from_indeed(title)
+            jobs = []
+            if INDEED_KEY:  # Prefer Indeed if key available
+                jobs = get_jobs_from_indeed(title)
+            elif JSEARCH_KEY:
+                jobs = get_jobs_from_jsearch(title)
+
             if jobs:
                 all_jobs += jobs
 
-    # Remove duplicates
-    all_jobs = list(dict.fromkeys(all_jobs))
+    all_jobs = list(dict.fromkeys(all_jobs))  # remove duplicates
 
     if not all_jobs:
         all_jobs = ["No jobs found right now. Try another query."]
@@ -158,6 +168,7 @@ def career_bot(request: CareerRequest):
         "explanation": explanation,
         "job_recommendations": all_jobs
     }
+
 
 # ------------------ Web Page ------------------ #
 @app.get("/", response_class=HTMLResponse)
