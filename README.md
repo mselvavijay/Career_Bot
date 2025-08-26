@@ -63,5 +63,5 @@ venv\Scripts\activate      # Windows
 6. **Access via EC2 public key**
    http://your-ec2-public-ip:8000
    
-   http://107.22.84.10:8000   (This is my Public Key IP which is accessible by everyone to use this bot whih is deployed on AWS)
+   http://107.22.84.10:8000   (This is my Public Key IP which is accessible by everyone to use this bot and this is deployed on AWS)
    (Once I start the instance and run it PS:- this is only for testing)
