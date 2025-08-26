@@ -4,90 +4,35 @@
     <meta charset="UTF-8">
     <title>Career Bot</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f7fa;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background-color: #4e73df;
-            color: white;
-            padding: 20px 0;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        h1 {
-            margin: 0;
-            font-size: 2.2rem;
-        }
-        main {
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 20px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        input[type="text"] {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 1rem;
-        }
-        button {
-            background-color: #4e73df;
-            color: white;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-        button:hover {
-            background-color: #2e59d9;
-        }
-        .output {
-            margin-top: 25px;
-            line-height: 1.6;
-        }
-        .output h3 {
-            margin-bottom: 5px;
-            color: #4e73df;
-        }
-        ul {
-            padding-left: 20px;
-        }
-        footer {
-            text-align: center;
-            margin-top: 50px;
-            color: #888;
-        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; margin: 0; padding: 0; }
+        header { background-color: #4e73df; color: white; padding: 20px 0; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { margin: 0; font-size: 2.2rem; }
+        main { max-width: 800px; margin: 40px auto; padding: 20px; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        input[type="text"] { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; }
+        button { background-color: #4e73df; color: white; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; }
+        button:hover { background-color: #2e59d9; }
+        .output { margin-top: 25px; line-height: 1.6; }
+        .output h3 { margin-bottom: 5px; color: #4e73df; }
+        ul { padding-left: 20px; }
+        footer { text-align: center; margin-top: 50px; color: #888; }
     </style>
 </head>
 <body>
     <header>
         <h1>Career Bot</h1>
-        <p>Discover your career path and job recommendations based on your interests</p>
+        <p>Discover your career path and job titles based on your interests</p>
     </header>
     <main>
         <input type="text" id="user_input" placeholder="Enter your interests, e.g., coding, fitness">
         <button onclick="getCareer()">Submit</button>
         <div class="output" id="result"></div>
     </main>
-    <footer>
-        &copy; 2025 Career Bot
-    </footer>
+    <footer>&copy; 2025 Career Bot</footer>
 
     <script>
         async function getCareer() {
             const input = document.getElementById("user_input").value.trim();
-            if (!input) {
-                alert("Please enter your interests.");
-                return;
-            }
+            if (!input) { alert("Please enter your interests."); return; }
 
             document.getElementById("result").innerHTML = "Loading...";
 
@@ -100,16 +45,18 @@
 
                 const data = await response.json();
 
+                const jobs = data.job_titles || ["No job titles available."];
+
                 document.getElementById("result").innerHTML = `
                     <h3>Interests:</h3> ${data.interests.join(", ")}
                     <h3>Career Category:</h3> ${data.career_category}
                     <h3>Explanation:</h3> ${data.explanation}
                     <h3>Job Titles:</h3>
-                    <ul>${data.job_titles.map(job => `<li>${job}</li>`).join("")}</ul>
+                    <ul>${jobs.map(job => `<li>${job}</li>`).join("")}</ul>
                 `;
             } catch (error) {
-                document.getElementById("result").innerHTML = "Error fetching career recommendations. Please try again later.";
                 console.error(error);
+                document.getElementById("result").innerHTML = "Error fetching career recommendations. Please try again later.";
             }
         }
     </script>

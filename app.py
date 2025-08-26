@@ -21,10 +21,25 @@ HEADERS = {
 system_extract = "You are an assistant that extracts main interests from user conversations. Answer in 1-2 short phrases separated by commas."
 system_map = "You are a helpful assistant that maps interests to career paths from: STEM, Arts, Sports. Answer with only the category."
 system_explain = "You are a career guide. Give a concise 1-2 sentence explanation for the recommended career path."
+system_job_titles = "You are a career assistant. Generate 5-10 relevant job titles for a person interested in these topics."
+
+# Optional interest normalization
+interest_map = {
+    "singing": "music",
+    "composing music": "music",
+    "coding": "programming",
+    "programming": "programming",
+    "fitness": "fitness",
+    "painting": "painting",
+    "music": "music",
+    "football": "football",
+    "basketball": "basketball",
+    "web design": "web_design",
+    "web designing": "web_design"
+}
 
 # ------------------ Helper Functions ------------------ #
 def call_mistral(system_msg, user_msg):
-    """Call Mistral LLM via OpenRouter."""
     try:
         data = {
             "model": "mistralai/mistral-7b-instruct",
@@ -41,7 +56,7 @@ def call_mistral(system_msg, user_msg):
             return "Error: No response from model."
     except Exception as e:
         print("Error calling Mistral:", e)
-        return "Error: Could not call model."
+        return f"Error: {str(e)}"
 
 # ------------------ FastAPI Setup ------------------ #
 app = FastAPI(title="Career Bot API")
@@ -58,20 +73,38 @@ def career_bot(request: CareerRequest):
 
     # Step 1: Extract interests
     interests_text = call_mistral(system_extract, user_input)
-    interests_list = [i.strip().lower() for i in interests_text.split(",")]
+    interests_list = []
+    if "Error" not in interests_text.lower():
+        for i in interests_text.split(","):
+            i = i.lower().replace("interests:", "").strip()
+            i = interest_map.get(i, i)
+            interests_list.append(i)
+    else:
+        interests_list = ["Error: Could not extract interests."]
 
     # Step 2: Map to career category
-    map_prompt = f"The following are the user interests: {', '.join(interests_list)}. Which category do they best fit into among STEM, Arts, Sports?"
-    career_category = call_mistral(system_map, map_prompt)
+    if "Error" not in interests_text.lower():
+        map_prompt = f"The following are the user interests: {', '.join(interests_list)}. Which category do they best fit into among STEM, Arts, Sports?"
+        career_category = call_mistral(system_map, map_prompt)
+    else:
+        career_category = "Error: Could not determine career category."
 
     # Step 3: Explain
-    explain_prompt = f"Explain why {career_category.strip()} is a good fit for someone interested in {', '.join(interests_list)}."
-    explanation = call_mistral(system_explain, explain_prompt)
+    if "Error" not in career_category.lower():
+        explain_prompt = f"Explain why {career_category.strip()} is a good fit for someone interested in {', '.join(interests_list)}."
+        explanation = call_mistral(system_explain, explain_prompt)
+    else:
+        explanation = "Error: Could not generate explanation."
 
     # Step 4: Generate job titles using LLM
-    job_titles_prompt = f"Suggest 5-10 realistic job titles for someone interested in {', '.join(interests_list)}."
-    job_titles_text = call_mistral("", job_titles_prompt)
-    job_titles_list = [jt.strip() for jt in job_titles_text.split("\n") if jt.strip()]
+    if "Error" not in career_category.lower():
+        job_titles_prompt = f"Suggest 5-10 realistic job titles for someone interested in {', '.join(interests_list)}."
+        job_titles = call_mistral(system_job_titles, job_titles_prompt)
+        job_titles_list = [jt.strip() for jt in job_titles.split("\n") if jt.strip()]
+        if not job_titles_list:
+            job_titles_list = ["No job titles found."]
+    else:
+        job_titles_list = ["No job titles available due to earlier errors."]
 
     return {
         "interests": interests_list,
