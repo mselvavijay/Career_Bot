@@ -12,7 +12,6 @@ load_dotenv()
 API_KEY = os.getenv("OPENROUTER_API_KEY")
 
 BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
-REMOTIVE_URL = "https://remotive.io/api/remote-jobs"
 
 HEADERS = {
     "Authorization": f"Bearer {API_KEY}",
@@ -23,12 +22,9 @@ HEADERS = {
 system_extract = "You are an assistant that extracts main interests from user conversations. Answer in 1-2 short phrases separated by commas."
 system_map = "You are a helpful assistant that maps interests to career paths from: STEM, Arts, Sports. Answer with only the category."
 system_explain = "You are a career guide. Give a concise 1-2 sentence explanation for the recommended career path."
-system_jobs = (
-    "You are a career assistant. Generate 5-7 realistic job titles for someone interested in '{}'. "
-    "Include creative, performing, and teaching roles if relevant. Provide only job titles, separated by commas."
-)
+system_job = "You are a career guide that suggests 5-10 job titles suitable for the user interests in India. Answer as a comma-separated list only."
 
-# ------------------ Interest Mapping ------------------ #
+# ------------------ Interest mapping ------------------ #
 interest_map = {
     "dashboard": "dashboards",
     "dashboards": "dashboards",
@@ -39,25 +35,16 @@ interest_map = {
     "painting": "painting",
     "music": "music",
     "singing": "music",
+    "composing music": "music",
     "football": "football",
     "basketball": "basketball",
     "web designing": "web_design",
     "web design": "web_design"
 }
 
-interest_to_jobs = {
-    "coding": ["Software Engineer", "Backend Developer", "Full Stack Developer", "Data Analyst"],
-    "dashboards": ["Data Analyst", "BI Developer", "Dashboard Developer", "UI/UX Designer"],
-    "painting": ["Graphic Designer", "Illustrator", "Animator", "Art Teacher"],
-    "music": ["Music Teacher", "Singer", "Composer", "Sound Designer", "Performer"],
-    "football": ["Football Coach", "Sports Analyst", "Physical Trainer"],
-    "fitness": ["Personal Trainer", "Fitness Coach", "Yoga Instructor"],
-    "basketball": ["Basketball Coach", "Sports Analyst", "Athletic Trainer"],
-    "web_design": ["Web Designer", "Front-End Developer", "UI/UX Designer"]
-}
-
 # ------------------ Helper Functions ------------------ #
 def call_mistral(system_msg, user_msg):
+    """Call Mistral LLM with a system and user prompt"""
     try:
         data = {
             "model": "mistralai/mistral-7b-instruct",
@@ -68,43 +55,20 @@ def call_mistral(system_msg, user_msg):
         }
         response = requests.post(BASE_URL, headers=HEADERS, json=data, timeout=30)
         result = response.json()
-        if "choices" in result:
+        if "choices" in result and len(result["choices"]) > 0:
             return result["choices"][0]["message"]["content"].strip()
         else:
-            return ""
+            return "Error: No response from model."
     except Exception as e:
         print("Error calling Mistral:", e)
-        return ""
+        return "Error: Could not call model."
 
-def get_jobs_from_remotive(job_title, location="India"):
-    try:
-        params = {"search": job_title}
-        response = requests.get(REMOTIVE_URL, params=params, timeout=10)
-        data = response.json()
-        jobs = []
-        if "jobs" in data and len(data["jobs"]) > 0:
-            for job in data["jobs"][:5]:
-                # Filter for India location
-                if location.lower() in job['candidate_required_location'].lower():
-                    jobs.append(f"{job['title']} at {job['company_name']} ({job['candidate_required_location']})")
-        return jobs
-    except Exception as e:
-        print("Error calling Remotive:", e)
-        return []
-
-def generate_jobs_for_interest(interest):
-    # Try Mistral first
-    job_prompt = system_jobs.format(interest)
-    result = call_mistral(job_prompt, "")
-    jobs = [j.strip() for j in result.split(",") if j.strip()]
-    # Fallback if Mistral returns nothing
-    if not jobs:
-        jobs = interest_to_jobs.get(interest, [])
-    # Finally, fetch real listings from Remotive
-    remotive_jobs = []
-    for title in jobs:
-        remotive_jobs += get_jobs_from_remotive(title)
-    return remotive_jobs if remotive_jobs else ["No jobs found right now. Try another query."]
+def generate_jobs_with_llm(interests_list):
+    """Generate job recommendations using LLM"""
+    prompt = f"Suggest 5-10 job titles in India for someone interested in: {', '.join(interests_list)}. Only return job titles separated by commas."
+    jobs_text = call_mistral(system_job, prompt)
+    jobs = [j.strip() for j in jobs_text.split(",") if j.strip()]
+    return jobs if jobs else ["No jobs found right now. Try another query."]
 
 # ------------------ FastAPI Setup ------------------ #
 app = FastAPI(title="Career Bot API")
@@ -135,13 +99,8 @@ def career_bot(request: CareerRequest):
     explain_prompt = f"Explain why {career_category.strip()} is a good fit for someone interested in {', '.join(interests_list)}."
     explanation = call_mistral(system_explain, explain_prompt)
 
-    # Step 4: Get job recommendations
-    all_jobs = []
-    for interest in interests_list:
-        all_jobs += generate_jobs_for_interest(interest)
-
-    # Remove duplicates
-    all_jobs = list(dict.fromkeys(all_jobs))
+    # Step 4: Generate job recommendations using LLM
+    all_jobs = generate_jobs_with_llm(interests_list)
 
     return {
         "interests": interests_list,
