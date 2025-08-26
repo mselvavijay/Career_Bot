@@ -12,6 +12,7 @@ load_dotenv()
 API_KEY = os.getenv("OPENROUTER_API_KEY")
 
 BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
+REMOTIVE_URL = "https://remotive.io/api/remote-jobs"
 
 HEADERS = {
     "Authorization": f"Bearer {API_KEY}",
@@ -22,15 +23,38 @@ HEADERS = {
 system_extract = "You are an assistant that extracts main interests from user conversations. Answer in 1-2 short phrases separated by commas."
 system_map = "You are a helpful assistant that maps interests to career paths from: STEM, Arts, Sports. Answer with only the category."
 system_explain = "You are a career guide. Give a concise 1-2 sentence explanation for the recommended career path."
-system_jobs = "You are a career assistant. Generate 5-7 relevant job titles for the following interest: {}. Provide only job titles, separated by commas."
+system_jobs = (
+    "You are a career assistant. Generate 5-7 realistic job titles for someone interested in '{}'. "
+    "Include creative, performing, and teaching roles if relevant. Provide only job titles, separated by commas."
+)
 
-# ------------------ FastAPI Setup ------------------ #
-app = FastAPI(title="Career Bot API")
-templates = Jinja2Templates(directory="templates")
-app.mount("/static", StaticFiles(directory="static"), name="static")
+# ------------------ Interest Mapping ------------------ #
+interest_map = {
+    "dashboard": "dashboards",
+    "dashboards": "dashboards",
+    "coding": "coding",
+    "programming": "coding",
+    "fitness": "fitness",
+    "exercise": "fitness",
+    "painting": "painting",
+    "music": "music",
+    "singing": "music",
+    "football": "football",
+    "basketball": "basketball",
+    "web designing": "web_design",
+    "web design": "web_design"
+}
 
-class CareerRequest(BaseModel):
-    user_input: str
+interest_to_jobs = {
+    "coding": ["Software Engineer", "Backend Developer", "Full Stack Developer", "Data Analyst"],
+    "dashboards": ["Data Analyst", "BI Developer", "Dashboard Developer", "UI/UX Designer"],
+    "painting": ["Graphic Designer", "Illustrator", "Animator", "Art Teacher"],
+    "music": ["Music Teacher", "Singer", "Composer", "Sound Designer", "Performer"],
+    "football": ["Football Coach", "Sports Analyst", "Physical Trainer"],
+    "fitness": ["Personal Trainer", "Fitness Coach", "Yoga Instructor"],
+    "basketball": ["Basketball Coach", "Sports Analyst", "Athletic Trainer"],
+    "web_design": ["Web Designer", "Front-End Developer", "UI/UX Designer"]
+}
 
 # ------------------ Helper Functions ------------------ #
 def call_mistral(system_msg, user_msg):
@@ -47,18 +71,48 @@ def call_mistral(system_msg, user_msg):
         if "choices" in result:
             return result["choices"][0]["message"]["content"].strip()
         else:
-            return "Error: No response from model."
+            return ""
     except Exception as e:
         print("Error calling Mistral:", e)
-        return "Error: Could not call model."
+        return ""
+
+def get_jobs_from_remotive(job_title, location="India"):
+    try:
+        params = {"search": job_title}
+        response = requests.get(REMOTIVE_URL, params=params, timeout=10)
+        data = response.json()
+        jobs = []
+        if "jobs" in data and len(data["jobs"]) > 0:
+            for job in data["jobs"][:5]:
+                # Filter for India location
+                if location.lower() in job['candidate_required_location'].lower():
+                    jobs.append(f"{job['title']} at {job['company_name']} ({job['candidate_required_location']})")
+        return jobs
+    except Exception as e:
+        print("Error calling Remotive:", e)
+        return []
 
 def generate_jobs_for_interest(interest):
-    """Generate job titles for a given interest using Mistral."""
+    # Try Mistral first
     job_prompt = system_jobs.format(interest)
     result = call_mistral(job_prompt, "")
-    # Split by commas and clean up
     jobs = [j.strip() for j in result.split(",") if j.strip()]
-    return jobs
+    # Fallback if Mistral returns nothing
+    if not jobs:
+        jobs = interest_to_jobs.get(interest, [])
+    # Finally, fetch real listings from Remotive
+    remotive_jobs = []
+    for title in jobs:
+        remotive_jobs += get_jobs_from_remotive(title)
+    return remotive_jobs if remotive_jobs else ["No jobs found right now. Try another query."]
+
+# ------------------ FastAPI Setup ------------------ #
+app = FastAPI(title="Career Bot API")
+templates = Jinja2Templates(directory="templates")
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+class CareerRequest(BaseModel):
+    user_input: str
 
 # ------------------ API Endpoint ------------------ #
 @app.post("/career-bot")
@@ -67,7 +121,11 @@ def career_bot(request: CareerRequest):
 
     # Step 1: Extract interests
     interests_text = call_mistral(system_extract, user_input)
-    interests_list = [i.lower().replace("interests:", "").strip() for i in interests_text.split(",")]
+    interests_list = []
+    for i in interests_text.split(","):
+        i = i.lower().replace("interests:", "").strip()
+        i = interest_map.get(i, i)
+        interests_list.append(i)
 
     # Step 2: Map to career category
     map_prompt = f"The following are the user interests: {', '.join(interests_list)}. Which category do they best fit into among STEM, Arts, Sports?"
@@ -77,16 +135,13 @@ def career_bot(request: CareerRequest):
     explain_prompt = f"Explain why {career_category.strip()} is a good fit for someone interested in {', '.join(interests_list)}."
     explanation = call_mistral(system_explain, explain_prompt)
 
-    # Step 4: Generate jobs using Mistral LLM
+    # Step 4: Get job recommendations
     all_jobs = []
     for interest in interests_list:
-        jobs = generate_jobs_for_interest(interest)
-        all_jobs += jobs
+        all_jobs += generate_jobs_for_interest(interest)
 
-    all_jobs = list(dict.fromkeys(all_jobs))  # remove duplicates
-
-    if not all_jobs:
-        all_jobs = ["No jobs found right now. Try another query."]
+    # Remove duplicates
+    all_jobs = list(dict.fromkeys(all_jobs))
 
     return {
         "interests": interests_list,
