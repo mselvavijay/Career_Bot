@@ -104,8 +104,8 @@
                     <h3>Interests:</h3> ${data.interests.join(", ")}
                     <h3>Career Category:</h3> ${data.career_category}
                     <h3>Explanation:</h3> ${data.explanation}
-                    <h3>Job Recommendations:</h3>
-                    <ul>${data.job_recommendations.map(job => `<li>${job}</li>`).join("")}</ul>
+                    <h3>Job Titles:</h3>
+                    <ul>${data.job_titles.map(job => `<li>${job}</li>`).join("")}</ul>
                 `;
             } catch (error) {
                 document.getElementById("result").innerHTML = "Error fetching career recommendations. Please try again later.";
