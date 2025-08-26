@@ -5,7 +5,6 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import os
 import requests
-import re
 from dotenv import load_dotenv
 
 # ------------------ Load environment ------------------ #
@@ -24,22 +23,20 @@ system_map = "You are a helpful assistant that maps interests to career paths fr
 system_explain = "You are a career guide. Give a concise 1-2 sentence explanation for the recommended career path."
 system_job_titles = "You are a career assistant. Generate 5-10 relevant job titles for a person interested in these topics."
 
-# ------------------ Interest Mapping ------------------ #
+# ------------------ Optional interest map ------------------ #
 interest_map = {
-    "coding": "coding",
     "programming": "coding",
     "computer programming": "coding",
     "software development": "coding",
-    "fitness": "fitness",
-    "exercise": "fitness",
     "painting": "painting",
     "music": "music",
     "singing": "music",
-    "composing music": "music",
+    "composing": "music",
     "football": "football",
     "basketball": "basketball",
-    "web designing": "web_design",
-    "web design": "web_design"
+    "fitness": "fitness",
+    "web design": "web_design",
+    "web designing": "web_design"
 }
 
 # ------------------ Helper Functions ------------------ #
@@ -79,16 +76,11 @@ def career_bot(request: CareerRequest):
     # Step 1: Extract interests
     interests_text = call_mistral(system_extract, user_input)
     interests_list = []
-
     for i in interests_text.split(","):
-        i = i.lower()
-        i = re.sub(r"[()]", "", i)          # remove parentheses
-        i = i.replace("interests:", "").strip()
+        i = i.lower().replace("interests:", "").strip()
         i = interest_map.get(i, i)
-        interests_list.append(i)
-
-    # Remove duplicates
-    interests_list = list(dict.fromkeys(interests_list))
+        if i:
+            interests_list.append(i)
 
     # Step 2: Map to career category
     map_prompt = f"The following are the user interests: {', '.join(interests_list)}. Which category do they best fit into among STEM, Arts, Sports?"
@@ -100,8 +92,8 @@ def career_bot(request: CareerRequest):
 
     # Step 4: Generate job titles using LLM
     job_titles_prompt = f"Suggest 5-10 realistic job titles for someone interested in {', '.join(interests_list)}."
-    job_titles = call_mistral(system_job_titles, job_titles_prompt)
-    job_titles_list = [jt.strip() for jt in re.split(r",|\n|-", job_titles) if jt.strip()]
+    job_titles_text = call_mistral(system_job_titles, job_titles_prompt)
+    job_titles_list = [jt.strip() for jt in job_titles_text.replace("\n", ",").split(",") if jt.strip()]
 
     return {
         "interests": interests_list,
