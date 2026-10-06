@@ -1,55 +1,54 @@
+import asyncio
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
 from models import models
 from schemas import schemas
-from services.llm_service import call_mistral
+from services.llm_service import analyze_user_input
 from services.jsearch_service import get_jobs_from_jsearch
 
 router = APIRouter()
 
-system_extract = "You are an assistant that extracts main interests from user conversations. Answer in 1-2 short phrases separated by commas."
-system_map = "You are a helpful assistant that maps interests to career paths from: STEM, Arts, Sports. Answer with only the category."
-system_explain = "You are a career guide. Give a concise 1-2 sentence explanation for the recommended career path."
-system_job_titles = "You are a career assistant. Generate 5-10 relevant job titles for a person interested in these topics."
 
 @router.post("/career-bot", response_model=schemas.CareerResponse)
-def career_bot(request: schemas.CareerRequest, db: Session = Depends(get_db)):
+async def career_bot(request: schemas.CareerRequest, db: Session = Depends(get_db)):
     user_input = request.user_input
-    
-    # 1. Extract interests
-    interests_text = call_mistral(system_extract, user_input)
-    interests_list = [i.strip().lower() for i in interests_text.split(",") if i.strip()]
-    
-    # 2. Map to category
-    map_prompt = f"The following are the user interests: {', '.join(interests_list)}. Which category do they best fit into among STEM, Arts, Sports?"
-    career_category = call_mistral(system_map, map_prompt)
-    
-    # 3. Explain
-    explain_prompt = f"Explain why {career_category.strip()} is a good fit for someone interested in {', '.join(interests_list)}."
-    explanation = call_mistral(system_explain, explain_prompt)
-    
-    # 4. Generate Job Titles (LLM) and Fetch Real Jobs (JSearch)
-    job_titles_prompt = f"Suggest 5-10 realistic job titles for someone interested in {', '.join(interests_list)}."
-    job_titles_text = call_mistral(system_job_titles, job_titles_prompt)
-    llm_job_titles = [jt.strip() for jt in job_titles_text.split("\n") if jt.strip()]
-    
+
+    # STEP 1: Single LLM call — replaces 4 sequential calls
+    # Returns interests, career_category, explanation, and job_titles all at once
+    llm_result = await analyze_user_input(user_input)
+
+    interests_list = llm_result.get("interests", [])
+    career_category = llm_result.get("career_category", "STEM")
+    explanation = llm_result.get("explanation", "")
+    llm_job_titles = llm_result.get("job_titles", [])
+
+    # STEP 2: Fetch real jobs from JSearch — all 3 searches run IN PARALLEL
+    # Instead of waiting for each one to finish, we fire all 3 at the same time
+    top_titles = [
+        title.split(".", 1)[-1].strip() if "." in title[:3] else title
+        for title in llm_job_titles[:3]
+    ]
+
+    job_results = await asyncio.gather(
+        *[get_jobs_from_jsearch(title) for title in top_titles],
+        return_exceptions=True  # Don't crash if one JSearch call fails
+    )
+
+    # Flatten results and filter out any failed (exception) responses
     final_jobs = []
-    # Try fetching real jobs for a couple of top LLM suggestions
-    for title in llm_job_titles[:3]: 
-        # Clean title (e.g. remove numbering "1. Software Engineer")
-        clean_title = title.split(".", 1)[-1].strip() if "." in title[:3] else title
-        real_jobs = get_jobs_from_jsearch(clean_title)
-        final_jobs.extend(real_jobs)
-    
+    for result in job_results:
+        if isinstance(result, list):
+            final_jobs.extend(result)
+
     # Deduplicate
     final_jobs = list(dict.fromkeys(final_jobs))
-    
+
     # If no real jobs found, fallback to LLM suggestions
     if not final_jobs:
         final_jobs = llm_job_titles
-        
-    # Save to database
+
+    # STEP 3: Save to database
     db_history = models.ChatHistory(
         user_input=user_input,
         extracted_interests=",".join(interests_list),
@@ -60,7 +59,7 @@ def career_bot(request: schemas.CareerRequest, db: Session = Depends(get_db)):
     db.add(db_history)
     db.commit()
     db.refresh(db_history)
-    
+
     return schemas.CareerResponse(
         interests=interests_list,
         career_category=career_category,
