@@ -1324,10 +1324,6 @@
             populateProfileForm(user);
             loadSessions();
 
-            // Reveal the candidate profile button in header
-            const profileBtn = document.getElementById('btn_candidate_profile');
-            if (profileBtn) profileBtn.style.display = 'inline-flex';
-
             // Reveal the sidebar profile card
             const sidebarBadge = document.getElementById('sidebar_profile_badge');
             if (sidebarBadge) {
@@ -1366,10 +1362,6 @@
                 avatarInitials.textContent = initial;
             }
 
-            // Ensure profile edit button is visible
-            const profileBtn = document.getElementById('btn_candidate_profile');
-            if (profileBtn) profileBtn.style.display = 'inline-flex';
-
             const sidebarBadge = document.getElementById('sidebar_profile_badge');
             if (sidebarBadge) {
                 sidebarBadge.style.display = 'block';
@@ -1385,10 +1377,6 @@
             localStorage.removeItem('career_bot_user_email');
             localStorage.removeItem('career_bot_user_pic');
             localStorage.removeItem('career_bot_session_id');
-
-            // Hide candidate profile button
-            const profileBtn = document.getElementById('btn_candidate_profile');
-            if (profileBtn) profileBtn.style.display = 'none';
 
             const sidebarBadge = document.getElementById('sidebar_profile_badge');
             if (sidebarBadge) sidebarBadge.style.display = 'none';
