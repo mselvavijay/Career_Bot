@@ -34,6 +34,12 @@ def home():
         return HTMLResponse(content=INDEX_HTML_PATH.read_text(encoding="utf-8"), status_code=200)
     return HTMLResponse(content="<h1>CareerBot is operational</h1>", status_code=200)
 
+
+@app.get("/consultation", response_class=HTMLResponse)
+def consultation():
+    if INDEX_HTML_PATH.exists():
+        return HTMLResponse(content=INDEX_HTML_PATH.read_text(encoding="utf-8"), status_code=200)
+    return HTMLResponse(content="<h1>CareerBot consultation is unavailable</h1>", status_code=404)
 @app.get("/health")
 def health():
     return {"status": "ok"}
