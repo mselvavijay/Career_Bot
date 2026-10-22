@@ -1331,7 +1331,7 @@
         }
 
         .job-prep-item::before {
-            content: "ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢";
+            content: "ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢";
             position: absolute;
             left: 2px;
             top: -1px;
@@ -1685,6 +1685,11 @@
         .roadmap-modal .auth-modal { max-width: 620px; }
         .roadmap-list { display: grid; gap: 10px; list-style: none; margin: 18px 0 0; }
         .roadmap-list li { padding: 12px; border-radius: var(--radius-sm); background: #090e1a; border: 1px solid var(--border-subtle); color: var(--text-secondary); line-height: 1.5; }
+
+        .welcome-message { display: grid; gap: 10px; }
+        .welcome-message ul { margin: 0; padding-left: 18px; display: grid; gap: 5px; color: var(--text-secondary); }
+        .premium-feature-list { margin: 18px 0 0; padding-left: 20px; display: grid; gap: 10px; color: var(--text-secondary); }
+        .premium-feature-list li::marker { color: var(--accent); }
         /* Footer */
         footer.site-footer {
             border-top: 1px solid var(--border-subtle);
@@ -1889,17 +1894,12 @@
                 </div>
             </div>
 
-            <button class="btn-hero-cta" onclick="openConsultation()"><span>Start Consultation</span><svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" /></svg></button>
+            <button class="btn-hero-cta" onclick="openPremiumModal()"><span>Start Prep</span><svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" /></svg></button>
         </div>
     </header>
 
     <!-- Hero Section with Immediate Live Advisory Console -->
     <section class="hero-section" id="app_workspace">
-        <div class="hero-eyebrow">
-            <span class="pulse-indicator"></span>
-            <span>Next-Gen AI Career Discovery Engine &bull; Live India Tech Talent Radar</span>
-        </div>
-
         <h2 class="hero-title">
             Architect Your Career Leap with <span class="text-gradient">Next-Gen AI Intelligence</span>
         </h2>
@@ -1994,15 +1994,16 @@
                             </div>
                             <div class="msg-body-wrapper">
                                 <div class="msg-card-assistant">
-                                    <div class="msg-text-main">
-                                        Welcome to <strong>CareerBot AI</strong>. Sign in with Google to sync your
-                                        candidate profile.
-                                        Under the Basic Plan, I recommend <strong>10 tailored Indian job
-                                            openings</strong> (Bangalore, Hyderabad, Pune, Mumbai, Gurgaon, Remote)
-                                        along with a structured <strong>3-week preparation guide</strong> in concise
-                                        bullet points calibrated strictly against your <strong>Degree</strong>,
-                                        <strong>Years of Experience</strong>, and <strong>Technical Skills</strong>!
-                                    </div>
+                                    <div class="msg-text-main welcome-message">
+    <p><strong>Welcome to CareerBot AI.</strong> Letâ€™s turn your background into a clear India-focused career plan.</p>
+    <p>Share your experience, education, and core skillsâ€”or sign in to use your saved profile.</p>
+    <ul>
+        <li>Relevant roles matched to your profile</li>
+        <li>India-based opportunities with compensation ranges</li>
+        <li>A free 3-week roadmap for each role you choose</li>
+    </ul>
+    <p>What role are you aiming for?</p>
+</div>
                                 </div>
                             </div>
                         </div>
@@ -2125,6 +2126,22 @@
     </footer>
 
 
+
+    <div class="modal-overlay" id="premium_modal_overlay" role="dialog" aria-modal="true" aria-labelledby="premium_modal_title">
+        <div class="auth-modal" style="max-width: 460px;">
+            <div class="modal-header">
+                <div>
+                    <h3 class="modal-title" id="premium_modal_title">Upgrade to Premium Prep</h3>
+                    <p style="font-size:0.82rem; color:var(--text-secondary); margin-top:5px;">Unlock a deeper role-preparation experience.</p>
+                </div>
+                <button class="btn-modal-close" onclick="closePremiumModal()" aria-label="Close">&times;</button>
+            </div>
+            <ul class="premium-feature-list">
+                <li>Role-specific mock tests</li>
+                <li>Detailed preparation roadmap</li>
+            </ul>
+        </div>
+    </div>
     <div class="modal-overlay roadmap-modal" id="roadmap_modal_overlay" role="dialog" aria-modal="true" aria-labelledby="roadmap_modal_title">
         <div class="auth-modal">
             <div class="modal-header"><div><h3 class="modal-title" id="roadmap_modal_title">Free 3-Week Roadmap</h3><p id="roadmap_modal_subtitle" style="font-size:0.8rem; color:var(--text-secondary); margin-top:4px;"></p></div><button class="btn-modal-close" onclick="closeRoadmapModal()" aria-label="Close">&times;</button></div>
@@ -2622,10 +2639,15 @@
                     </div>
                     <div class="msg-body-wrapper">
                         <div class="msg-card-assistant">
-                            <div class="msg-text-main">
-                                Fresh consultation initialized. Ask any career question or explore trajectory advice. 
-                                Groq LLM references your saved Degree, Years of Experience, and Core Skills automatically!
-                            </div>
+                            <div class="msg-text-main welcome-message">
+    <p><strong>Fresh consultation ready.</strong> Tell me about your next career move.</p>
+    <ul>
+        <li>Years of experience</li>
+        <li>Education</li>
+        <li>Core skills and target role</li>
+    </ul>
+    <p>Iâ€™ll help you explore matching India-based roles.</p>
+</div>
                         </div>
                     </div>
                 </div>
@@ -2663,6 +2685,14 @@
         }
 
 
+
+        function openPremiumModal() {
+            document.getElementById('premium_modal_overlay').classList.add('open');
+        }
+
+        function closePremiumModal() {
+            document.getElementById('premium_modal_overlay').classList.remove('open');
+        }
         function openConsultation() {
             if (window.location.pathname !== '/consultation') {
                 window.location.assign('/consultation');
