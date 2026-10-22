@@ -52,14 +52,23 @@ Expected JSON format:
   ]
 }}
 
-Guidelines:
-- Provide 3 to 5 realistic, high-quality open job listings matching the candidate's career trajectory in "open_jobs".
-- MANDATORY SENIORITY LEVEL MATCHING: You must STRICTLY match all recommended job titles, responsibilities, and salaries to the candidate's declared Years of Experience:
-  * 0 Years / Fresher / Student: STRICTLY suggest Entry-Level, Associate, Junior, or Intern roles (e.g. Junior Python Engineer, Associate AI Developer, Graduate Software Engineer). NEVER recommend Senior, Lead, or Staff roles to freshers.
-  * 1-3 Years: Suggest Junior to Mid-Level positions.
-  * 4-7 Years: Suggest Mid-Senior, Specialist, or Lead positions.
-  * 8+ Years: Suggest Senior, Staff, Principal, or Management roles.
-- The candidate's technical skills automatically define their target domain and specialties.
+MANDATORY TRI-FACTOR CALIBRATION RULES (EXPERIENCE + SKILLS + DEGREE):
+You must STRICTLY synthesize and cross-calibrate all career guidance, recommended job titles, responsibilities, and open job cards across ALL THREE pillars simultaneously:
+
+1. YEARS OF EXPERIENCE (Calibrates Seniority, Hierarchy & Compensation Level):
+   * 0 Years / Fresher / College Student: STRICTLY suggest Entry-Level, Graduate, Junior, or Intern roles (e.g., Junior Software Engineer, Associate Data Analyst, Graduate AI Engineer). Under NO circumstances should Senior, Lead, Staff, or Managerial roles be recommended to candidates with 0-1 years of experience.
+   * 1-3 Years: Suggest Junior to Mid-Level individual contributor positions.
+   * 4-7 Years: Suggest Mid-Senior, Specialist, or Technical Lead positions.
+   * 8+ Years: Suggest Senior, Staff, Principal, Architect, or Management positions.
+
+2. CORE SKILLS & TECHNICAL COMPETENCIES (Calibrates Domain, Frameworks & Specialization):
+   * Derive the candidate's exact technical domains, toolchains, frameworks, and job responsibilities directly from their declared skills (e.g., Python, React, PyTorch, Cloud, SQL, DevOps).
+   * Ensure every recommended role and open job card directly utilizes their core competencies.
+
+3. DEGREE & EDUCATION (Calibrates Academic Grounding & Industry Qualification Fit):
+   * Cross-reference the candidate's academic degree and field of study (e.g., B.Tech / B.E. in CS/IT/ECE, M.S., BCA, MCA, B.Sc, MBA, or related discipline) to ensure the suggested roles and career trajectories align with standard industry education requirements and academic pedigree.
+
+ALL THREE FACTORS MUST ALIGN: A candidate's recommended job title must be the intersection of their Degree (academic eligibility), their Skills (technical domain), and their Years of Experience (hierarchical level).
 - Make the "apply_url" a direct search query to LinkedIn Jobs or Google Jobs for that specific role title.
 - Keep the tone professional, encouraging, and authoritative.
 """
@@ -133,16 +142,16 @@ def build_system_message(user_profile: Optional[Dict[str, Any]] = None) -> str:
         if user_profile.get("name"):
             profile_parts.append(f"Candidate Name: {user_profile['name']}")
         if user_profile.get("education"):
-            profile_parts.append(f"Education: {user_profile['education']}")
-        if user_profile.get("current_role"):
-            profile_parts.append(f"Current Role / Title: {user_profile['current_role']}")
+            profile_parts.append(f"Degree / Education: {user_profile['education']} (Academic foundation & qualification requirements)")
         if user_profile.get("years_of_experience") is not None and str(user_profile.get("years_of_experience")).strip():
-            profile_parts.append(f"Years of Experience: {user_profile['years_of_experience']} (CRITICAL: Strictly calibrate all job seniority, levels, and advice to this experience)")
+            profile_parts.append(f"Years of Experience: {user_profile['years_of_experience']} (Seniority level: strictly match role level to this experience)")
         if user_profile.get("skills"):
-            profile_parts.append(f"Core Competencies & Skills: {user_profile['skills']} (Derive candidate specializations and target roles directly from these skills)")
+            profile_parts.append(f"Core Competencies & Skills: {user_profile['skills']} (Derive technical specialization and matching job titles directly from these skills)")
+        if user_profile.get("current_role"):
+            profile_parts.append(f"Current Role / Stage: {user_profile['current_role']}")
 
         if profile_parts:
-            prompt += "\n\nACTIVE CANDIDATE PROFILE CONTEXT:\n" + "\n".join(profile_parts)
+            prompt += "\n\nACTIVE CANDIDATE PROFILE (TRI-FACTOR CONTEXT: EXPERIENCE + SKILLS + DEGREE):\n" + "\n".join(profile_parts)
     return prompt
 
 
