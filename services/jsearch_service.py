@@ -29,7 +29,7 @@ async def get_jobs_from_jsearch(job_title: str, location: str = "India") -> list
     }
 
     try:
-        async with httpx.AsyncClient(timeout=15.0) as client:
+        async with httpx.AsyncClient(timeout=5.0) as client:
             response = await client.get(JSEARCH_URL, headers=headers, params=params)
             response.raise_for_status()
             data = response.json()
@@ -40,6 +40,6 @@ async def get_jobs_from_jsearch(job_title: str, location: str = "India") -> list
                 jobs.append(f"{job['job_title']} at {job['employer_name']} ({job['job_city']})")
         return jobs
 
-    except Exception as e:
-        print(f"Error fetching jobs from JSearch for '{job_title}':", e)
+    except Exception:
+        # Silent fallback to LLM generated titles if API is down, rate-limited, or 404
         return []
