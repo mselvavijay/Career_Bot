@@ -290,10 +290,16 @@
                 <p class="race-copy">A rapid-fire coding room built for speed, logic, and sharp AI prompting. Solve concise code traps before the clock runs out and climb the daily leaderboard.</p>
                 <div class="race-highlight">DAILY CONTEST &nbsp; <strong>#1 WINNER TAKES IT ALL</strong></div>
                 <div class="race-actions"><button class="btn-primary-hero" type="button" onclick="openRaceModal()">Join Contest <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" /></svg></button><button class="btn-secondary-hero" type="button" onclick="shareRaceInvite()">Invite Friend</button><span class="race-note" id="race_seat_status">Only 20 seats per daily race</span></div>
-                <div class="winner-card" aria-label="AI Race winner card preview">
-                    <div class="winner-card-top"><div><div class="winner-card-label">Winner&apos;s flex card</div><h3 id="winner_card_name">Your name could be here</h3><p id="winner_card_message">Finish first in today&apos;s race to claim #1 and share your win.</p></div><div class="winner-crown" aria-hidden="true">&#9813;</div></div>
-                    <div class="winner-card-actions"><button type="button" onclick="downloadWinnerCard()">Download Winner Card</button><button type="button" onclick="shareWinnerOnLinkedIn()">Share on LinkedIn</button></div>
-                </div>
+                <section class="race-result-card" aria-label="AI Race daily contest final result">
+                    <div class="race-result-header">
+                        <div><span class="race-result-brand">HireKrkeDekho</span><span class="race-result-meta">AI Race &middot; Daily Contest Result</span></div>
+                        <span class="race-result-date" id="race_result_date">Contest date</span>
+                    </div>
+                    <div class="race-result-title">Daily Contest Winner</div>
+                    <div class="race-result-main"><div class="race-result-rank">#1</div><div><h3 id="race_result_winner">Winner announced after the race</h3><p>First place takes it all.</p></div></div>
+                    <div class="race-result-stats"><span>Total contest time <strong id="race_result_time">&mdash;</strong></span><span>Total score <strong id="race_result_score">&mdash;</strong></span></div>
+                    <p class="race-result-footer">Speed. Logic. Sharp prompting.</p>
+                </section>
             </div>
             <aside class="race-rules">
                 <h3>Race Rules</h3>

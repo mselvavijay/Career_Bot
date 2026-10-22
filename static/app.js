@@ -171,7 +171,7 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
             if (user.picture_url) localStorage.setItem('career_bot_user_pic', user.picture_url);
 
             renderUserAccountBadge(user);
-            refreshWinnerCard();
+            refreshRaceResultCard();
             populateProfileForm(user);
             loadSessions();
 
@@ -430,31 +430,13 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
 
 
 
-        function winnerCardDetails() {
-            const winnerName = currentUserData?.name || localStorage.getItem('career_bot_user_name') || 'AI Race Champion';
-            return { winnerName, message: `Congratulations ${winnerName}! You finished #1 in the HireKrkeDekho AI Race.` };
+        function refreshRaceResultCard() {
+            const date = document.getElementById('race_result_date');
+            if (!date) return;
+            const formattedDate = new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date());
+            date.textContent = `Contest date: ${formattedDate}`;
         }
 
-        function refreshWinnerCard() {
-            const { winnerName, message } = winnerCardDetails();
-            const name = document.getElementById('winner_card_name');
-            const copy = document.getElementById('winner_card_message');
-            if (name) name.textContent = `${winnerName} - #1`;if (copy) copy.textContent = message;
-        }
-
-        function downloadWinnerCard() {
-            const { winnerName } = winnerCardDetails();
-            const safeName = winnerName.replace(/[<>&"']/g, '');
-            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630"><rect width="1200" height="630" fill="#0b1220"/><rect x="42" y="42" width="1116" height="546" rx="30" fill="#101d33" stroke="#40557e" stroke-width="2"/><text x="100" y="145" fill="#9fb4d9" font-family="Arial, sans-serif" font-size="30" font-weight="700" letter-spacing="5">HIREKRKEDEKHO - AI RACE</text><text x="100" y="315" fill="#ffffff" font-family="Arial, sans-serif" font-size="78" font-weight="700">${safeName}</text><text x="100" y="390" fill="#d9e1f0" font-family="Arial, sans-serif" font-size="42">FINISHED #1 - DAILY CONTEST WINNER</text><text x="100" y="500" fill="#9fb4d9" font-family="Arial, sans-serif" font-size="28">Speed. Logic. Sharp prompting.</text><text x="1030" y="165" fill="#ffe7a3" font-family="Arial, sans-serif" font-size="70">#1</text></svg>`;
-            const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob); link.download = 'hirekrkedekho-ai-race-winner.svg'; link.click(); URL.revokeObjectURL(link.href);
-        }
-
-        function shareWinnerOnLinkedIn() {
-            const shareUrl = `${window.location.origin}/#ai_race`;
-            window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`, '_blank', 'noopener,noreferrer');
-        }
         async function loadRaceStatus() {
             try {
                 const response = await fetch('/race/status');
@@ -499,7 +481,7 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
                         if (!verify.ok) throw new Error(result.detail || 'Payment verification failed.');
                         status.textContent = 'Entry confirmed. You are in today\'s AI Race!';
                         loadRaceStatus();
-        refreshWinnerCard();
+        refreshRaceResultCard();
                     },
                     modal: { ondismiss: async () => { await fetch('/race/cancel', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ entry_id: order.entry_id }) }); button.disabled = false; status.textContent = 'Payment cancelled. Your seat was released.'; loadRaceStatus(); } }
                 });
@@ -536,7 +518,7 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
 
         function closeConsultation() {
             loadRaceStatus();
-        refreshWinnerCard();
+        refreshRaceResultCard();
         if (window.location.pathname === '/consultation') {
                 window.location.assign('/');
                 return;
@@ -802,7 +784,7 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
                 .replace(/'/g, '&#039;');
         }
         loadRaceStatus();
-        refreshWinnerCard();
+        refreshRaceResultCard();
         if (window.location.pathname === '/consultation') {
             window.addEventListener('DOMContentLoaded', openConsultation);
         }

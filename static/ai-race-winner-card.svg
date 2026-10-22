@@ -1,11 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title description">
-  <title id="title">HireKrkeDekho AI Race winner card</title>
-  <desc id="description">A #1 daily contest winner flex card.</desc>
-  <rect width="1200" height="630" fill="#0b1220"/>
-  <rect x="42" y="42" width="1116" height="546" rx="30" fill="#101d33" stroke="#40557e" stroke-width="2"/>
-  <text x="100" y="145" fill="#9fb4d9" font-family="Arial, sans-serif" font-size="30" font-weight="700" letter-spacing="5">HIREKRKEDEKHO - AI RACE</text>
-  <text x="100" y="315" fill="#ffffff" font-family="Arial, sans-serif" font-size="78" font-weight="700">YOUR NAME</text>
-  <text x="100" y="390" fill="#d9e1f0" font-family="Arial, sans-serif" font-size="42">FINISHED #1 - DAILY CONTEST WINNER</text>
-  <text x="100" y="500" fill="#9fb4d9" font-family="Arial, sans-serif" font-size="28">Speed. Logic. Sharp prompting.</text>
-  <text x="1030" y="165" fill="#ffe7a3" font-family="Arial, sans-serif" font-size="70" font-weight="700">#1</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">HireKrkeDekho AI Race daily contest final result</title>
+  <desc id="desc">A navy and gold final result card for the daily contest winner.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#121c2c"/><stop offset=".57" stop-color="#080f1c"/><stop offset="1" stop-color="#202430"/></linearGradient>
+    <radialGradient id="medal"><stop stop-color="#6f5d39"/><stop offset=".72" stop-color="#282518"/><stop offset="1" stop-color="#11161d"/></radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#07101d"/>
+  <rect x="112" y="48" width="976" height="534" rx="24" fill="url(#background)" stroke="#c0a268" stroke-width="3"/>
+  <rect x="129" y="65" width="942" height="500" rx="17" fill="none" stroke="#c0a268" stroke-opacity=".34"/>
+  <path d="M150 130V88h90M1050 130V88h-90M150 500v42h90M1050 500v42h-90" fill="none" stroke="#d8bd80" stroke-opacity=".62" stroke-width="2"/>
+  <text x="600" y="112" text-anchor="middle" fill="#f5f2e9" font-family="Arial, sans-serif" font-size="23" font-weight="700">HireKrkeDekho</text>
+  <text x="600" y="143" text-anchor="middle" fill="#bcb4a2" font-family="Arial, sans-serif" font-size="15" font-weight="700">AI RACE · DAILY CONTEST RESULT</text>
+  <line x1="202" y1="174" x2="998" y2="174" stroke="#c0a268" stroke-opacity=".34"/>
+  <text x="600" y="231" text-anchor="middle" fill="#d5ba7c" font-family="Arial, sans-serif" font-size="35" font-weight="800" letter-spacing="2">DAILY CONTEST WINNER</text>
+  <text x="260" y="342" fill="#f1d68f" font-family="Arial, sans-serif" font-size="72" font-weight="900">#1</text>
+  <circle cx="820" cy="332" r="81" fill="url(#medal)" stroke="#d5ba7c" stroke-width="4"/>
+  <circle cx="820" cy="332" r="65" fill="none" stroke="#d5ba7c" stroke-opacity=".72" stroke-width="3"/>
+  <text x="820" y="355" text-anchor="middle" fill="#f1d68f" font-family="Arial, sans-serif" font-size="54" font-weight="900">1</text>
+  <text x="600" y="370" text-anchor="middle" fill="#fff" font-family="Arial, sans-serif" font-size="39" font-weight="800">WINNER ANNOUNCED AFTER THE RACE</text>
+  <text x="600" y="405" text-anchor="middle" fill="#c7c6c2" font-family="Arial, sans-serif" font-size="18">Total contest time: —   |   Total score: —</text>
+  <line x1="202" y1="456" x2="998" y2="456" stroke="#c0a268" stroke-opacity=".34"/>
+  <text x="600" y="504" text-anchor="middle" fill="#d5ba7c" font-family="Arial, sans-serif" font-size="18" font-weight="700" letter-spacing="2">SPEED. LOGIC. SHARP PROMPTING.</text>
 </svg>

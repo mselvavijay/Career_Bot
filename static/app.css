@@ -883,15 +883,22 @@
         .race-actions .btn-primary-hero { border-radius: 8px; box-shadow: none; background: #5b6ee8; }
         .race-actions .btn-primary-hero:hover { background: #4c5fd5; box-shadow: none; }
         .race-actions .btn-secondary-hero { border-radius: 8px; background: transparent; border-color: #394968; color: #d7deec; }
-        .winner-card { margin-top: 28px; padding: 20px; border: 1px solid #314468; border-radius: 14px; background: linear-gradient(135deg, #111e36, #10182a); }
-        .winner-card-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-        .winner-card-label { color: #9fb4d9; font-size: .7rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
-        .winner-crown { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; color: #ffe7a3; background: #2c2930; border: 1px solid #6c5b36; font-size: 1.3rem; }
-        .winner-card h3 { margin: 8px 0 4px; font-size: 1.12rem; color: #fff; }
-        .winner-card p { color: #a7b3c9; font-size: .82rem; line-height: 1.5; }
-        .winner-card-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 16px; }
-        .winner-card-actions button { padding: 8px 10px; border-radius: 7px; border: 1px solid #3c4e73; background: transparent; color: #d7deec; font: inherit; font-size: .76rem; font-weight: 700; cursor: pointer; }
-        .winner-card-actions button:hover { background: #17243c; border-color: #6d83ff; color: #fff; }
+        .race-result-card { position: relative; isolation: isolate; overflow: hidden; max-width: 640px; margin-top: 30px; padding: 24px; border: 1px solid #a88a52; border-radius: 15px; background: linear-gradient(135deg, #101827 0%, #0b1220 58%, #171d29 100%); box-shadow: inset 0 0 0 4px rgba(197, 163, 98, .08), 0 16px 34px rgba(0, 0, 0, .28); }
+        .race-result-card::before, .race-result-card::after { position: absolute; z-index: -1; width: 110px; height: 110px; border-color: rgba(210, 180, 111, .38); content: ""; pointer-events: none; }
+        .race-result-card::before { top: 11px; left: 11px; border-top: 1px solid; border-left: 1px solid; }
+        .race-result-card::after { right: 11px; bottom: 11px; border-right: 1px solid; border-bottom: 1px solid; }
+        .race-result-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding-bottom: 14px; border-bottom: 1px solid rgba(204, 175, 109, .22); }
+        .race-result-brand { display: block; color: #f4f1e8; font-size: .86rem; font-weight: 800; letter-spacing: -.02em; }
+        .race-result-meta, .race-result-date { display: block; margin-top: 4px; color: #bcb5a4; font-size: .65rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
+        .race-result-date { margin-top: 1px; text-align: right; }
+        .race-result-title { margin: 21px 0 16px; color: #d6bd86; font-size: clamp(1.05rem, 2.2vw, 1.45rem); font-weight: 800; letter-spacing: .055em; text-transform: uppercase; }
+        .race-result-main { display: flex; align-items: center; gap: 17px; }
+        .race-result-rank { display: grid; flex: 0 0 auto; place-items: center; width: 82px; height: 82px; border: 2px solid #d6bd86; border-radius: 50%; color: #f4d990; background: radial-gradient(circle at 35% 28%, #5d5134, #17191b 66%); box-shadow: inset 0 0 0 6px #20201c, 0 0 20px rgba(213, 183, 112, .2); font-size: 2rem; font-weight: 900; }
+        .race-result-main h3 { margin: 0 0 5px; color: #fff; font-size: clamp(1.12rem, 2.5vw, 1.55rem); line-height: 1.1; }
+        .race-result-main p { margin: 0; color: #c6c7ca; font-size: .8rem; }
+        .race-result-stats { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 22px; padding: 12px 0; border-top: 1px solid rgba(204, 175, 109, .22); border-bottom: 1px solid rgba(204, 175, 109, .22); color: #aaa79f; font-size: .72rem; }
+        .race-result-stats strong { margin-left: 4px; color: #f4f1e8; }
+        .race-result-footer { margin: 13px 0 0; color: #d6bd86; font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
         .race-note { color: #8290a8; font-size: .78rem; }
         .race-rules { padding: 26px; border-radius: 14px; background: #0f192a; border: 1px solid #26334d; }
         .race-rules h3 { margin-bottom: 16px; font-size: .95rem; letter-spacing: .02em; color: #fff; }
