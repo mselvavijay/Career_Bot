@@ -1129,7 +1129,23 @@
                 </button>
             </div>
 
-            <p style="font-size:0.84rem; color:var(--text-secondary); line-height:1.5; margin-bottom:16px;">
+            <div id="google_oauth_status_banner" style="display:none; background: rgba(37,99,235,0.08); border: 1px solid rgba(59,130,246,0.25); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 14px;">
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                    <svg class="icon icon-sm" viewBox="0 0 24 24" style="color:#60a5fa;">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                    </svg>
+                    <span style="font-size:0.78rem; font-weight:700; color:#93c5fd;">Official accounts.google.com Popup Setup</span>
+                </div>
+                <p style="font-size:0.75rem; color:var(--text-secondary); line-height:1.45; margin-bottom:8px;">
+                    Google's official popup requires a registered <strong>GOOGLE_CLIENT_ID</strong> from Google Cloud Console. To test the popup immediately, paste your Client ID below or add it to your Vercel environment variables:
+                </p>
+                <div style="display:flex; gap:6px;">
+                    <input type="text" id="custom_google_client_id" placeholder="xxxx-xxxx.apps.googleusercontent.com" style="flex:1; background:#070c18; border:1px solid var(--border-subtle); color:#fff; font-size:0.75rem; padding:6px 8px; border-radius:4px; outline:none;">
+                    <button onclick="applyGoogleClientId()" style="background:var(--primary); color:#fff; border:none; padding:6px 12px; font-size:0.75rem; font-weight:600; border-radius:4px; cursor:pointer;">Activate</button>
+                </div>
+            </div>
+
+            <p style="font-size:0.84rem; color:var(--text-secondary); line-height:1.5; margin-bottom:14px;">
                 Authenticate your candidate account to persist your profile, career roadmaps, and conversation history across devices.
             </p>
 
@@ -1137,7 +1153,7 @@
 
             <div style="display:flex; align-items:center; gap:10px; margin: 14px 0;">
                 <div style="flex:1; height:1px; background:var(--border-subtle);"></div>
-                <span style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">or candidate sign in</span>
+                <span style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">or sign in with candidate email</span>
                 <div style="flex:1; height:1px; background:var(--border-subtle);"></div>
             </div>
 
@@ -1184,23 +1200,15 @@
                 const res = await fetch('/auth/config');
                 if (res.ok) {
                     const data = await res.json();
-                    googleClientId = data.google_client_id || "";
-                    if (googleClientId && window.google && google.accounts && google.accounts.id) {
-                        google.accounts.id.initialize({
-                            client_id: googleClientId,
-                            callback: handleGoogleCredentialResponse,
-                            auto_select: false
-                        });
+                    googleClientId = data.google_client_id || localStorage.getItem('career_bot_google_client_id') || "";
 
-                        // Render official button in header container if available
-                        const btnContainer = document.getElementById('google_btn_container');
-                        if (btnContainer) {
-                            google.accounts.id.renderButton(btnContainer, {
-                                theme: 'filled_black',
-                                size: 'medium',
-                                text: 'signin_with',
-                                shape: 'rectangular'
-                            });
+                    if (googleClientId && window.google && google.accounts && google.accounts.id) {
+                        setupGoogleIdentity(googleClientId);
+                    } else {
+                        // Display status in modal
+                        const statusBanner = document.getElementById('google_oauth_status_banner');
+                        if (statusBanner) {
+                            statusBanner.style.display = 'block';
                         }
                     }
                 }
@@ -1221,6 +1229,66 @@
                     picture_url: storedPic || ''
                 });
             }
+        }
+
+        function setupGoogleIdentity(clientId) {
+            googleClientId = clientId;
+            try {
+                google.accounts.id.initialize({
+                    client_id: googleClientId,
+                    callback: handleGoogleCredentialResponse,
+                    auto_select: false
+                });
+
+                // Display official Google rendered button in header
+                const btnContainer = document.getElementById('google_btn_container');
+                const triggerBtn = document.getElementById('btn_login_trigger');
+                if (btnContainer) {
+                    btnContainer.innerHTML = '';
+                    btnContainer.style.display = 'block';
+                    if (triggerBtn) triggerBtn.style.display = 'none';
+
+                    google.accounts.id.renderButton(btnContainer, {
+                        theme: 'outline',
+                        size: 'medium',
+                        text: 'signin_with',
+                        shape: 'rectangular',
+                        logo_alignment: 'left'
+                    });
+                }
+
+                // Also render into modal slot
+                const slot = document.getElementById('modal_google_btn_slot');
+                if (slot) {
+                    slot.innerHTML = '';
+                    google.accounts.id.renderButton(slot, {
+                        theme: 'filled_blue',
+                        size: 'large',
+                        text: 'signin_with',
+                        shape: 'rectangular',
+                        width: 320
+                    });
+                }
+
+                const statusBanner = document.getElementById('google_oauth_status_banner');
+                if (statusBanner) statusBanner.style.display = 'none';
+
+                // Prompt Google One Tap popup
+                google.accounts.id.prompt();
+            } catch (e) {
+                console.warn('Google setup error:', e);
+            }
+        }
+
+        function applyGoogleClientId() {
+            const input = document.getElementById('custom_google_client_id');
+            const val = input ? input.value.trim() : '';
+            if (!val) {
+                alert('Please enter a valid Google Client ID (ending in .apps.googleusercontent.com)');
+                return;
+            }
+            localStorage.setItem('career_bot_google_client_id', val);
+            setupGoogleIdentity(val);
         }
 
         async function handleGoogleCredentialResponse(response) {
