@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="CareerBot AI - Next-Gen AI Talent & Career Advisory Platform inspired by modern design. Calibrated by Degree, Experience, and Technical Stack.">
+    <meta name="description"
+        content="CareerBot AI - Next-Gen AI Talent & Career Advisory Platform inspired by modern design. Calibrated by Degree, Experience, and Technical Stack.">
     <title>CareerBot AI | Executive Talent & Career Intelligence</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link rel="stylesheet" href="/static/style.css">
     <style>
@@ -38,7 +41,9 @@
             --radius-xl: 24px;
         }
 
-        *, *::before, *::after {
+        *,
+        *::before,
+        *::after {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
@@ -72,6 +77,7 @@
             z-index: 0;
             filter: blur(40px);
         }
+
         .ambient-glow-right {
             position: absolute;
             width: 650px;
@@ -94,8 +100,16 @@
             flex-shrink: 0;
             fill: currentColor;
         }
-        .icon-sm { width: 14px; height: 14px; }
-        .icon-lg { width: 22px; height: 22px; }
+
+        .icon-sm {
+            width: 14px;
+            height: 14px;
+        }
+
+        .icon-lg {
+            width: 22px;
+            height: 22px;
+        }
 
         /* ===== NAVIGATION BAR ===== */
         header.site-header {
@@ -188,13 +202,13 @@
             cursor: pointer;
             transition: all 0.2s ease;
             font-family: inherit;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
         }
 
         .btn-google-auth:hover {
             background: #f9fafb;
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         .btn-hero-cta {
@@ -331,8 +345,17 @@
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(0.85); }
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.4;
+                transform: scale(0.85);
+            }
         }
 
         .hero-title {
@@ -495,7 +518,9 @@
             overflow-x: auto;
         }
 
-        .fintora-prompt-suggestions::-webkit-scrollbar { height: 3px; }
+        .fintora-prompt-suggestions::-webkit-scrollbar {
+            height: 3px;
+        }
 
         .suggestion-label {
             font-size: 0.72rem;
@@ -562,8 +587,15 @@
         }
 
         @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
         }
 
         .telemetry-icon-box {
@@ -686,9 +718,18 @@
             border-radius: 50%;
             background: #334155;
         }
-        .window-dot:nth-child(1) { background: #ef4444; }
-        .window-dot:nth-child(2) { background: #f59e0b; }
-        .window-dot:nth-child(3) { background: #10b981; }
+
+        .window-dot:nth-child(1) {
+            background: #ef4444;
+        }
+
+        .window-dot:nth-child(2) {
+            background: #f59e0b;
+        }
+
+        .window-dot:nth-child(3) {
+            background: #10b981;
+        }
 
         .mockup-badge {
             font-size: 0.72rem;
@@ -986,8 +1027,14 @@
             scroll-behavior: smooth;
         }
 
-        .messages-container::-webkit-scrollbar { width: 6px; }
-        .messages-container::-webkit-scrollbar-thumb { background: var(--border-subtle); border-radius: 4px; }
+        .messages-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .messages-container::-webkit-scrollbar-thumb {
+            background: var(--border-subtle);
+            border-radius: 4px;
+        }
 
         .message-row {
             display: flex;
@@ -1001,8 +1048,15 @@
         }
 
         @keyframes slideIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .message-row.user {
@@ -1277,7 +1331,7 @@
         }
 
         .job-prep-item::before {
-            content: "•";
+            content: "ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢";
             position: absolute;
             left: 2px;
             top: -1px;
@@ -1330,7 +1384,9 @@
             padding-bottom: 4px;
         }
 
-        .prompt-chips-bar::-webkit-scrollbar { height: 3px; }
+        .prompt-chips-bar::-webkit-scrollbar {
+            height: 3px;
+        }
 
         .chip-button {
             background: var(--bg-card);
@@ -1400,9 +1456,18 @@
             transition: background 0.15s, transform 0.05s;
         }
 
-        .btn-send-msg:hover { background: var(--primary-hover); }
-        .btn-send-msg:active { transform: scale(0.97); }
-        .btn-send-msg:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-send-msg:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-send-msg:active {
+            transform: scale(0.97);
+        }
+
+        .btn-send-msg:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
 
         .typing-loader {
             display: inline-flex;
@@ -1419,12 +1484,27 @@
             animation: pulseDot 1.4s infinite ease-in-out both;
         }
 
-        .typing-loader span:nth-child(1) { animation-delay: -0.32s; }
-        .typing-loader span:nth-child(2) { animation-delay: -0.16s; }
+        .typing-loader span:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .typing-loader span:nth-child(2) {
+            animation-delay: -0.16s;
+        }
 
         @keyframes pulseDot {
-            0%, 80%, 100% { transform: scale(0.4); opacity: 0.4; }
-            40% { transform: scale(1); opacity: 1; }
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0.4);
+                opacity: 0.4;
+            }
+
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
 
         /* ===== MODALS ===== */
@@ -1458,8 +1538,15 @@
         }
 
         @keyframes modalPop {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
 
         .modal-header {
@@ -1484,7 +1571,9 @@
             border-radius: 4px;
         }
 
-        .btn-modal-close:hover { color: var(--text-primary); }
+        .btn-modal-close:hover {
+            color: var(--text-primary);
+        }
 
         .field-group {
             margin-bottom: 12px;
@@ -1551,6 +1640,50 @@
             border: 1px solid rgba(16, 185, 129, 0.3);
         }
 
+
+        /* Dedicated consultation experience */
+        .consultation-shell { display: none; }
+        body.consultation-active { overflow: hidden; }
+        body.consultation-active .consultation-shell {
+            display: block;
+            position: fixed;
+            inset: 0;
+            z-index: 300;
+            max-width: none;
+            margin: 0;
+            padding: 24px;
+            overflow: hidden;
+            background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.2), transparent 35%), #06070c;
+        }
+        body.consultation-active .consultation-shell .telemetry-badge { display: none; }
+        body.consultation-active .workspace-frame { width: min(1440px, 100%); height: 100%; max-height: none; min-height: 0; margin: 0 auto; }
+        .consultation-close { display: none; }
+        body.consultation-active .consultation-close {
+            display: grid;
+            place-items: center;
+            position: absolute;
+            top: 34px;
+            right: 40px;
+            z-index: 12;
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 50%;
+            color: var(--text-secondary);
+            background: var(--bg-card);
+            font-size: 1.5rem;
+            line-height: 1;
+            cursor: pointer;
+        }
+        .input-box-wrapper { min-width: 0; }
+        .input-box-wrapper input { min-width: 0; }
+        .btn-send-msg { flex: 0 0 auto; }
+        .job-card-actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+        .btn-roadmap { background: transparent; color: var(--accent); border: 1px solid var(--border-cyan); }
+        .btn-roadmap:hover { background: rgba(6, 182, 212, 0.12); color: #fff; border-color: var(--accent); }
+        .roadmap-modal .auth-modal { max-width: 620px; }
+        .roadmap-list { display: grid; gap: 10px; list-style: none; margin: 18px 0 0; }
+        .roadmap-list li { padding: 12px; border-radius: var(--radius-sm); background: #090e1a; border: 1px solid var(--border-subtle); color: var(--text-secondary); line-height: 1.5; }
         /* Footer */
         footer.site-footer {
             border-top: 1px solid var(--border-subtle);
@@ -1562,42 +1695,136 @@
         }
 
         @media (max-width: 900px) {
-            .hero-title { font-size: 2.2rem; }
-            .stats-grid { grid-template-columns: 1fr; }
-            .tri-factor-grid { grid-template-columns: 1fr; }
-            .workspace-frame { grid-template-columns: 1fr; height: min(720px, calc(100dvh - var(--header-height) - 32px)); min-height: 520px; }
-            .frame-sidebar { display: none; }
-            .job-cards-grid { grid-template-columns: 1fr; }
-            .demo-cards-mini { grid-template-columns: 1fr; }
-            .nav-links { display: none; }
+            .hero-title {
+                font-size: 2.2rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tri-factor-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .workspace-frame {
+                grid-template-columns: 1fr;
+                height: min(720px, calc(100dvh - var(--header-height) - 32px));
+                min-height: 520px;
+            }
+
+            .frame-sidebar {
+                display: none;
+            }
+
+            .job-cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .demo-cards-mini {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                display: none;
+            }
         }
+
         @media (max-width: 640px) {
-            header.site-header { height: 64px; padding: 0 16px; }
-            .brand-meta p, .btn-hero-cta span { display: none; }
-            .header-actions { gap: 8px; }
-            .btn-google-auth, .btn-hero-cta { padding: 9px 11px; }
-            .hero-section { padding: 48px 16px 44px; }
-            .hero-title { font-size: clamp(2rem, 10vw, 2.5rem); }
-            .hero-subtitle { font-size: 0.96rem; }
-            .workspace-frame { border-radius: 16px; min-height: 500px; }
-            .messages-container { padding: 16px; gap: 14px; }
-            .workspace-input-bar { padding: 10px 12px; }
-            .message-row.user { max-width: 100%; }
-            .msg-card-assistant { padding: 14px; }
-            .input-box-wrapper { padding-left: 12px; }
-            .btn-send-msg { padding: 9px 12px; }
-            .telemetry-badge { display: none; }
-            .fintora-prompt-inner { gap: 8px; padding-left: 10px; }
-            .btn-fintora-prompt-action { padding: 9px 11px; }
-            .btn-fintora-prompt-action span { display: none; }
+            header.site-header {
+                height: 64px;
+                padding: 0 16px;
+            }
+
+            .brand-meta p,
+            .btn-hero-cta span {
+                display: none;
+            }
+
+            .header-actions {
+                gap: 8px;
+            }
+
+            .btn-google-auth,
+            .btn-hero-cta {
+                padding: 9px 11px;
+            }
+
+            .hero-section {
+                padding: 48px 16px 44px;
+            }
+
+            .hero-title {
+                font-size: clamp(2rem, 10vw, 2.5rem);
+            }
+
+            .hero-subtitle {
+                font-size: 0.96rem;
+            }
+
+            .workspace-frame {
+                border-radius: 16px;
+                min-height: 500px;
+            }
+
+            .messages-container {
+                padding: 16px;
+                gap: 14px;
+            }
+
+            .workspace-input-bar {
+                padding: 10px 12px;
+            }
+
+            .message-row.user {
+                max-width: 100%;
+            }
+
+            .msg-card-assistant {
+                padding: 14px;
+            }
+
+            .input-box-wrapper {
+                padding-left: 12px;
+            }
+
+            .btn-send-msg {
+                padding: 9px 12px;
+            }
+
+            .telemetry-badge {
+                display: none;
+            }
+
+            .fintora-prompt-inner {
+                gap: 8px;
+                padding-left: 10px;
+            }
+
+            .btn-fintora-prompt-action {
+                padding: 9px 11px;
+            }
+
+            .btn-fintora-prompt-action span {
+                display: none;
+            }
         }
 
         @media (prefers-reduced-motion: reduce) {
-            html { scroll-behavior: auto; }
-            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+            html {
+                scroll-behavior: auto;
+            }
+
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="ambient-glow-left"></div>
     <div class="ambient-glow-right"></div>
@@ -1607,7 +1834,7 @@
         <a href="/" class="header-brand">
             <div class="brand-logo">
                 <svg class="icon" viewBox="0 0 24 24">
-                    <path d="M12 2L2 7l10 5 10-5-10-5zm0 9.5l-8-4v6.5l8 4 8-4v-6.5l-8 4z"/>
+                    <path d="M12 2L2 7l10 5 10-5-10-5zm0 9.5l-8-4v6.5l8 4 8-4v-6.5l-8 4z" />
                 </svg>
             </div>
             <div class="brand-meta">
@@ -1631,16 +1858,21 @@
                 <!-- Custom Sign-In Button (Trigger) -->
                 <button class="btn-google-auth" id="btn_login_trigger" onclick="openAuthModal()">
                     <svg class="icon" style="width:16px;height:16px;" viewBox="0 0 24 24">
-                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                        <path fill="#4285F4"
+                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                        <path fill="#34A853"
+                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                        <path fill="#FBBC05"
+                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                        <path fill="#EA4335"
+                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
                     </svg>
                     <span>Sign in with Google</span>
                 </button>
 
                 <!-- Active Logged In User State -->
-                <div class="user-account-badge" id="user_account_badge" onclick="openProfileModal()" title="Click to view/edit candidate profile">
+                <div class="user-account-badge" id="user_account_badge" onclick="openProfileModal()"
+                    title="Click to view/edit candidate profile">
                     <img id="user_avatar_img" class="user-avatar" src="" alt="Profile" style="display:none;">
                     <div id="user_avatar_initials" class="user-avatar">U</div>
                     <div class="user-info-text">
@@ -1649,18 +1881,14 @@
                     </div>
                     <button class="btn-signout" onclick="event.stopPropagation(); signOutUser();" title="Sign Out">
                         <svg class="icon icon-sm" viewBox="0 0 24 24">
-                            <path d="M16 17v-3H9v-4h7V7l5 5-5 5M14 2a2 2 0 0 1 2 2v2h-2V4H5v16h9v-2h2v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9z"/>
+                            <path
+                                d="M16 17v-3H9v-4h7V7l5 5-5 5M14 2a2 2 0 0 1 2 2v2h-2V4H5v16h9v-2h2v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9z" />
                         </svg>
                     </button>
                 </div>
             </div>
 
-            <button class="btn-hero-cta" onclick="openPremiumModal()">
-                <span>Start Assessment</span>
-                <svg class="icon icon-sm" viewBox="0 0 24 24">
-                    <path d="M5 12h14M12 5l7 7-7 7"/>
-                </svg>
-            </button>
+            <button class="btn-hero-cta" onclick="openConsultation()"><span>Start Consultation</span><svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" /></svg></button>
         </div>
     </header>
 
@@ -1676,16 +1904,19 @@
         </h2>
 
         <p class="hero-subtitle">
-            Calibrated strictly by your <strong>Years of Experience</strong>, <strong>Core Technical Skills</strong>, and <strong>Degree</strong>. Discover 10 tailored tech opportunities across India with structured 3-week preparation guides.
+            Calibrated strictly by your <strong>Years of Experience</strong>, <strong>Core Technical Skills</strong>,
+            and <strong>Degree</strong>. Discover 10+ tailored tech opportunities across India with structured 3-week
+            preparation guides.
         </p>
 
         <!-- Live Interactive Advisory Workspace (Immediately visible to user) -->
-        <div class="showcase-container-outer" style="margin-top: 10px;">
+        <div class="showcase-container-outer consultation-shell" aria-hidden="true">
+            <button class="consultation-close" type="button" onclick="closeConsultation()" aria-label="Close consultation">&times;</button>
             <!-- Left Telemetry Badge -->
             <div class="telemetry-badge telemetry-badge-left">
                 <div class="telemetry-icon-box green">
                     <svg class="icon icon-sm" viewBox="0 0 24 24">
-                        <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
+                        <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z" />
                     </svg>
                 </div>
                 <div class="telemetry-meta">
@@ -1698,7 +1929,8 @@
             <div class="telemetry-badge telemetry-badge-right">
                 <div class="telemetry-icon-box cyan">
                     <svg class="icon icon-sm" viewBox="0 0 24 24">
-                        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
+                        <path
+                            d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" />
                     </svg>
                 </div>
                 <div class="telemetry-meta">
@@ -1713,7 +1945,7 @@
                 <aside class="frame-sidebar">
                     <button class="btn-outline-action" onclick="startNewSession()">
                         <svg class="icon icon-sm" viewBox="0 0 24 24">
-                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
                         </svg>
                         <span>New Consultation</span>
                     </button>
@@ -1722,22 +1954,28 @@
                         <div class="panel-header">
                             <span class="panel-title">
                                 <svg class="icon icon-sm" viewBox="0 0 24 24">
-                                    <path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
+                                    <path
+                                        d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z" />
                                 </svg>
                                 Consultations
                             </span>
                         </div>
 
                         <div class="sessions-scroll-area" id="session_list_container">
-                            <div style="font-size:0.75rem; color:var(--text-muted); text-align:center; padding:16px 0;">No past records found</div>
+                            <div style="font-size:0.75rem; color:var(--text-muted); text-align:center; padding:16px 0;">
+                                No past records found</div>
                         </div>
                     </div>
 
                     <!-- Active Profile Indicator in Sidebar -->
                     <div class="panel-card" id="sidebar_profile_badge" style="display:none; padding:12px;">
-                        <div style="font-size:0.68rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px;">Profile Synced</div>
-                        <div style="font-size:0.83rem; font-weight:600; color:#fff;" id="sidebar_profile_name">Candidate</div>
-                        <button onclick="openProfileModal()" style="background:transparent; border:none; color:var(--accent); font-size:0.75rem; font-weight:600; cursor:pointer; padding:0; margin-top:6px; display:inline-flex; align-items:center; gap:4px;">
+                        <div
+                            style="font-size:0.68rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px;">
+                            Profile Synced</div>
+                        <div style="font-size:0.83rem; font-weight:600; color:#fff;" id="sidebar_profile_name">Candidate
+                        </div>
+                        <button onclick="openProfileModal()"
+                            style="background:transparent; border:none; color:var(--accent); font-size:0.75rem; font-weight:600; cursor:pointer; padding:0; margin-top:6px; display:inline-flex; align-items:center; gap:4px;">
                             <span>Update Profile &amp; Skills</span> &rarr;
                         </button>
                     </div>
@@ -1750,14 +1988,19 @@
                         <div class="message-row assistant">
                             <div class="msg-sender-icon">
                                 <svg class="icon icon-sm" viewBox="0 0 24 24">
-                                    <path d="M12 2L2 7l10 5 10-5-10-5zm0 9.5l-8-4v6.5l8 4 8-4v-6.5l-8 4z"/>
+                                    <path d="M12 2L2 7l10 5 10-5-10-5zm0 9.5l-8-4v6.5l8 4 8-4v-6.5l-8 4z" />
                                 </svg>
                             </div>
                             <div class="msg-body-wrapper">
                                 <div class="msg-card-assistant">
                                     <div class="msg-text-main">
-                                        Welcome to <strong>CareerBot AI</strong>. Sign in with Google to sync your candidate profile.
-                                        Under the Basic Plan, I recommend <strong>10 tailored Indian job openings</strong> (Bangalore, Hyderabad, Pune, Mumbai, Gurgaon, Remote) along with a structured <strong>3-week preparation guide</strong> in concise bullet points calibrated strictly against your <strong>Degree</strong>, <strong>Years of Experience</strong>, and <strong>Technical Skills</strong>!
+                                        Welcome to <strong>CareerBot AI</strong>. Sign in with Google to sync your
+                                        candidate profile.
+                                        Under the Basic Plan, I recommend <strong>10 tailored Indian job
+                                            openings</strong> (Bangalore, Hyderabad, Pune, Mumbai, Gurgaon, Remote)
+                                        along with a structured <strong>3-week preparation guide</strong> in concise
+                                        bullet points calibrated strictly against your <strong>Degree</strong>,
+                                        <strong>Years of Experience</strong>, and <strong>Technical Skills</strong>!
                                     </div>
                                 </div>
                             </div>
@@ -1767,33 +2010,33 @@
                     <!-- Input Console with Quick Inquiries -->
                     <div class="workspace-input-bar">
                         <div class="prompt-chips-bar">
-                            <button class="chip-button" onclick="sendQuickPrompt('I have 2 years of Python, SQL, and FastAPI experience with a B.Tech. Recommend 10 matching jobs in India with 3-week prep roadmaps.')">
+                            <button class="chip-button"
+                                onclick="sendQuickPrompt('I have 2 years of Python, SQL, and FastAPI experience with a B.Tech. Recommend 10 matching jobs in India with 3-week prep roadmaps.')">
                                 2 Yrs Python &amp; FastAPI (India)
                             </button>
-                            <button class="chip-button" onclick="sendQuickPrompt('Fresher college graduate with Computer Science degree seeking software engineering openings in India with prep guides.')">
+                            <button class="chip-button"
+                                onclick="sendQuickPrompt('Fresher college graduate with Computer Science degree seeking software engineering openings in India with prep guides.')">
                                 Fresher CS Graduate
                             </button>
-                            <button class="chip-button" onclick="sendQuickPrompt('5+ years Senior Developer aiming for Tech Lead and Staff Engineer roles in Bangalore/Hyderabad.')">
+                            <button class="chip-button"
+                                onclick="sendQuickPrompt('5+ years Senior Developer aiming for Tech Lead and Staff Engineer roles in Bangalore/Hyderabad.')">
                                 5+ Yrs Senior / Lead Roles
                             </button>
-                            <button class="chip-button" onclick="sendQuickPrompt('Show me 10 competitive remote engineering positions in India with salary ranges.')">
+                            <button class="chip-button"
+                                onclick="sendQuickPrompt('Show me 10 competitive remote engineering positions in India with salary ranges.')">
                                 Remote Tech Roles (India)
                             </button>
                         </div>
 
                         <div class="input-box-wrapper">
-                            <input
-                                type="text"
-                                id="user_input_field"
+                            <input type="text" id="user_input_field"
                                 placeholder="Detail your background, target roles in India, or career questions..."
                                 onkeydown="if(event.key==='Enter' && !event.shiftKey) submitMessage()"
-                                autocomplete="off"
-                                spellcheck="true"
-                            >
+                                autocomplete="off" spellcheck="true">
                             <button class="btn-send-msg" id="btn_send_action" onclick="submitMessage()">
                                 <span>Send</span>
                                 <svg class="icon icon-sm" viewBox="0 0 24 24">
-                                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
                                 </svg>
                             </button>
                         </div>
@@ -1802,22 +2045,7 @@
             </div>
         </div>
 
-        <div class="hero-cta-group" style="margin-top: 32px;">
-            <button class="btn-primary-hero" onclick="openPremiumModal()">
-                <svg class="icon icon-sm" viewBox="0 0 24 24">
-                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-                </svg>
-                <span>Go for Premium Candidate Assessment</span>
-            </button>
-            <button class="btn-secondary-hero" onclick="openProfileModal()">
-                <svg class="icon icon-sm" viewBox="0 0 24 24">
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
-                <span>Edit Candidate Profile</span>
-            </button>
-        </div>
-
-        <!-- Metric Cards Row -->
+        <div class="hero-cta-group" style="margin-top: 32px;"><button class="btn-primary-hero" onclick="openConsultation()"><span>Start Your Consultation</span><svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" /></svg></button></div>`r`n`r`n        <!-- Metric Cards Row -->
         <div class="stats-grid" style="margin-top: 10px;">
             <div class="stat-card">
                 <div class="stat-value">10 Open Jobs</div>
@@ -1839,43 +2067,49 @@
         <div class="section-eyebrow">Smart Career Calibration</div>
         <h3 class="section-title">The Three Pillars of Your Assessment</h3>
         <p class="section-desc">
-            Rather than generic chatbot answers, CareerBot evaluates three mandatory candidate parameters together to calculate the ideal career match:
+            Rather than generic chatbot answers, CareerBot evaluates three mandatory candidate parameters together to
+            calculate the ideal career match:
         </p>
 
         <div class="tri-factor-grid">
             <div class="tri-card">
                 <div class="tri-icon-box">
                     <svg class="icon" viewBox="0 0 24 24">
-                        <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zm0 13l-8-4.36v5.86L12 21l8-3.5v-5.86L12 16z"/>
+                        <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zm0 13l-8-4.36v5.86L12 21l8-3.5v-5.86L12 16z" />
                     </svg>
                 </div>
                 <h3>1. Degree &amp; Education</h3>
                 <p>
-                    Evaluates your academic foundation, qualifications, and degree discipline (B.Tech, M.S., BCA, MCA, or cross-domain conversions) to establish eligibility for specialized roles.
+                    Evaluates your academic foundation, qualifications, and degree discipline (B.Tech, M.S., BCA, MCA,
+                    or cross-domain conversions) to establish eligibility for specialized roles.
                 </p>
             </div>
 
             <div class="tri-card">
                 <div class="tri-icon-box">
                     <svg class="icon" viewBox="0 0 24 24">
-                        <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                        <path
+                            d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" />
                     </svg>
                 </div>
                 <h3>2. Years of Experience</h3>
                 <p>
-                    Strictly matches job seniority. Freshers and students (0 yrs) receive entry-level and junior roles, while experienced candidates receive senior, lead, or staff architect positions.
+                    Strictly matches job seniority. Freshers and students (0 yrs) receive entry-level and junior roles,
+                    while experienced candidates receive senior, lead, or staff architect positions.
                 </p>
             </div>
 
             <div class="tri-card">
                 <div class="tri-icon-box">
                     <svg class="icon" viewBox="0 0 24 24">
-                        <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
+                        <path
+                            d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z" />
                     </svg>
                 </div>
                 <h3>3. Technical Skills</h3>
                 <p>
-                    Your technical competencies directly define your target domain and job categories (e.g. Python, SQL, React, PyTorch, Docker), eliminating guesswork.
+                    Your technical competencies directly define your target domain and job categories (e.g. Python, SQL,
+                    React, PyTorch, Docker), eliminating guesswork.
                 </p>
             </div>
         </div>
@@ -1887,6 +2121,13 @@
         <p>&copy; 2026 CareerBot AI &bull; Intelligent Talent &amp; Career Discovery &bull; Powered by Groq LLM</p>
     </footer>
 
+
+    <div class="modal-overlay roadmap-modal" id="roadmap_modal_overlay" role="dialog" aria-modal="true" aria-labelledby="roadmap_modal_title">
+        <div class="auth-modal">
+            <div class="modal-header"><div><h3 class="modal-title" id="roadmap_modal_title">Free 3-Week Roadmap</h3><p id="roadmap_modal_subtitle" style="font-size:0.8rem; color:var(--text-secondary); margin-top:4px;"></p></div><button class="btn-modal-close" onclick="closeRoadmapModal()" aria-label="Close">&times;</button></div>
+            <ol class="roadmap-list" id="roadmap_modal_list"></ol>
+        </div>
+    </div>
     <!-- Candidate Profile Modal (Opens after login and via "Update Profile & Skills") -->
     <div class="modal-overlay" id="profile_modal_overlay">
         <div class="auth-modal" style="max-width: 520px;">
@@ -1899,7 +2140,8 @@
                 </div>
                 <button class="btn-modal-close" onclick="closeProfileModal()">
                     <svg class="icon" viewBox="0 0 24 24">
-                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                        <path
+                            d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
                     </svg>
                 </button>
             </div>
@@ -1911,7 +2153,8 @@
 
             <div class="field-group">
                 <label for="prof_email">Connected Google Account</label>
-                <input type="email" id="prof_email" placeholder="e.g. candidate@gmail.com" readonly style="opacity:0.7; cursor:not-allowed;">
+                <input type="email" id="prof_email" placeholder="e.g. candidate@gmail.com" readonly
+                    style="opacity:0.7; cursor:not-allowed;">
             </div>
 
             <div class="field-group">
@@ -1921,7 +2164,8 @@
 
             <div class="field-group">
                 <label for="prof_experience">Years of Experience</label>
-                <input type="text" id="prof_experience" placeholder="e.g. 0 (Fresher / Student), 2 years, 5+ years" autocomplete="off">
+                <input type="text" id="prof_experience" placeholder="e.g. 0 (Fresher / Student), 2 years, 5+ years"
+                    autocomplete="off">
             </div>
 
             <div class="field-group">
@@ -1931,16 +2175,19 @@
 
             <div class="field-group">
                 <label for="prof_skills">Core Competencies &amp; Technical Skills</label>
-                <input type="text" id="prof_skills" placeholder="e.g. Python, SQL, FastAPI, PyTorch, Docker, System Design">
+                <input type="text" id="prof_skills"
+                    placeholder="e.g. Python, SQL, FastAPI, PyTorch, Docker, System Design">
             </div>
 
             <div style="display:flex; align-items:center; justify-content:space-between; margin-top:16px;">
                 <span class="status-pill" id="saved_status_indicator" style="display:none;">
                     Saved &amp; Synced to Google Profile
                 </span>
-                <button class="btn-primary-action" onclick="saveCandidateProfile()" style="margin-left:auto; width:auto; padding:9px 20px;">
+                <button class="btn-primary-action" onclick="saveCandidateProfile()"
+                    style="margin-left:auto; width:auto; padding:9px 20px;">
                     <svg class="icon icon-sm" viewBox="0 0 24 24">
-                        <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
+                        <path
+                            d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z" />
                     </svg>
                     <span>Save Candidate Profile</span>
                 </button>
@@ -1955,7 +2202,8 @@
                 <h3 class="modal-title">Candidate Authentication</h3>
                 <button class="btn-modal-close" onclick="closeAuthModal()">
                     <svg class="icon" viewBox="0 0 24 24">
-                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                        <path
+                            d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
                     </svg>
                 </button>
             </div>
@@ -1964,7 +2212,8 @@
 
             <div style="display:flex; align-items:center; gap:10px; margin: 14px 0;">
                 <div style="flex:1; height:1px; background:var(--border-subtle);"></div>
-                <span style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">or sign in with candidate email</span>
+                <span style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">or sign in with
+                    candidate email</span>
                 <div style="flex:1; height:1px; background:var(--border-subtle);"></div>
             </div>
 
@@ -1980,7 +2229,7 @@
 
             <button class="btn-primary-action" onclick="authenticateViaDirectEmail()" style="margin-top:12px;">
                 <svg class="icon icon-sm" viewBox="0 0 24 24">
-                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
                 </svg>
                 <span>Continue to Candidate Portal</span>
             </button>
@@ -2410,6 +2659,31 @@
             }
         }
 
+
+        function openConsultation() {
+            document.body.classList.add('consultation-active');
+            const shell = document.querySelector('.consultation-shell');
+            if (shell) shell.setAttribute('aria-hidden', 'false');
+            document.getElementById('user_input_field')?.focus();
+        }
+
+        function closeConsultation() {
+            document.body.classList.remove('consultation-active');
+            const shell = document.querySelector('.consultation-shell');
+            if (shell) shell.setAttribute('aria-hidden', 'true');
+        }
+
+        function openRoadmapModal(title, guide) {
+            document.getElementById('roadmap_modal_title').textContent = 'Free 3-Week Roadmap';
+            document.getElementById('roadmap_modal_subtitle').textContent = title;
+            const list = document.getElementById('roadmap_modal_list');
+            list.innerHTML = guide.map(item => `<li>${escapeHtml(item)}</li>`).join('');
+            document.getElementById('roadmap_modal_overlay').classList.add('open');
+        }
+
+        function closeRoadmapModal() {
+            document.getElementById('roadmap_modal_overlay').classList.remove('open');
+        }
         /* ===== CHAT DISPATCH ===== */
         function submitHeroPrompt() {
             const input = document.getElementById('hero_prompt_input');
@@ -2539,12 +2813,8 @@
                                 </div>
                                 <div class="job-company-meta">
                                     <span class="meta-item">
-                                        <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/></svg>
-                                        ${escapeHtml(job.company || 'Leading Enterprise')}
-                                    </span>
-                                    <span class="meta-item">
                                         <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>
-                                        ${escapeHtml(job.location || 'Remote / Hybrid')}
+                                        India Â· ${escapeHtml(job.job_type || 'Hybrid')}
                                     </span>
                                 </div>
                                 ${job.salary_range ? `
@@ -2556,12 +2826,13 @@
                                 ${job.description ? `<div class="job-desc-snippet">${escapeHtml(job.description)}</div>` : ''}
                                 ${skillsPills ? `<div class="job-skills-list">${skillsPills}</div>` : ''}
                             </div>
-                            <a href="${escapeHtml(applyUrl)}" target="_blank" rel="noopener noreferrer" class="btn-apply-job">
-                                <span>Explore Openings</span>
-                                <svg class="icon icon-sm" viewBox="0 0 24 24">
-                                    <path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/>
-                                </svg>
-                            </a>
+                            <div class="job-card-actions">
+                                <button type="button" class="btn-apply-job btn-roadmap" data-title="${escapeHtml(job.title)}" data-guide="${escapeHtml(JSON.stringify(job.prep_guide || []))}" onclick="openRoadmapModal(this.dataset.title, JSON.parse(this.dataset.guide))">Free 3-Week Roadmap</button>
+                                <a href="${escapeHtml(applyUrl)}" target="_blank" rel="noopener noreferrer" class="btn-apply-job">
+                                    <span>View on LinkedIn</span>
+                                    <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+                                </a>
+                            </div>
                         </div>
                     `;
                 }).join('');
@@ -2659,4 +2930,5 @@
         }
     </script>
 </body>
+
 </html>

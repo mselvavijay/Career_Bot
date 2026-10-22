@@ -8,7 +8,7 @@ from database import get_db
 from models import models
 from schemas import schemas
 from services.llm_service import analyze_conversation_turn, analyze_user_input
-from services.jsearch_service import get_jobs_from_jsearch
+from services.jsearch_service import get_recent_jobs_from_jsearch
 
 router = APIRouter()
 
@@ -186,6 +186,11 @@ async def multi_turn_chat(request: schemas.MultiTurnChatRequest, db: Session = D
     explanation = llm_result.get("explanation", "")
     llm_job_titles = llm_result.get("job_titles", [])
     raw_open_jobs = llm_result.get("open_jobs", [])
+
+    # Prefer live India listings posted within the past week when JSearch is configured.
+    recent_jobs = await get_recent_jobs_from_jsearch(llm_job_titles)
+    if recent_jobs:
+        raw_open_jobs = recent_jobs
 
     # Convert to structured JobListing schemas
     structured_jobs: List[schemas.JobListing] = []

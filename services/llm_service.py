@@ -29,8 +29,8 @@ SYSTEM_PROMPT_TEMPLATE = """You are an expert AI Career Counselor and Talent Int
 You converse directly with the candidate, leveraging their declared user profile (Degree, Years of Experience, Technical Skills) to deliver tailored job recommendations in India along with structured 3-Week Preparation Guides.
 
 CRITICAL INSTRUCTIONS FOR BASIC PLAN:
-1. GEOGRAPHIC FOCUS: Strictly recommend jobs located in INDIA (Bangalore, Hyderabad, Pune, Mumbai, Gurgaon, Noida, Chennai, or Remote India).
-2. COMPENSATION: Express all salary ranges in Indian Rupees LPA (Lakhs Per Annum, e.g. ₹6 - ₹10 LPA, ₹12 - ₹20 LPA, ₹22 - ₹38 LPA) matching candidate experience.
+1. RECENCY & LOCATION: Recommend only India-based Hybrid or Remote jobs posted within the last 7 days. Provide a LinkedIn search URL for each role; never include company names.
+2. COMPENSATION: Express all salary ranges in Indian Rupees LPA (Lakhs Per Annum, e.g. ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¹6 - ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¹10 LPA, ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¹12 - ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¹20 LPA, ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¹22 - ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¹38 LPA) matching candidate experience.
 3. 10 JOB OPENINGS: You must ALWAYS provide EXACTLY 10 job openings in the "open_jobs" array.
 4. 3-WEEK PREPARATION GUIDE: For EACH of the 10 job openings, you must include a "prep_guide" array of EXACTLY 3 concise bullet points:
    - "Week 1: [DSA, Core Fundamentals & Language Concepts]"
@@ -53,7 +53,7 @@ Expected JSON format:
       "company": "Indian Tech Company or MNC Hub (e.g. Swiggy / Flipkart / Razorpay / PhonePe / Infosys)",
       "location": "City in India (e.g. Bangalore, Karnataka / Remote India)",
       "job_type": "Full-time",
-      "salary_range": "₹8,00,000 - ₹14,00,000 LPA",
+      "salary_range": "ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¹8,00,000 - ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¹14,00,000 LPA",
       "skills_required": ["Python", "FastAPI", "PostgreSQL"],
       "description": "High-impact opening focusing on scalable microservices and APIs.",
       "prep_guide": [
@@ -68,10 +68,10 @@ Expected JSON format:
 
 MANDATORY TRI-FACTOR CALIBRATION RULES (EXPERIENCE + SKILLS + DEGREE):
 1. YEARS OF EXPERIENCE (Calibrates Seniority, Hierarchy & LPA in India):
-   * 0 Years / Fresher / Student: STRICTLY suggest Entry-Level, Graduate, Junior, or Intern roles (e.g., Junior Python Engineer, Associate AI Developer, Graduate Software Engineer). Target ₹4 - ₹9 LPA. NEVER recommend Senior or Lead roles.
-   * 1-3 Years: Junior to Mid-Level software roles (₹8 - ₹16 LPA).
-   * 4-7 Years: Mid-Senior, Specialist, or Technical Lead roles (₹18 - ₹32 LPA).
-   * 8+ Years: Senior Staff, Principal, or Engineering Manager roles (₹35 - ₹60+ LPA).
+   * 0 Years / Fresher / Student: STRICTLY suggest Entry-Level, Graduate, Junior, or Intern roles (e.g., Junior Python Engineer, Associate AI Developer, Graduate Software Engineer). Target ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¹4 - ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¹9 LPA. NEVER recommend Senior or Lead roles.
+   * 1-3 Years: Junior to Mid-Level software roles (ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¹8 - ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¹16 LPA).
+   * 4-7 Years: Mid-Senior, Specialist, or Technical Lead roles (ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¹18 - ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¹32 LPA).
+   * 8+ Years: Senior Staff, Principal, or Engineering Manager roles (ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¹35 - ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¹60+ LPA).
 2. CORE SKILLS: The 10 roles must directly utilize the candidate's declared programming languages, frameworks, and domain competencies.
 3. DEGREE: Ensure academic alignment (e.g. B.Tech / B.E., M.S., BCA, MCA, B.Sc) with industry prerequisites.
 """
@@ -95,13 +95,13 @@ def format_job_card(title: str, category: str = "Technology", exp_years: int = 0
     location = INDIAN_TECH_HUBS[index % len(INDIAN_TECH_HUBS)]
 
     if exp_years == 0:
-        salary = "₹5,50,000 - ₹9,00,000 LPA"
+        salary = "5 - 9 LPA"
     elif exp_years <= 3:
-        salary = "₹9,00,000 - ₹16,00,000 LPA"
+        salary = "8 - 16 LPA"
     elif exp_years <= 7:
-        salary = "₹18,00,000 - ₹30,00,000 LPA"
+        salary = "18 - 32 LPA"
     else:
-        salary = "₹32,00,000 - ₹55,00,000+ LPA"
+        salary = "35 - 60 LPA"
 
     return {
         "title": clean_title,
@@ -139,12 +139,12 @@ def sanitize_and_enrich_jobs(parsed: dict, user_profile: Optional[Dict[str, Any]
         for idx, j in enumerate(open_jobs):
             if isinstance(j, dict) and j.get("title"):
                 title = j["title"].strip()
-                company = j.get("company") or INDIAN_COMPANIES[idx % len(INDIAN_COMPANIES)]
-                location = j.get("location") or INDIAN_TECH_HUBS[idx % len(INDIAN_TECH_HUBS)]
+                company = ""
+                location = "India"
                 if "India" not in location and not any(h in location for h in ["Bangalore", "Hyderabad", "Pune", "Mumbai", "Delhi", "Gurgaon", "Noida", "Chennai"]):
                     location = f"{location} (India)"
-                job_type = j.get("job_type") or "Full-time"
-                salary = j.get("salary_range") or "Competitive LPA"
+                job_type = "Remote" if "remote" in str(j.get("job_type", "")).lower() else "Hybrid"
+                salary = "5 - 9 LPA" if exp_years == 0 else ("8 - 16 LPA" if exp_years <= 3 else ("18 - 32 LPA" if exp_years <= 7 else "35 - 60 LPA"))
                 skills = j.get("skills_required") or [title]
                 desc = j.get("description") or f"Active position for {title} in India."
 
