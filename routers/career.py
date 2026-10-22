@@ -1,4 +1,5 @@
 import asyncio
+import json
 import uuid
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -20,6 +21,9 @@ def create_or_update_profile(profile_data: schemas.UserProfileCreate, db: Sessio
     """Create a new user profile or initialize one."""
     new_user = models.UserProfile(
         name=profile_data.name,
+        email=profile_data.email,
+        picture_url=profile_data.picture_url,
+        google_id=profile_data.google_id,
         education=profile_data.education,
         current_role=profile_data.current_role,
         skills=profile_data.skills,
@@ -93,6 +97,13 @@ def get_session_messages(session_id: str, db: Session = Depends(get_db)):
 
     output = []
     for m in messages:
+        open_jobs_data = []
+        if m.open_jobs:
+            try:
+                open_jobs_data = json.loads(m.open_jobs)
+            except Exception:
+                open_jobs_data = []
+
         output.append({
             "id": m.id,
             "role": m.role,
@@ -101,6 +112,7 @@ def get_session_messages(session_id: str, db: Session = Depends(get_db)):
             "career_category": m.career_category,
             "explanation": m.explanation,
             "job_titles": m.job_titles.split(" || ") if m.job_titles else [],
+            "open_jobs": open_jobs_data,
             "created_at": m.created_at
         })
     return output
@@ -110,6 +122,7 @@ def get_session_messages(session_id: str, db: Session = Depends(get_db)):
 async def multi_turn_chat(request: schemas.MultiTurnChatRequest, db: Session = Depends(get_db)):
     """
     Multi-turn career counseling endpoint with profile context & conversation memory.
+    Directly uses Groq LLM for guaranteed structured open jobs recommendations.
     """
     user_input = request.user_input.strip()
     if not user_input:
@@ -158,40 +171,32 @@ async def multi_turn_chat(request: schemas.MultiTurnChatRequest, db: Session = D
     db.add(user_msg_record)
     db.commit()
 
-    # 4. Invoke LLM with multi-turn context + profile
+    # 4. Invoke LLM with multi-turn context + profile (guarantees structured open_jobs)
     llm_result = await analyze_conversation_turn(
         user_input=user_input,
         conversation_history=conversation_history,
         user_profile=profile_dict
     )
 
-    reply_text = llm_result.get("reply") or llm_result.get("explanation") or "Here are my recommendations."
+    reply_text = llm_result.get("reply") or llm_result.get("explanation") or "Here are your career recommendations."
     interests_list = llm_result.get("interests", [])
-    career_category = llm_result.get("career_category", "General")
+    career_category = llm_result.get("career_category", "Professional & Technology")
     explanation = llm_result.get("explanation", "")
     llm_job_titles = llm_result.get("job_titles", [])
+    raw_open_jobs = llm_result.get("open_jobs", [])
 
-    # 5. Parallel JSearch lookup for live job openings
-    top_titles = [
-        title.split(".", 1)[-1].strip() if "." in title[:3] else title
-        for title in llm_job_titles[:3]
-    ]
+    # Convert to structured JobListing schemas
+    structured_jobs: List[schemas.JobListing] = []
+    for item in raw_open_jobs:
+        if isinstance(item, dict):
+            structured_jobs.append(schemas.JobListing(**item))
+        elif isinstance(item, schemas.JobListing):
+            structured_jobs.append(item)
 
-    job_results = await asyncio.gather(
-        *[get_jobs_from_jsearch(title) for title in top_titles],
-        return_exceptions=True
-    )
+    final_job_titles = [j.title for j in structured_jobs] or llm_job_titles
 
-    final_jobs = []
-    for result in job_results:
-        if isinstance(result, list):
-            final_jobs.extend(result)
-    final_jobs = list(dict.fromkeys(final_jobs))
-
-    if not final_jobs:
-        final_jobs = llm_job_titles
-
-    # 6. Save assistant turn to database
+    # 5. Save assistant turn to database (including open_jobs JSON)
+    open_jobs_json = json.dumps([j.model_dump() for j in structured_jobs])
     assistant_msg = models.ChatMessage(
         session_id=session_id,
         role="assistant",
@@ -199,7 +204,8 @@ async def multi_turn_chat(request: schemas.MultiTurnChatRequest, db: Session = D
         extracted_interests=",".join(interests_list),
         career_category=career_category,
         explanation=explanation,
-        job_titles=" || ".join(final_jobs)
+        job_titles=" || ".join(final_job_titles),
+        open_jobs=open_jobs_json
     )
     db.add(assistant_msg)
 
@@ -209,7 +215,7 @@ async def multi_turn_chat(request: schemas.MultiTurnChatRequest, db: Session = D
         extracted_interests=",".join(interests_list),
         career_category=career_category,
         explanation=explanation,
-        job_titles=",".join(final_jobs)
+        job_titles=",".join(final_job_titles)
     )
     db.add(db_history)
     db.commit()
@@ -221,7 +227,8 @@ async def multi_turn_chat(request: schemas.MultiTurnChatRequest, db: Session = D
         interests=interests_list,
         career_category=career_category,
         explanation=explanation,
-        job_titles=final_jobs
+        job_titles=final_job_titles,
+        open_jobs=structured_jobs
     )
 
 
@@ -243,5 +250,7 @@ async def career_bot(request: schemas.CareerRequest, db: Session = Depends(get_d
         career_category=multi_turn_res.career_category or "STEM",
         explanation=multi_turn_res.explanation or multi_turn_res.message,
         job_titles=multi_turn_res.job_titles,
+        open_jobs=multi_turn_res.open_jobs,
         session_id=multi_turn_res.session_id
     )
+

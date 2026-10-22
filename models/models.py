@@ -8,6 +8,9 @@ class UserProfile(Base):
     __tablename__ = "user_profiles"
 
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    email = Column(String(255), unique=True, index=True, nullable=True)
+    google_id = Column(String(255), unique=True, index=True, nullable=True)
+    picture_url = Column(String(500), nullable=True)
     name = Column(String(100), nullable=True)
     education = Column(String(200), nullable=True)
     current_role = Column(String(100), nullable=True)
@@ -44,6 +47,7 @@ class ChatMessage(Base):
     career_category = Column(String(100), nullable=True)
     explanation = Column(Text, nullable=True)
     job_titles = Column(Text, nullable=True)  # Comma-separated or JSON
+    open_jobs = Column(Text, nullable=True)  # JSON-encoded array of structured job listings
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     session = relationship("ConversationSession", back_populates="messages")

@@ -35,3 +35,26 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+def init_db():
+    """Create tables and apply safe schema migrations for both SQLite and PostgreSQL."""
+    from sqlalchemy import text
+    Base.metadata.create_all(bind=engine)
+
+    # Safely ensure new columns exist in existing tables
+    migrations = [
+        ("user_profiles", "email", "VARCHAR(255)"),
+        ("user_profiles", "google_id", "VARCHAR(255)"),
+        ("user_profiles", "picture_url", "VARCHAR(500)"),
+        ("chat_messages", "open_jobs", "TEXT"),
+    ]
+
+    with engine.begin() as conn:
+        for table, col, col_type in migrations:
+            try:
+                conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {col} {col_type}"))
+            except Exception:
+                # Column likely already exists or database engine handled it
+                pass
+

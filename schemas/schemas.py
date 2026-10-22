@@ -1,10 +1,12 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from datetime import datetime
 
 # --- User Profile Schemas ---
 class UserProfileBase(BaseModel):
     name: Optional[str] = None
+    email: Optional[str] = None
+    picture_url: Optional[str] = None
     education: Optional[str] = None
     current_role: Optional[str] = None
     skills: Optional[str] = None
@@ -12,17 +14,39 @@ class UserProfileBase(BaseModel):
     target_industry: Optional[str] = None
 
 class UserProfileCreate(UserProfileBase):
-    pass
+    google_id: Optional[str] = None
 
 class UserProfileUpdate(UserProfileBase):
     pass
 
 class UserProfileResponse(UserProfileBase):
     id: str
+    google_id: Optional[str] = None
     created_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True
+
+
+# --- Auth Schemas ---
+class GoogleAuthRequest(BaseModel):
+    credential: Optional[str] = None  # Google ID Token
+    email: Optional[str] = None
+    name: Optional[str] = None
+    google_id: Optional[str] = None
+    picture: Optional[str] = None
+
+
+# --- Structured Job Listing Schemas ---
+class JobListing(BaseModel):
+    title: str
+    company: str = "Industry Leader"
+    location: str = "Remote / Hybrid"
+    job_type: str = "Full-time"
+    salary_range: Optional[str] = None
+    skills_required: List[str] = Field(default_factory=list)
+    description: Optional[str] = None
+    apply_url: Optional[str] = None
 
 
 # --- Chat & Context Schemas ---
@@ -33,6 +57,7 @@ class ChatMessageSchema(BaseModel):
     career_category: Optional[str] = None
     explanation: Optional[str] = None
     job_titles: Optional[List[str]] = None
+    open_jobs: Optional[List[JobListing]] = None
     created_at: Optional[datetime] = None
 
     class Config:
@@ -51,6 +76,7 @@ class MultiTurnChatResponse(BaseModel):
     career_category: Optional[str] = None
     explanation: Optional[str] = None
     job_titles: List[str] = Field(default_factory=list)
+    open_jobs: List[JobListing] = Field(default_factory=list)
 
 class SessionSummaryResponse(BaseModel):
     id: str
@@ -69,4 +95,6 @@ class CareerResponse(BaseModel):
     career_category: str
     explanation: str
     job_titles: List[str]
+    open_jobs: List[JobListing] = Field(default_factory=list)
     session_id: Optional[str] = None
+
