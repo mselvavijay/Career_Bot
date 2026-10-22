@@ -9,6 +9,7 @@ class UserProfileBase(BaseModel):
     picture_url: Optional[str] = None
     education: Optional[str] = None
     current_role: Optional[str] = None
+    years_of_experience: Optional[str] = None
     skills: Optional[str] = None
     interests: Optional[str] = None
     target_industry: Optional[str] = None

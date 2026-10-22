@@ -948,14 +948,6 @@
                     </button>
                 </div>
             </div>
-
-            <!-- Candidate Profile Button (Appears ONLY after login) -->
-            <button class="btn-candidate-profile" id="btn_candidate_profile" onclick="openProfileModal()">
-                <svg class="icon icon-sm" viewBox="0 0 24 24">
-                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
-                </svg>
-                <span>Edit Profile</span>
-            </button>
         </div>
     </header>
 
@@ -1092,18 +1084,13 @@
             </div>
 
             <div class="field-group">
+                <label for="prof_experience">Years of Experience</label>
+                <input type="text" id="prof_experience" placeholder="e.g. 0 (Fresher / Student), 2 years, 5+ years" autocomplete="off">
+            </div>
+
+            <div class="field-group">
                 <label for="prof_skills">Core Competencies &amp; Technical Skills</label>
                 <input type="text" id="prof_skills" placeholder="e.g. Python, SQL, FastAPI, PyTorch, Docker, System Design">
-            </div>
-
-            <div class="field-group">
-                <label for="prof_interests">Focus Areas &amp; Passions</label>
-                <textarea id="prof_interests" placeholder="e.g. Generative AI, Cloud Infrastructure, Distributed Systems"></textarea>
-            </div>
-
-            <div class="field-group">
-                <label for="prof_industry">Target Sector</label>
-                <input type="text" id="prof_industry" placeholder="e.g. Enterprise Software &amp; Artificial Intelligence">
             </div>
 
             <div style="display:flex; align-items:center; justify-content:space-between; margin-top:16px;">
@@ -1420,9 +1407,8 @@
             document.getElementById('prof_email').value = '';
             document.getElementById('prof_education').value = '';
             document.getElementById('prof_role').value = '';
+            document.getElementById('prof_experience').value = '';
             document.getElementById('prof_skills').value = '';
-            document.getElementById('prof_interests').value = '';
-            document.getElementById('prof_industry').value = '';
 
             startNewSession();
         }
@@ -1450,9 +1436,8 @@
                 email: document.getElementById('prof_email').value.trim(),
                 education: document.getElementById('prof_education').value.trim(),
                 current_role: document.getElementById('prof_role').value.trim(),
-                skills: document.getElementById('prof_skills').value.trim(),
-                interests: document.getElementById('prof_interests').value.trim(),
-                target_industry: document.getElementById('prof_industry').value.trim()
+                years_of_experience: document.getElementById('prof_experience').value.trim(),
+                skills: document.getElementById('prof_skills').value.trim()
             };
 
             try {
@@ -1503,9 +1488,8 @@
             document.getElementById('prof_email').value = p.email || '';
             document.getElementById('prof_education').value = p.education || '';
             document.getElementById('prof_role').value = p.current_role || '';
+            document.getElementById('prof_experience').value = p.years_of_experience || '';
             document.getElementById('prof_skills').value = p.skills || '';
-            document.getElementById('prof_interests').value = p.interests || '';
-            document.getElementById('prof_industry').value = p.target_industry || '';
 
             const sidebarName = document.getElementById('sidebar_profile_name');
             if (sidebarName) sidebarName.textContent = p.name || p.email || 'Candidate';

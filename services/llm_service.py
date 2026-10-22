@@ -54,7 +54,12 @@ Expected JSON format:
 
 Guidelines:
 - Provide 3 to 5 realistic, high-quality open job listings matching the candidate's career trajectory in "open_jobs".
-- Include realistic salary expectations and key required skills.
+- MANDATORY SENIORITY LEVEL MATCHING: You must STRICTLY match all recommended job titles, responsibilities, and salaries to the candidate's declared Years of Experience:
+  * 0 Years / Fresher / Student: STRICTLY suggest Entry-Level, Associate, Junior, or Intern roles (e.g. Junior Python Engineer, Associate AI Developer, Graduate Software Engineer). NEVER recommend Senior, Lead, or Staff roles to freshers.
+  * 1-3 Years: Suggest Junior to Mid-Level positions.
+  * 4-7 Years: Suggest Mid-Senior, Specialist, or Lead positions.
+  * 8+ Years: Suggest Senior, Staff, Principal, or Management roles.
+- The candidate's technical skills automatically define their target domain and specialties.
 - Make the "apply_url" a direct search query to LinkedIn Jobs or Google Jobs for that specific role title.
 - Keep the tone professional, encouraging, and authoritative.
 """
@@ -126,17 +131,15 @@ def build_system_message(user_profile: Optional[Dict[str, Any]] = None) -> str:
     if user_profile:
         profile_parts = []
         if user_profile.get("name"):
-            profile_parts.append(f"Name: {user_profile['name']}")
+            profile_parts.append(f"Candidate Name: {user_profile['name']}")
         if user_profile.get("education"):
             profile_parts.append(f"Education: {user_profile['education']}")
         if user_profile.get("current_role"):
-            profile_parts.append(f"Current Role: {user_profile['current_role']}")
+            profile_parts.append(f"Current Role / Title: {user_profile['current_role']}")
+        if user_profile.get("years_of_experience") is not None and str(user_profile.get("years_of_experience")).strip():
+            profile_parts.append(f"Years of Experience: {user_profile['years_of_experience']} (CRITICAL: Strictly calibrate all job seniority, levels, and advice to this experience)")
         if user_profile.get("skills"):
-            profile_parts.append(f"Skills: {user_profile['skills']}")
-        if user_profile.get("interests"):
-            profile_parts.append(f"Declared Profile Interests: {user_profile['interests']}")
-        if user_profile.get("target_industry"):
-            profile_parts.append(f"Target Industry: {user_profile['target_industry']}")
+            profile_parts.append(f"Core Competencies & Skills: {user_profile['skills']} (Derive candidate specializations and target roles directly from these skills)")
 
         if profile_parts:
             prompt += "\n\nACTIVE CANDIDATE PROFILE CONTEXT:\n" + "\n".join(profile_parts)

@@ -47,6 +47,7 @@ def init_db():
         ("user_profiles", "email", "VARCHAR(255)"),
         ("user_profiles", "google_id", "VARCHAR(255)"),
         ("user_profiles", "picture_url", "VARCHAR(500)"),
+        ("user_profiles", "years_of_experience", "VARCHAR(50)"),
         ("chat_messages", "open_jobs", "TEXT"),
     ]
 

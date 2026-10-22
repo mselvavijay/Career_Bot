@@ -26,6 +26,7 @@ def create_or_update_profile(profile_data: schemas.UserProfileCreate, db: Sessio
         google_id=profile_data.google_id,
         education=profile_data.education,
         current_role=profile_data.current_role,
+        years_of_experience=profile_data.years_of_experience,
         skills=profile_data.skills,
         interests=profile_data.interests,
         target_industry=profile_data.target_industry
@@ -137,6 +138,7 @@ async def multi_turn_chat(request: schemas.MultiTurnChatRequest, db: Session = D
                 "name": user_profile.name,
                 "education": user_profile.education,
                 "current_role": user_profile.current_role,
+                "years_of_experience": user_profile.years_of_experience,
                 "skills": user_profile.skills,
                 "interests": user_profile.interests,
                 "target_industry": user_profile.target_industry
