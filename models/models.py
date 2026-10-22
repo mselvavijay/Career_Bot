@@ -1,14 +1,62 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime
+import uuid
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
 from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
 from database import Base
 
+class UserProfile(Base):
+    __tablename__ = "user_profiles"
+
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    name = Column(String(100), nullable=True)
+    education = Column(String(200), nullable=True)
+    current_role = Column(String(100), nullable=True)
+    skills = Column(Text, nullable=True)  # Comma-separated or free text
+    interests = Column(Text, nullable=True)  # Comma-separated or free text
+    target_industry = Column(String(100), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    sessions = relationship("ConversationSession", back_populates="user", cascade="all, delete-orphan")
+
+
+class ConversationSession(Base):
+    __tablename__ = "conversation_sessions"
+
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id = Column(String(36), ForeignKey("user_profiles.id"), nullable=True)
+    title = Column(String(200), default="Career Discussion")
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    user = relationship("UserProfile", back_populates="sessions")
+    messages = relationship("ChatMessage", back_populates="session", cascade="all, delete-orphan", order_by="ChatMessage.created_at")
+
+
+class ChatMessage(Base):
+    __tablename__ = "chat_messages"
+
+    id = Column(Integer, primary_key=True, index=True)
+    session_id = Column(String(36), ForeignKey("conversation_sessions.id"), nullable=False)
+    role = Column(String(20), nullable=False)  # 'user' or 'assistant'
+    content = Column(Text, nullable=False)
+    # Extra structured response data if role == 'assistant'
+    extracted_interests = Column(String(500), nullable=True)
+    career_category = Column(String(100), nullable=True)
+    explanation = Column(Text, nullable=True)
+    job_titles = Column(Text, nullable=True)  # Comma-separated or JSON
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    session = relationship("ConversationSession", back_populates="messages")
+
+
+# Backward compatibility with existing records
 class ChatHistory(Base):
     __tablename__ = "chat_history"
 
     id = Column(Integer, primary_key=True, index=True)
     user_input = Column(Text, nullable=False)
-    extracted_interests = Column(String, nullable=True)
-    career_category = Column(String, nullable=True)
+    extracted_interests = Column(String(500), nullable=True)
+    career_category = Column(String(100), nullable=True)
     explanation = Column(Text, nullable=True)
-    job_titles = Column(Text, nullable=True)  # Store as comma-separated string
+    job_titles = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

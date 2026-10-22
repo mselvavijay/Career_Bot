@@ -1,30 +1,177 @@
 import asyncio
-from fastapi import APIRouter, Depends, HTTPException
+import uuid
+from typing import List, Optional
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from database import get_db
 from models import models
 from schemas import schemas
-from services.llm_service import analyze_user_input
+from services.llm_service import analyze_conversation_turn, analyze_user_input
 from services.jsearch_service import get_jobs_from_jsearch
 
 router = APIRouter()
 
+# -------------------------------------------------------------
+# User Profile Endpoints
+# -------------------------------------------------------------
 
-@router.post("/career-bot", response_model=schemas.CareerResponse)
-async def career_bot(request: schemas.CareerRequest, db: Session = Depends(get_db)):
-    user_input = request.user_input
+@router.post("/profile", response_model=schemas.UserProfileResponse)
+def create_or_update_profile(profile_data: schemas.UserProfileCreate, db: Session = Depends(get_db)):
+    """Create a new user profile or initialize one."""
+    new_user = models.UserProfile(
+        name=profile_data.name,
+        education=profile_data.education,
+        current_role=profile_data.current_role,
+        skills=profile_data.skills,
+        interests=profile_data.interests,
+        target_industry=profile_data.target_industry
+    )
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
 
-    # STEP 1: Single LLM call — replaces 4 sequential calls
-    # Returns interests, career_category, explanation, and job_titles all at once
-    llm_result = await analyze_user_input(user_input)
+@router.put("/profile/{user_id}", response_model=schemas.UserProfileResponse)
+def update_profile(user_id: str, profile_data: schemas.UserProfileUpdate, db: Session = Depends(get_db)):
+    """Update an existing user profile."""
+    user = db.query(models.UserProfile).filter(models.UserProfile.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User profile not found")
 
+    for field, value in profile_data.model_dump(exclude_unset=True).items():
+        setattr(user, field, value)
+
+    db.commit()
+    db.refresh(user)
+    return user
+
+@router.get("/profile/{user_id}", response_model=schemas.UserProfileResponse)
+def get_profile(user_id: str, db: Session = Depends(get_db)):
+    """Retrieve an existing user profile."""
+    user = db.query(models.UserProfile).filter(models.UserProfile.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User profile not found")
+    return user
+
+
+# -------------------------------------------------------------
+# Session & Multi-Turn Chat Endpoints
+# -------------------------------------------------------------
+
+@router.get("/sessions", response_model=List[schemas.SessionSummaryResponse])
+def list_sessions(user_id: Optional[str] = Query(None), db: Session = Depends(get_db)):
+    """List recent conversation sessions."""
+    query = db.query(models.ConversationSession)
+    if user_id:
+        query = query.filter(models.ConversationSession.user_id == user_id)
+    sessions = query.order_by(models.ConversationSession.created_at.desc()).limit(20).all()
+
+    result = []
+    for s in sessions:
+        msg_count = db.query(models.ChatMessage).filter(models.ChatMessage.session_id == s.id).count()
+        result.append(schemas.SessionSummaryResponse(
+            id=s.id,
+            title=s.title or "Career Discussion",
+            created_at=s.created_at,
+            message_count=msg_count
+        ))
+    return result
+
+@router.get("/sessions/{session_id}/messages")
+def get_session_messages(session_id: str, db: Session = Depends(get_db)):
+    """Get full dialogue history for a session."""
+    session = db.query(models.ConversationSession).filter(models.ConversationSession.id == session_id).first()
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    messages = (
+        db.query(models.ChatMessage)
+        .filter(models.ChatMessage.session_id == session_id)
+        .order_by(models.ChatMessage.created_at.asc())
+        .all()
+    )
+
+    output = []
+    for m in messages:
+        output.append({
+            "id": m.id,
+            "role": m.role,
+            "content": m.content,
+            "extracted_interests": m.extracted_interests.split(",") if m.extracted_interests else [],
+            "career_category": m.career_category,
+            "explanation": m.explanation,
+            "job_titles": m.job_titles.split(" || ") if m.job_titles else [],
+            "created_at": m.created_at
+        })
+    return output
+
+
+@router.post("/chat", response_model=schemas.MultiTurnChatResponse)
+async def multi_turn_chat(request: schemas.MultiTurnChatRequest, db: Session = Depends(get_db)):
+    """
+    Multi-turn career counseling endpoint with profile context & conversation memory.
+    """
+    user_input = request.user_input.strip()
+    if not user_input:
+        raise HTTPException(status_code=400, detail="Input cannot be empty.")
+
+    # 1. Retrieve or initialize user profile if user_id is provided
+    profile_dict = None
+    if request.user_id:
+        user_profile = db.query(models.UserProfile).filter(models.UserProfile.id == request.user_id).first()
+        if user_profile:
+            profile_dict = {
+                "name": user_profile.name,
+                "education": user_profile.education,
+                "current_role": user_profile.current_role,
+                "skills": user_profile.skills,
+                "interests": user_profile.interests,
+                "target_industry": user_profile.target_industry
+            }
+
+    # 2. Retrieve or create session
+    session_id = request.session_id
+    if session_id:
+        session = db.query(models.ConversationSession).filter(models.ConversationSession.id == session_id).first()
+        if not session:
+            session = models.ConversationSession(id=session_id, user_id=request.user_id, title=user_input[:40])
+            db.add(session)
+            db.commit()
+    else:
+        session = models.ConversationSession(user_id=request.user_id, title=user_input[:40])
+        db.add(session)
+        db.commit()
+        db.refresh(session)
+        session_id = session.id
+
+    # 3. Fetch past messages for this session (context memory)
+    past_db_messages = (
+        db.query(models.ChatMessage)
+        .filter(models.ChatMessage.session_id == session_id)
+        .order_by(models.ChatMessage.created_at.asc())
+        .all()
+    )
+    conversation_history = [{"role": m.role, "content": m.content} for m in past_db_messages]
+
+    # Save incoming user message
+    user_msg_record = models.ChatMessage(session_id=session_id, role="user", content=user_input)
+    db.add(user_msg_record)
+    db.commit()
+
+    # 4. Invoke LLM with multi-turn context + profile
+    llm_result = await analyze_conversation_turn(
+        user_input=user_input,
+        conversation_history=conversation_history,
+        user_profile=profile_dict
+    )
+
+    reply_text = llm_result.get("reply") or llm_result.get("explanation") or "Here are my recommendations."
     interests_list = llm_result.get("interests", [])
-    career_category = llm_result.get("career_category", "STEM")
+    career_category = llm_result.get("career_category", "General")
     explanation = llm_result.get("explanation", "")
     llm_job_titles = llm_result.get("job_titles", [])
 
-    # STEP 2: Fetch real jobs from JSearch — all 3 searches run IN PARALLEL
-    # Instead of waiting for each one to finish, we fire all 3 at the same time
+    # 5. Parallel JSearch lookup for live job openings
     top_titles = [
         title.split(".", 1)[-1].strip() if "." in title[:3] else title
         for title in llm_job_titles[:3]
@@ -32,23 +179,31 @@ async def career_bot(request: schemas.CareerRequest, db: Session = Depends(get_d
 
     job_results = await asyncio.gather(
         *[get_jobs_from_jsearch(title) for title in top_titles],
-        return_exceptions=True  # Don't crash if one JSearch call fails
+        return_exceptions=True
     )
 
-    # Flatten results and filter out any failed (exception) responses
     final_jobs = []
     for result in job_results:
         if isinstance(result, list):
             final_jobs.extend(result)
-
-    # Deduplicate
     final_jobs = list(dict.fromkeys(final_jobs))
 
-    # If no real jobs found, fallback to LLM suggestions
     if not final_jobs:
         final_jobs = llm_job_titles
 
-    # STEP 3: Save to database
+    # 6. Save assistant turn to database
+    assistant_msg = models.ChatMessage(
+        session_id=session_id,
+        role="assistant",
+        content=reply_text,
+        extracted_interests=",".join(interests_list),
+        career_category=career_category,
+        explanation=explanation,
+        job_titles=" || ".join(final_jobs)
+    )
+    db.add(assistant_msg)
+
+    # Also keep legacy ChatHistory in sync
     db_history = models.ChatHistory(
         user_input=user_input,
         extracted_interests=",".join(interests_list),
@@ -58,11 +213,35 @@ async def career_bot(request: schemas.CareerRequest, db: Session = Depends(get_d
     )
     db.add(db_history)
     db.commit()
-    db.refresh(db_history)
 
-    return schemas.CareerResponse(
+    return schemas.MultiTurnChatResponse(
+        session_id=session_id,
+        user_id=request.user_id,
+        message=reply_text,
         interests=interests_list,
         career_category=career_category,
         explanation=explanation,
         job_titles=final_jobs
+    )
+
+
+# -------------------------------------------------------------
+# Legacy Endpoint: /career-bot (Maintained for backwards compatibility)
+# -------------------------------------------------------------
+@router.post("/career-bot", response_model=schemas.CareerResponse)
+async def career_bot(request: schemas.CareerRequest, db: Session = Depends(get_db)):
+    multi_turn_res = await multi_turn_chat(
+        schemas.MultiTurnChatRequest(
+            user_input=request.user_input,
+            session_id=request.session_id,
+            user_id=request.user_id
+        ),
+        db=db
+    )
+    return schemas.CareerResponse(
+        interests=multi_turn_res.interests,
+        career_category=multi_turn_res.career_category or "STEM",
+        explanation=multi_turn_res.explanation or multi_turn_res.message,
+        job_titles=multi_turn_res.job_titles,
+        session_id=multi_turn_res.session_id
     )
