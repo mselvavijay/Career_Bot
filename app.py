@@ -4,7 +4,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from database import engine, Base, init_db
-from routers import career, auth
+from routers import career, auth, race
 
 # Initialize tables and apply schema migrations safely
 try:
@@ -27,6 +27,7 @@ if STATIC_DIR.exists():
 
 app.include_router(auth.router)
 app.include_router(career.router)
+app.include_router(race.router)
 
 @app.get("/", response_class=HTMLResponse)
 def home():

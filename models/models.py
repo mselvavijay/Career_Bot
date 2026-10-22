@@ -55,6 +55,18 @@ class ChatMessage(Base):
 
 
 # Backward compatibility with existing records
+class RaceEntry(Base):
+    __tablename__ = "race_entries"
+
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    contest_date = Column(String(10), nullable=False, index=True)
+    user_id = Column(String(36), ForeignKey("user_profiles.id"), nullable=True)
+    razorpay_order_id = Column(String(100), unique=True, nullable=True)
+    razorpay_payment_id = Column(String(100), unique=True, nullable=True)
+    payment_status = Column(String(20), nullable=False, default="pending")
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
 class ChatHistory(Base):
     __tablename__ = "chat_history"
 
