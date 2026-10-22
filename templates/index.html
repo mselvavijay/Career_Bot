@@ -49,7 +49,6 @@
             overflow: hidden;
         }
 
-        /* ===== SVG ICON UTILITY ===== */
         .icon {
             display: inline-flex;
             align-items: center;
@@ -62,7 +61,7 @@
         .icon-sm { width: 14px; height: 14px; }
         .icon-lg { width: 22px; height: 22px; }
 
-        /* ===== APP HEADER ===== */
+        /* ===== HEADER ===== */
         header {
             height: var(--header-height);
             background: rgba(15, 23, 42, 0.95);
@@ -121,7 +120,6 @@
             gap: 12px;
         }
 
-        /* ===== AUTH WIDGET ===== */
         .auth-widget {
             display: flex;
             align-items: center;
@@ -136,7 +134,7 @@
             color: #1f2937;
             font-size: 0.82rem;
             font-weight: 600;
-            padding: 7px 14px;
+            padding: 8px 16px;
             border-radius: var(--radius-sm);
             border: 1px solid #d1d5db;
             cursor: pointer;
@@ -159,6 +157,12 @@
             padding: 5px 12px 5px 6px;
             border-radius: 30px;
             font-size: 0.82rem;
+            cursor: pointer;
+            transition: border-color 0.15s;
+        }
+
+        .user-account-badge:hover {
+            border-color: var(--primary);
         }
 
         .user-avatar {
@@ -217,13 +221,14 @@
             color: #f87171;
         }
 
-        .btn-sidebar-toggle {
-            display: flex;
+        /* Candidate Profile Button: ONLY SHOWN AFTER LOGIN */
+        .btn-candidate-profile {
+            display: none; /* Controlled via JS after authentication */
             align-items: center;
             gap: 7px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            color: var(--text-secondary);
+            background: rgba(37, 99, 235, 0.12);
+            border: 1px solid rgba(37, 99, 235, 0.4);
+            color: #60a5fa;
             font-size: 0.82rem;
             font-weight: 600;
             padding: 7px 14px;
@@ -233,33 +238,30 @@
             font-family: inherit;
         }
 
-        .btn-sidebar-toggle:hover {
-            color: var(--text-primary);
-            border-color: var(--border-highlight);
-            background: var(--bg-card-hover);
+        .btn-candidate-profile:hover {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
         }
 
         /* ===== MAIN WORKSPACE ===== */
         .app-container {
             display: grid;
-            grid-template-columns: 320px 1fr;
+            grid-template-columns: 280px 1fr;
             height: calc(100vh - var(--header-height));
             overflow: hidden;
         }
 
-        /* ===== SIDEBAR ===== */
+        /* ===== SIDEBAR: CONSULTATION HISTORY ONLY ===== */
         .sidebar {
             background: #0b1120;
             border-right: 1px solid var(--border-subtle);
             display: flex;
             flex-direction: column;
             overflow-y: auto;
-            padding: 18px 16px;
-            gap: 16px;
+            padding: 16px 14px;
+            gap: 14px;
         }
-
-        .sidebar::-webkit-scrollbar { width: 5px; }
-        .sidebar::-webkit-scrollbar-thumb { background: var(--border-subtle); border-radius: 4px; }
 
         .panel-card {
             background: var(--bg-surface);
@@ -288,88 +290,14 @@
             gap: 6px;
         }
 
-        .status-pill {
-            display: none;
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: var(--success);
-            background: var(--success-glow);
-            padding: 2px 8px;
-            border-radius: 20px;
-        }
-
-        .field-group {
-            margin-bottom: 10px;
-        }
-
-        .field-group label {
-            display: block;
-            font-size: 0.72rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 4px;
-        }
-
-        .field-group input,
-        .field-group textarea {
-            width: 100%;
-            background: #070c18;
-            border: 1px solid var(--border-subtle);
-            color: var(--text-primary);
-            padding: 8px 10px;
-            border-radius: var(--radius-sm);
-            font-size: 0.82rem;
-            font-family: inherit;
-            outline: none;
-            transition: border-color 0.15s, box-shadow 0.15s;
-        }
-
-        .field-group input:focus,
-        .field-group textarea:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 2px var(--primary-glow);
-        }
-
-        .field-group textarea {
-            resize: vertical;
-            min-height: 50px;
-        }
-
-        .btn-primary-action {
-            width: 100%;
-            background: var(--primary);
-            color: #ffffff;
-            border: none;
-            padding: 9px 14px;
-            border-radius: var(--radius-sm);
-            font-size: 0.84rem;
-            font-weight: 600;
-            cursor: pointer;
-            font-family: inherit;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            transition: background 0.15s, transform 0.05s;
-            margin-top: 6px;
-        }
-
-        .btn-primary-action:hover {
-            background: var(--primary-hover);
-        }
-
-        .btn-primary-action:active {
-            transform: scale(0.99);
-        }
-
         .btn-outline-action {
             width: 100%;
             background: transparent;
             color: var(--accent);
             border: 1px dashed rgba(56, 189, 248, 0.4);
-            padding: 8px 12px;
+            padding: 9px 12px;
             border-radius: var(--radius-sm);
-            font-size: 0.8rem;
+            font-size: 0.82rem;
             font-weight: 600;
             cursor: pointer;
             font-family: inherit;
@@ -378,7 +306,7 @@
             justify-content: center;
             gap: 6px;
             transition: all 0.2s;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .btn-outline-action:hover {
@@ -388,18 +316,18 @@
 
         .sessions-scroll-area {
             overflow-y: auto;
-            max-height: 220px;
+            flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 5px;
         }
 
         .session-card {
-            padding: 8px 10px;
+            padding: 9px 11px;
             background: rgba(7, 12, 24, 0.6);
             border: 1px solid transparent;
             border-radius: var(--radius-sm);
-            font-size: 0.78rem;
+            font-size: 0.8rem;
             color: var(--text-secondary);
             cursor: pointer;
             transition: all 0.15s ease;
@@ -443,7 +371,6 @@
         .messages-container::-webkit-scrollbar { width: 6px; }
         .messages-container::-webkit-scrollbar-thumb { background: var(--border-subtle); border-radius: 4px; }
 
-        /* ===== MESSAGE CARDS ===== */
         .message-row {
             display: flex;
             gap: 14px;
@@ -806,7 +733,6 @@
         .btn-send-msg:active { transform: scale(0.97); }
         .btn-send-msg:disabled { opacity: 0.4; cursor: not-allowed; }
 
-        /* ===== LOADING INDICATOR ===== */
         .typing-loader {
             display: inline-flex;
             gap: 5px;
@@ -835,8 +761,8 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(4px);
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(5px);
             z-index: 200;
             align-items: center;
             justify-content: center;
@@ -852,10 +778,12 @@
             border: 1px solid var(--border-highlight);
             border-radius: var(--radius-lg);
             width: 100%;
-            max-width: 440px;
+            max-width: 480px;
             padding: 24px;
-            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 20px 48px rgba(0, 0, 0, 0.6);
             animation: modalPop 0.2s ease-out;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         @keyframes modalPop {
@@ -865,7 +793,7 @@
 
         .modal-header {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: space-between;
             margin-bottom: 16px;
         }
@@ -882,30 +810,88 @@
             color: var(--text-muted);
             cursor: pointer;
             padding: 4px;
+            border-radius: 4px;
         }
 
         .btn-modal-close:hover { color: var(--text-primary); }
 
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 960px) {
+        .field-group {
+            margin-bottom: 12px;
+        }
+
+        .field-group label {
+            display: block;
+            font-size: 0.74rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .field-group input,
+        .field-group textarea {
+            width: 100%;
+            background: #070c18;
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+            padding: 8px 10px;
+            border-radius: var(--radius-sm);
+            font-size: 0.83rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+        .field-group input:focus,
+        .field-group textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary-glow);
+        }
+
+        .field-group textarea {
+            resize: vertical;
+            min-height: 52px;
+        }
+
+        .btn-primary-action {
+            width: 100%;
+            background: var(--primary);
+            color: #ffffff;
+            border: none;
+            padding: 10px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: background 0.15s, transform 0.05s;
+        }
+
+        .btn-primary-action:hover {
+            background: var(--primary-hover);
+        }
+
+        .status-pill {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--success);
+            background: var(--success-glow);
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        @media (max-width: 900px) {
             .app-container {
                 grid-template-columns: 1fr;
             }
 
             .sidebar {
                 display: none;
-                position: fixed;
-                top: var(--header-height);
-                left: 0;
-                width: 320px;
-                max-width: 85vw;
-                height: calc(100vh - var(--header-height));
-                z-index: 90;
-                box-shadow: 8px 0 30px rgba(0, 0, 0, 0.6);
-            }
-
-            .sidebar.mobile-open {
-                display: flex;
             }
 
             .job-cards-grid {
@@ -948,14 +934,14 @@
                 </button>
 
                 <!-- Active Logged In User State -->
-                <div class="user-account-badge" id="user_account_badge">
+                <div class="user-account-badge" id="user_account_badge" onclick="openProfileModal()" title="Click to view/edit candidate profile">
                     <img id="user_avatar_img" class="user-avatar" src="" alt="Profile" style="display:none;">
                     <div id="user_avatar_initials" class="user-avatar">U</div>
                     <div class="user-info-text">
                         <span class="user-name-label" id="user_display_name">Candidate</span>
                         <span class="user-email-label" id="user_display_email">candidate@example.com</span>
                     </div>
-                    <button class="btn-signout" onclick="signOutUser()" title="Sign Out">
+                    <button class="btn-signout" onclick="event.stopPropagation(); signOutUser();" title="Sign Out">
                         <svg class="icon icon-sm" viewBox="0 0 24 24">
                             <path d="M16 17v-3H9v-4h7V7l5 5-5 5M14 2a2 2 0 0 1 2 2v2h-2V4H5v16h9v-2h2v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9z"/>
                         </svg>
@@ -963,77 +949,28 @@
                 </div>
             </div>
 
-            <!-- Profile Sidebar Toggle -->
-            <button class="btn-sidebar-toggle" onclick="toggleSidebar()">
-                <svg class="icon" viewBox="0 0 24 24">
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            <!-- Candidate Profile Button (Appears ONLY after login) -->
+            <button class="btn-candidate-profile" id="btn_candidate_profile" onclick="openProfileModal()">
+                <svg class="icon icon-sm" viewBox="0 0 24 24">
+                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
                 </svg>
-                <span>Candidate Profile</span>
+                <span>Edit Profile</span>
             </button>
         </div>
     </header>
 
     <!-- Main Grid Layout -->
     <div class="app-container">
-        <!-- Sidebar: Candidate Profile & Assessment Sessions -->
+        <!-- Sidebar: Focused purely on Consultation History -->
         <aside class="sidebar" id="sidebar">
-            <!-- Candidate Profile Panel -->
-            <div class="panel-card">
-                <div class="panel-header">
-                    <span class="panel-title">
-                        <svg class="icon icon-sm" viewBox="0 0 24 24">
-                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-                        </svg>
-                        Candidate Profile
-                    </span>
-                    <span class="status-pill" id="saved_status_indicator">Saved</span>
-                </div>
+            <button class="btn-outline-action" onclick="startNewSession()">
+                <svg class="icon icon-sm" viewBox="0 0 24 24">
+                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                </svg>
+                <span>New Consultation</span>
+            </button>
 
-                <div class="field-group">
-                    <label for="prof_name">Full Name</label>
-                    <input type="text" id="prof_name" placeholder="e.g. John Doe" autocomplete="name">
-                </div>
-
-                <div class="field-group">
-                    <label for="prof_email">Professional Email</label>
-                    <input type="email" id="prof_email" placeholder="e.g. candidate@example.com" autocomplete="email">
-                </div>
-
-                <div class="field-group">
-                    <label for="prof_education">Highest Degree / University</label>
-                    <input type="text" id="prof_education" placeholder="e.g. B.S. Computer Science / Stanford" autocomplete="off">
-                </div>
-
-                <div class="field-group">
-                    <label for="prof_role">Current Role / Career Stage</label>
-                    <input type="text" id="prof_role" placeholder="e.g. Mid-Level Developer / Recent Grad" autocomplete="off">
-                </div>
-
-                <div class="field-group">
-                    <label for="prof_skills">Core Competencies &amp; Skills</label>
-                    <input type="text" id="prof_skills" placeholder="e.g. Python, SQL, System Architecture, AWS" autocomplete="off">
-                </div>
-
-                <div class="field-group">
-                    <label for="prof_interests">Focus Areas &amp; Passions</label>
-                    <textarea id="prof_interests" placeholder="e.g. AI Engineering, FinTech, Distributed Systems"></textarea>
-                </div>
-
-                <div class="field-group">
-                    <label for="prof_industry">Target Sector</label>
-                    <input type="text" id="prof_industry" placeholder="e.g. Enterprise Software &amp; AI" autocomplete="off">
-                </div>
-
-                <button class="btn-primary-action" onclick="saveCandidateProfile()">
-                    <svg class="icon icon-sm" viewBox="0 0 24 24">
-                        <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
-                    </svg>
-                    <span>Save Candidate Profile</span>
-                </button>
-            </div>
-
-            <!-- Past Consultations & Sessions Panel -->
-            <div class="panel-card" style="flex:1; display:flex; flex-direction:column; min-height:160px;">
+            <div class="panel-card" style="flex:1; display:flex; flex-direction:column; min-height:0;">
                 <div class="panel-header">
                     <span class="panel-title">
                         <svg class="icon icon-sm" viewBox="0 0 24 24">
@@ -1043,16 +980,18 @@
                     </span>
                 </div>
 
-                <button class="btn-outline-action" onclick="startNewSession()">
-                    <svg class="icon icon-sm" viewBox="0 0 24 24">
-                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-                    </svg>
-                    <span>New Consultation</span>
-                </button>
-
                 <div class="sessions-scroll-area" id="session_list_container">
-                    <div style="font-size:0.75rem; color:var(--text-muted); text-align:center; padding:12px 0;">No past records found</div>
+                    <div style="font-size:0.75rem; color:var(--text-muted); text-align:center; padding:16px 0;">No past records found</div>
                 </div>
+            </div>
+
+            <!-- Active Profile Indicator in Sidebar (Shown after login) -->
+            <div class="panel-card" id="sidebar_profile_badge" style="display:none; padding:12px;">
+                <div style="font-size:0.68rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px;">Google Profile Synced</div>
+                <div style="font-size:0.83rem; font-weight:600; color:#fff;" id="sidebar_profile_name">Candidate</div>
+                <button onclick="openProfileModal()" style="background:transparent; border:none; color:var(--accent); font-size:0.75rem; font-weight:600; cursor:pointer; padding:0; margin-top:6px; display:inline-flex; align-items:center; gap:4px;">
+                    <span>Update Profile &amp; Skills</span> &rarr;
+                </button>
             </div>
         </aside>
 
@@ -1070,8 +1009,8 @@
                     <div class="msg-body-wrapper">
                         <div class="msg-card-assistant">
                             <div class="msg-text-main">
-                                Welcome to <strong>CareerBot AI</strong>. I am your executive career counselor and talent intelligence advisor. 
-                                Share your background, technical competencies, or target industries, and I will synthesize tailored career trajectories alongside active open job listings.
+                                Welcome to <strong>CareerBot AI</strong>. Sign in with Google to sync your candidate profile. 
+                                Once saved, Groq LLM personalizes all career roadmaps, skill evaluations, and live market job openings to your exact qualifications.
                             </div>
                         </div>
                     </div>
@@ -1080,10 +1019,9 @@
 
             <!-- Input Bar -->
             <div class="workspace-input-bar">
-                <!-- Suggested Discovery Prompts -->
                 <div class="prompt-chips-bar">
-                    <button class="chip-button" onclick="sendQuickPrompt('I have experience in Python, SQL, and backend systems. What roles and companies match my profile?')">
-                        Backend &amp; Python Trajectories
+                    <button class="chip-button" onclick="sendQuickPrompt('Analyze career trajectories that match my saved profile skills.')">
+                        Tailored Career Paths
                     </button>
                     <button class="chip-button" onclick="sendQuickPrompt('Recommend high-growth AI and Machine Learning engineering roles suitable for my background.')">
                         AI / ML Openings
@@ -1096,7 +1034,6 @@
                     </button>
                 </div>
 
-                <!-- Input Box -->
                 <div class="input-box-wrapper">
                     <input
                         type="text"
@@ -1117,7 +1054,73 @@
         </main>
     </div>
 
-    <!-- Auth / Setup Modal -->
+    <!-- 1. Dedicated Candidate Profile Modal (Opens after login and via "Edit Profile") -->
+    <div class="modal-overlay" id="profile_modal_overlay">
+        <div class="auth-modal" style="max-width: 540px;">
+            <div class="modal-header">
+                <div>
+                    <h3 class="modal-title">Candidate Profile &amp; Career Context</h3>
+                    <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:2px;">
+                        Saved to your Google account &bull; Directs Groq LLM personalized guidance
+                    </p>
+                </div>
+                <button class="btn-modal-close" onclick="closeProfileModal()">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="field-group">
+                <label for="prof_name">Full Name</label>
+                <input type="text" id="prof_name" placeholder="e.g. Alex Morgan" autocomplete="name">
+            </div>
+
+            <div class="field-group">
+                <label for="prof_email">Connected Google Account</label>
+                <input type="email" id="prof_email" placeholder="e.g. candidate@gmail.com" readonly style="opacity:0.7; cursor:not-allowed;">
+            </div>
+
+            <div class="field-group">
+                <label for="prof_education">Highest Degree / University</label>
+                <input type="text" id="prof_education" placeholder="e.g. B.Tech Computer Science / Stanford University">
+            </div>
+
+            <div class="field-group">
+                <label for="prof_role">Current Role / Career Stage</label>
+                <input type="text" id="prof_role" placeholder="e.g. Junior Python Developer / 3rd Year Student">
+            </div>
+
+            <div class="field-group">
+                <label for="prof_skills">Core Competencies &amp; Technical Skills</label>
+                <input type="text" id="prof_skills" placeholder="e.g. Python, SQL, FastAPI, PyTorch, Docker, System Design">
+            </div>
+
+            <div class="field-group">
+                <label for="prof_interests">Focus Areas &amp; Passions</label>
+                <textarea id="prof_interests" placeholder="e.g. Generative AI, Cloud Infrastructure, Distributed Systems"></textarea>
+            </div>
+
+            <div class="field-group">
+                <label for="prof_industry">Target Sector</label>
+                <input type="text" id="prof_industry" placeholder="e.g. Enterprise Software &amp; Artificial Intelligence">
+            </div>
+
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-top:16px;">
+                <span class="status-pill" id="saved_status_indicator" style="display:none;">
+                    Saved &amp; Synced to Google Profile
+                </span>
+                <button class="btn-primary-action" onclick="saveCandidateProfile()" style="margin-left:auto; width:auto; padding:9px 20px;">
+                    <svg class="icon icon-sm" viewBox="0 0 24 24">
+                        <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
+                    </svg>
+                    <span>Save Candidate Profile</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Auth Modal (When not yet logged in) -->
     <div class="modal-overlay" id="auth_modal_overlay">
         <div class="auth-modal">
             <div class="modal-header">
@@ -1128,26 +1131,6 @@
                     </svg>
                 </button>
             </div>
-
-            <div id="google_oauth_status_banner" style="display:none; background: rgba(37,99,235,0.08); border: 1px solid rgba(59,130,246,0.25); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 14px;">
-                <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-                    <svg class="icon icon-sm" viewBox="0 0 24 24" style="color:#60a5fa;">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
-                    </svg>
-                    <span style="font-size:0.78rem; font-weight:700; color:#93c5fd;">Official accounts.google.com Popup Setup</span>
-                </div>
-                <p style="font-size:0.75rem; color:var(--text-secondary); line-height:1.45; margin-bottom:8px;">
-                    Google's official popup requires a registered <strong>GOOGLE_CLIENT_ID</strong> from Google Cloud Console. To test the popup immediately, paste your Client ID below or add it to your Vercel environment variables:
-                </p>
-                <div style="display:flex; gap:6px;">
-                    <input type="text" id="custom_google_client_id" placeholder="xxxx-xxxx.apps.googleusercontent.com" style="flex:1; background:#070c18; border:1px solid var(--border-subtle); color:#fff; font-size:0.75rem; padding:6px 8px; border-radius:4px; outline:none;">
-                    <button onclick="applyGoogleClientId()" style="background:var(--primary); color:#fff; border:none; padding:6px 12px; font-size:0.75rem; font-weight:600; border-radius:4px; cursor:pointer;">Activate</button>
-                </div>
-            </div>
-
-            <p style="font-size:0.84rem; color:var(--text-secondary); line-height:1.5; margin-bottom:14px;">
-                Authenticate your candidate account to persist your profile, career roadmaps, and conversation history across devices.
-            </p>
 
             <div id="modal_google_btn_slot" style="margin-bottom:14px; display:flex; justify-content:center;"></div>
 
@@ -1200,16 +1183,10 @@
                 const res = await fetch('/auth/config');
                 if (res.ok) {
                     const data = await res.json();
-                    googleClientId = data.google_client_id || localStorage.getItem('career_bot_google_client_id') || "";
+                    googleClientId = data.google_client_id || "";
 
                     if (googleClientId && window.google && google.accounts && google.accounts.id) {
                         setupGoogleIdentity(googleClientId);
-                    } else {
-                        // Display status in modal
-                        const statusBanner = document.getElementById('google_oauth_status_banner');
-                        if (statusBanner) {
-                            statusBanner.style.display = 'block';
-                        }
                     }
                 }
             } catch (err) {
@@ -1270,9 +1247,6 @@
                     });
                 }
 
-                const statusBanner = document.getElementById('google_oauth_status_banner');
-                if (statusBanner) statusBanner.style.display = 'none';
-
                 // Prompt Google One Tap popup
                 google.accounts.id.prompt();
             } catch (e) {
@@ -1280,22 +1254,10 @@
             }
         }
 
-        function applyGoogleClientId() {
-            const input = document.getElementById('custom_google_client_id');
-            const val = input ? input.value.trim() : '';
-            if (!val) {
-                alert('Please enter a valid Google Client ID (ending in .apps.googleusercontent.com)');
-                return;
-            }
-            localStorage.setItem('career_bot_google_client_id', val);
-            setupGoogleIdentity(val);
-        }
-
         async function handleGoogleCredentialResponse(response) {
             if (!response || !response.credential) return;
 
             try {
-                // Decode Google JWT payload client-side for immediate UX feedback
                 let clientDecoded = {};
                 try {
                     const base64Url = response.credential.split('.')[1];
@@ -1324,7 +1286,7 @@
                 }
 
                 const user = await res.json();
-                onUserAuthenticated(user);
+                onUserAuthenticated(user, true); // true = check if first time profile setup needed
                 closeAuthModal();
             } catch (err) {
                 console.error('Google Sign-in error:', err);
@@ -1354,7 +1316,7 @@
                 if (!res.ok) throw new Error('Could not authenticate profile.');
 
                 const user = await res.json();
-                onUserAuthenticated(user);
+                onUserAuthenticated(user, true);
                 closeAuthModal();
             } catch (err) {
                 console.error('Direct auth error:', err);
@@ -1362,7 +1324,7 @@
             }
         }
 
-        function onUserAuthenticated(user) {
+        function onUserAuthenticated(user, checkFirstTime = false) {
             currentUserId = user.id;
             currentUserData = user;
 
@@ -1374,10 +1336,29 @@
             renderUserAccountBadge(user);
             populateProfileForm(user);
             loadSessions();
+
+            // Reveal the candidate profile button in header
+            const profileBtn = document.getElementById('btn_candidate_profile');
+            if (profileBtn) profileBtn.style.display = 'inline-flex';
+
+            // Reveal the sidebar profile card
+            const sidebarBadge = document.getElementById('sidebar_profile_badge');
+            if (sidebarBadge) {
+                sidebarBadge.style.display = 'block';
+                document.getElementById('sidebar_profile_name').textContent = user.name || user.email || 'Candidate';
+            }
+
+            // If user has not filled education or skills yet, open the profile modal automatically!
+            if (checkFirstTime && (!user.education || !user.skills)) {
+                openProfileModal();
+            }
         }
 
         function renderUserAccountBadge(user) {
             document.getElementById('btn_login_trigger').style.display = 'none';
+            const googleBtn = document.getElementById('google_btn_container');
+            if (googleBtn) googleBtn.style.display = 'none';
+
             const badge = document.getElementById('user_account_badge');
             badge.style.display = 'inline-flex';
 
@@ -1397,6 +1378,16 @@
                 const initial = (user.name || user.email || 'C').charAt(0).toUpperCase();
                 avatarInitials.textContent = initial;
             }
+
+            // Ensure profile edit button is visible
+            const profileBtn = document.getElementById('btn_candidate_profile');
+            if (profileBtn) profileBtn.style.display = 'inline-flex';
+
+            const sidebarBadge = document.getElementById('sidebar_profile_badge');
+            if (sidebarBadge) {
+                sidebarBadge.style.display = 'block';
+                document.getElementById('sidebar_profile_name').textContent = user.name || user.email || 'Candidate';
+            }
         }
 
         function signOutUser() {
@@ -1408,7 +1399,20 @@
             localStorage.removeItem('career_bot_user_pic');
             localStorage.removeItem('career_bot_session_id');
 
-            document.getElementById('btn_login_trigger').style.display = 'inline-flex';
+            // Hide candidate profile button
+            const profileBtn = document.getElementById('btn_candidate_profile');
+            if (profileBtn) profileBtn.style.display = 'none';
+
+            const sidebarBadge = document.getElementById('sidebar_profile_badge');
+            if (sidebarBadge) sidebarBadge.style.display = 'none';
+
+            // Reset login button
+            const googleBtn = document.getElementById('google_btn_container');
+            if (googleBtn && googleClientId) {
+                googleBtn.style.display = 'block';
+            } else {
+                document.getElementById('btn_login_trigger').style.display = 'inline-flex';
+            }
             document.getElementById('user_account_badge').style.display = 'none';
 
             // Clear inputs
@@ -1424,19 +1428,6 @@
         }
 
         function openAuthModal() {
-            if (googleClientId && window.google && google.accounts && google.accounts.id) {
-                // If official client id is loaded, render button into modal slot
-                const slot = document.getElementById('modal_google_btn_slot');
-                if (slot && !slot.hasChildNodes()) {
-                    google.accounts.id.renderButton(slot, {
-                        theme: 'outline',
-                        size: 'large',
-                        text: 'signin_with',
-                        shape: 'rectangular',
-                        width: 320
-                    });
-                }
-            }
             document.getElementById('auth_modal_overlay').classList.add('open');
         }
 
@@ -1444,7 +1435,15 @@
             document.getElementById('auth_modal_overlay').classList.remove('open');
         }
 
-        /* ===== PROFILE MANAGEMENT ===== */
+        /* ===== PROFILE MODAL ===== */
+        function openProfileModal() {
+            document.getElementById('profile_modal_overlay').classList.add('open');
+        }
+
+        function closeProfileModal() {
+            document.getElementById('profile_modal_overlay').classList.remove('open');
+        }
+
         async function saveCandidateProfile() {
             const payload = {
                 name: document.getElementById('prof_name').value.trim(),
@@ -1476,7 +1475,10 @@
 
                     const pill = document.getElementById('saved_status_indicator');
                     pill.style.display = 'inline-block';
-                    setTimeout(() => { pill.style.display = 'none'; }, 2500);
+                    setTimeout(() => {
+                        pill.style.display = 'none';
+                        closeProfileModal();
+                    }, 1800);
                 }
             } catch (err) {
                 console.error('Error saving profile:', err);
@@ -1504,6 +1506,9 @@
             document.getElementById('prof_skills').value = p.skills || '';
             document.getElementById('prof_interests').value = p.interests || '';
             document.getElementById('prof_industry').value = p.target_industry || '';
+
+            const sidebarName = document.getElementById('sidebar_profile_name');
+            if (sidebarName) sidebarName.textContent = p.name || p.email || 'Candidate';
         }
 
         /* ===== SESSIONS ===== */
@@ -1516,7 +1521,7 @@
                 const container = document.getElementById('session_list_container');
 
                 if (!sessions.length) {
-                    container.innerHTML = '<div style="font-size:0.75rem; color:var(--text-muted); text-align:center; padding:12px 0;">No past records found</div>';
+                    container.innerHTML = '<div style="font-size:0.75rem; color:var(--text-muted); text-align:center; padding:16px 0;">No past records found</div>';
                     return;
                 }
 
@@ -1553,7 +1558,8 @@
                     <div class="msg-body-wrapper">
                         <div class="msg-card-assistant">
                             <div class="msg-text-main">
-                                Fresh consultation initialized. Outline your current career aspirations, skill competencies, or target roles to evaluate live market opportunities.
+                                Fresh consultation initialized. Ask any career question, transition guidance, or job discovery query. 
+                                Groq LLM references your latest candidate profile automatically!
                             </div>
                         </div>
                     </div>
@@ -1753,7 +1759,6 @@
                     </div>
                 `;
             } else if (hasLegacyJobs) {
-                // Fallback for string titles
                 const listItems = extra.job_titles.map(title => `
                     <div class="job-card" style="padding:10px 14px;">
                         <div style="font-weight:600; color:#fff; font-size:0.86rem; margin-bottom:6px;">${escapeHtml(title)}</div>
@@ -1815,11 +1820,6 @@
         function removeLoadingCard(id) {
             const el = document.getElementById(id);
             if (el) el.remove();
-        }
-
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('mobile-open');
         }
 
         function scrollStreamToBottom() {
