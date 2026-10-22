@@ -7,8 +7,19 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-API_KEY = os.getenv("OPENROUTER_API_KEY")
-BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
+# Check for Groq first, then OpenRouter
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+
+if GROQ_API_KEY:
+    API_KEY = GROQ_API_KEY
+    BASE_URL = "https://api.groq.com/openai/v1/chat/completions"
+    DEFAULT_MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
+else:
+    API_KEY = OPENROUTER_API_KEY
+    BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
+    DEFAULT_MODEL = "mistralai/mistral-7b-instruct"
+
 HEADERS = {
     "Authorization": f"Bearer {API_KEY}",
     "Content-Type": "application/json"
@@ -82,9 +93,10 @@ async def analyze_conversation_turn(
     messages.append({"role": "user", "content": user_input})
 
     payload = {
-        "model": "mistralai/mistral-7b-instruct",
+        "model": DEFAULT_MODEL,
         "messages": messages,
-        "temperature": 0.7
+        "temperature": 0.5,
+        "response_format": {"type": "json_object"}
     }
 
     try:
