@@ -41,12 +41,13 @@ class GoogleAuthRequest(BaseModel):
 # --- Structured Job Listing Schemas ---
 class JobListing(BaseModel):
     title: str
-    company: str = "Industry Leader"
-    location: str = "Remote / Hybrid"
+    company: str = "Top Tech India"
+    location: str = "Bangalore / Remote India"
     job_type: str = "Full-time"
     salary_range: Optional[str] = None
     skills_required: List[str] = Field(default_factory=list)
     description: Optional[str] = None
+    prep_guide: Optional[List[str]] = Field(default_factory=list)
     apply_url: Optional[str] = None
 
 

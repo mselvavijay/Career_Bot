@@ -25,87 +25,140 @@ HEADERS = {
     "Content-Type": "application/json"
 }
 
-SYSTEM_PROMPT_TEMPLATE = """You are an expert Executive AI Career Counselor and Talent Intelligence Advisor.
-You converse naturally with the candidate across multiple turns, taking into account their user profile (education, skills, interests, current role) and entire conversation context to deliver deeply personalized career recommendations and active job opportunities.
+SYSTEM_PROMPT_TEMPLATE = """You are an expert AI Career Counselor and Talent Intelligence Advisor specializing exclusively in the INDIAN Job Market.
+You converse directly with the candidate, leveraging their declared user profile (Degree, Years of Experience, Technical Skills) to deliver tailored job recommendations in India along with structured 3-Week Preparation Guides.
 
-CRITICAL INSTRUCTION:
-You must ALWAYS respond with ONLY a valid JSON object and nothing else. No markdown wrappers, no backticks, no explanatory text outside the JSON.
+CRITICAL INSTRUCTIONS FOR BASIC PLAN:
+1. GEOGRAPHIC FOCUS: Strictly recommend jobs located in INDIA (Bangalore, Hyderabad, Pune, Mumbai, Gurgaon, Noida, Chennai, or Remote India).
+2. COMPENSATION: Express all salary ranges in Indian Rupees LPA (Lakhs Per Annum, e.g. ₹6 - ₹10 LPA, ₹12 - ₹20 LPA, ₹22 - ₹38 LPA) matching candidate experience.
+3. 10 JOB OPENINGS: You must ALWAYS provide EXACTLY 10 job openings in the "open_jobs" array.
+4. 3-WEEK PREPARATION GUIDE: For EACH of the 10 job openings, you must include a "prep_guide" array of EXACTLY 3 concise bullet points:
+   - "Week 1: [DSA, Core Fundamentals & Language Concepts]"
+   - "Week 2: [Key Frameworks, Databases & Live Project Implementation]"
+   - "Week 3: [System Design, Mock Technical Interviews & Behavioral Rounds]"
+5. NO VERBOSE / LONG ESSAYS: Keep job descriptions to 1 concise sentence. Keep prep guide items as sharp, actionable bullets.
+6. CANDIDATE PROFILE GROUNDING: When the candidate's profile is saved, DO NOT speculate about generic career categories (e.g. Arts vs Sports). Directly provide role intelligence and the 10 jobs strictly matching their declared Degree, Experience, and Skills.
+7. CRITICAL JSON FORMAT: You must ALWAYS respond with ONLY a valid JSON object. No markdown wrappers, no backticks outside JSON.
 
 Expected JSON format:
 {{
-  "reply": "Your conversational response directly addressing the user's latest input, asking clarifying questions, acknowledging context, or summarizing strategic career guidance.",
-  "interests": ["Identified Focus Area 1", "Identified Focus Area 2"],
-  "career_category": "STEM" | "Arts" | "Sports" | "Business" | "Healthcare" | "Other",
-  "explanation": "A concise 1-2 sentence explanation connecting the candidate's background/skills/interests to the recommended category.",
-  "job_titles": ["Job Title 1", "Job Title 2", "Job Title 3"],
+  "reply": "Concise 2-3 sentence strategic summary acknowledging the candidate's degree, experience, and skills, introducing the 10 Indian job recommendations and prep roadmaps.",
+  "interests": ["Skill/Domain 1", "Skill/Domain 2"],
+  "career_category": "Technology",
+  "explanation": "Brief 1-sentence alignment with candidate profile.",
+  "job_titles": ["Job 1", "Job 2", "Job 3", "Job 4", "Job 5", "Job 6", "Job 7", "Job 8", "Job 9", "Job 10"],
   "open_jobs": [
     {{
-      "title": "Exact Role Title (e.g. Machine Learning Engineer)",
-      "company": "Target Hiring Organization or Industry Sector (e.g. OpenAI / Cloudflare / Enterprise AI Labs)",
-      "location": "Location & Work Mode (e.g. Remote / Hybrid / Bangalore / San Francisco)",
-      "job_type": "Full-time" | "Contract" | "Internship",
-      "salary_range": "Estimated Market Compensation (e.g. ₹10,00,000 - ₹18,00,000 / $85,000 - $125,000)",
-      "skills_required": ["Primary Skill 1", "Skill 2", "Skill 3"],
-      "description": "1-2 sentence summary of core mission, responsibilities, and key qualifications.",
-      "apply_url": "https://www.linkedin.com/jobs/search/?keywords=Machine+Learning+Engineer"
+      "title": "Exact Role Title (e.g. Backend Developer - Python)",
+      "company": "Indian Tech Company or MNC Hub (e.g. Swiggy / Flipkart / Razorpay / PhonePe / Infosys)",
+      "location": "City in India (e.g. Bangalore, Karnataka / Remote India)",
+      "job_type": "Full-time",
+      "salary_range": "₹8,00,000 - ₹14,00,000 LPA",
+      "skills_required": ["Python", "FastAPI", "PostgreSQL"],
+      "description": "High-impact opening focusing on scalable microservices and APIs.",
+      "prep_guide": [
+        "Week 1: DSA in Python, time-complexity analysis, and core concurrency patterns.",
+        "Week 2: FastAPI / Django REST microservice build, Dockerization, and SQL indexing.",
+        "Week 3: Low-Level System Design, Mock API problem-solving, and resume walkthrough."
+      ],
+      "apply_url": "https://www.linkedin.com/jobs/search/?keywords=Backend+Developer+Python&location=India"
     }}
   ]
 }}
 
 MANDATORY TRI-FACTOR CALIBRATION RULES (EXPERIENCE + SKILLS + DEGREE):
-You must STRICTLY synthesize and cross-calibrate all career guidance, recommended job titles, responsibilities, and open job cards across ALL THREE pillars simultaneously:
-
-1. YEARS OF EXPERIENCE (Calibrates Seniority, Hierarchy & Compensation Level):
-   * 0 Years / Fresher / College Student: STRICTLY suggest Entry-Level, Graduate, Junior, or Intern roles (e.g., Junior Software Engineer, Associate Data Analyst, Graduate AI Engineer). Under NO circumstances should Senior, Lead, Staff, or Managerial roles be recommended to candidates with 0-1 years of experience.
-   * 1-3 Years: Suggest Junior to Mid-Level individual contributor positions.
-   * 4-7 Years: Suggest Mid-Senior, Specialist, or Technical Lead positions.
-   * 8+ Years: Suggest Senior, Staff, Principal, Architect, or Management positions.
-
-2. CORE SKILLS & TECHNICAL COMPETENCIES (Calibrates Domain, Frameworks & Specialization):
-   * Derive the candidate's exact technical domains, toolchains, frameworks, and job responsibilities directly from their declared skills (e.g., Python, React, PyTorch, Cloud, SQL, DevOps).
-   * Ensure every recommended role and open job card directly utilizes their core competencies.
-
-3. DEGREE & EDUCATION (Calibrates Academic Grounding & Industry Qualification Fit):
-   * Cross-reference the candidate's academic degree and field of study (e.g., B.Tech / B.E. in CS/IT/ECE, M.S., BCA, MCA, B.Sc, MBA, or related discipline) to ensure the suggested roles and career trajectories align with standard industry education requirements and academic pedigree.
-
-ALL THREE FACTORS MUST ALIGN: A candidate's recommended job title must be the intersection of their Degree (academic eligibility), their Skills (technical domain), and their Years of Experience (hierarchical level).
-- Make the "apply_url" a direct search query to LinkedIn Jobs or Google Jobs for that specific role title.
-- Keep the tone professional, encouraging, and authoritative.
+1. YEARS OF EXPERIENCE (Calibrates Seniority, Hierarchy & LPA in India):
+   * 0 Years / Fresher / Student: STRICTLY suggest Entry-Level, Graduate, Junior, or Intern roles (e.g., Junior Python Engineer, Associate AI Developer, Graduate Software Engineer). Target ₹4 - ₹9 LPA. NEVER recommend Senior or Lead roles.
+   * 1-3 Years: Junior to Mid-Level software roles (₹8 - ₹16 LPA).
+   * 4-7 Years: Mid-Senior, Specialist, or Technical Lead roles (₹18 - ₹32 LPA).
+   * 8+ Years: Senior Staff, Principal, or Engineering Manager roles (₹35 - ₹60+ LPA).
+2. CORE SKILLS: The 10 roles must directly utilize the candidate's declared programming languages, frameworks, and domain competencies.
+3. DEGREE: Ensure academic alignment (e.g. B.Tech / B.E., M.S., BCA, MCA, B.Sc) with industry prerequisites.
 """
 
-def format_job_card(title: str, category: str = "Technology") -> dict:
+INDIAN_TECH_HUBS = [
+    "Bangalore, Karnataka", "Hyderabad, Telangana", "Pune, Maharashtra",
+    "Gurgaon, Delhi NCR", "Mumbai, Maharashtra", "Noida, Uttar Pradesh",
+    "Chennai, Tamil Nadu", "Remote (India)", "Bangalore / Hybrid", "Gurgaon / Hybrid"
+]
+
+INDIAN_COMPANIES = [
+    "Flipkart", "Swiggy", "Zomato", "Razorpay", "PhonePe",
+    "Zepto", "CRED", "Infosys Digital", "TCS Enterprise", "Jio Platforms",
+    "Microsoft India", "Amazon India", "Google India", "Groww", "Paytm"
+]
+
+def format_job_card(title: str, category: str = "Technology", exp_years: int = 0, index: int = 0) -> dict:
     clean_title = title.split(".", 1)[-1].strip() if "." in title[:3] else title.strip()
     encoded = clean_title.replace(" ", "+")
+    company = INDIAN_COMPANIES[index % len(INDIAN_COMPANIES)]
+    location = INDIAN_TECH_HUBS[index % len(INDIAN_TECH_HUBS)]
+
+    if exp_years == 0:
+        salary = "₹5,50,000 - ₹9,00,000 LPA"
+    elif exp_years <= 3:
+        salary = "₹9,00,000 - ₹16,00,000 LPA"
+    elif exp_years <= 7:
+        salary = "₹18,00,000 - ₹30,00,000 LPA"
+    else:
+        salary = "₹32,00,000 - ₹55,00,000+ LPA"
+
     return {
         "title": clean_title,
-        "company": f"Leading {category} Organizations",
-        "location": "Remote / Hybrid",
+        "company": company,
+        "location": location,
         "job_type": "Full-time",
-        "salary_range": "Competitive Market Compensation",
-        "skills_required": [clean_title, "Problem Solving", "System Design"],
-        "description": f"Active hiring opening seeking qualified professionals in {clean_title}.",
-        "apply_url": f"https://www.linkedin.com/jobs/search/?keywords={encoded}"
+        "salary_range": salary,
+        "skills_required": [clean_title, "Problem Solving", "Data Structures"],
+        "description": f"Active hiring opportunity in {location} for qualified {clean_title}.",
+        "prep_guide": [
+            f"Week 1: Algorithmic problem-solving (DSA) & Core Computer Science concepts for {clean_title}.",
+            f"Week 2: Deep dive into core frameworks, databases, and building a showcase project.",
+            f"Week 3: Low-Level & High-Level System Design, mock interviews, and live coding practice."
+        ],
+        "apply_url": f"https://www.linkedin.com/jobs/search/?keywords={encoded}&location=India"
     }
 
-def sanitize_and_enrich_jobs(parsed: dict) -> dict:
+def sanitize_and_enrich_jobs(parsed: dict, user_profile: Optional[Dict[str, Any]] = None) -> dict:
     category = parsed.get("career_category", "Technology")
     open_jobs = parsed.get("open_jobs", [])
     job_titles = parsed.get("job_titles", [])
 
+    exp_years = 0
+    if user_profile and user_profile.get("years_of_experience"):
+        try:
+            import re
+            m = re.search(r'\d+', str(user_profile.get("years_of_experience")))
+            if m:
+                exp_years = int(m.group())
+        except Exception:
+            exp_years = 0
+
     enriched_jobs = []
     if isinstance(open_jobs, list):
-        for j in open_jobs:
+        for idx, j in enumerate(open_jobs):
             if isinstance(j, dict) and j.get("title"):
                 title = j["title"].strip()
-                company = j.get("company") or f"Top {category} Employer"
-                location = j.get("location") or "Remote / Hybrid"
+                company = j.get("company") or INDIAN_COMPANIES[idx % len(INDIAN_COMPANIES)]
+                location = j.get("location") or INDIAN_TECH_HUBS[idx % len(INDIAN_TECH_HUBS)]
+                if "India" not in location and not any(h in location for h in ["Bangalore", "Hyderabad", "Pune", "Mumbai", "Delhi", "Gurgaon", "Noida", "Chennai"]):
+                    location = f"{location} (India)"
                 job_type = j.get("job_type") or "Full-time"
-                salary = j.get("salary_range") or "Competitive Compensation"
+                salary = j.get("salary_range") or "Competitive LPA"
                 skills = j.get("skills_required") or [title]
-                desc = j.get("description") or f"Exciting position for an ambitious {title}."
+                desc = j.get("description") or f"Active position for {title} in India."
+
+                prep_guide = j.get("prep_guide")
+                if not isinstance(prep_guide, list) or len(prep_guide) < 3:
+                    prep_guide = [
+                        f"Week 1: Core Fundamentals, DSA problem solving, and language fluency for {title}.",
+                        f"Week 2: Primary tech stack, API architecture, and real-world project deployment.",
+                        f"Week 3: System Design, technical mock interviews, and scenario-based problem solving."
+                    ]
+
                 apply_url = j.get("apply_url")
                 if not apply_url or not apply_url.startswith("http"):
-                    apply_url = f"https://www.linkedin.com/jobs/search/?keywords={title.replace(' ', '+')}"
+                    apply_url = f"https://www.linkedin.com/jobs/search/?keywords={title.replace(' ', '+')}&location=India"
 
                 enriched_jobs.append({
                     "title": title,
@@ -115,24 +168,50 @@ def sanitize_and_enrich_jobs(parsed: dict) -> dict:
                     "salary_range": salary,
                     "skills_required": skills if isinstance(skills, list) else [str(skills)],
                     "description": desc,
+                    "prep_guide": prep_guide,
                     "apply_url": apply_url
                 })
 
-    # If open_jobs was empty, build from job_titles
-    if not enriched_jobs and isinstance(job_titles, list):
-        for title in job_titles[:5]:
-            if isinstance(title, str) and title.strip():
-                enriched_jobs.append(format_job_card(title, category))
+    # Fill up to 10 jobs if fewer than 10 returned
+    if len(enriched_jobs) < 10:
+        seen_titles = {j["title"].lower() for j in enriched_jobs}
+        # Check job_titles first
+        if isinstance(job_titles, list):
+            for t in job_titles:
+                if isinstance(t, str) and t.strip() and t.strip().lower() not in seen_titles:
+                    enriched_jobs.append(format_job_card(t.strip(), category, exp_years, len(enriched_jobs)))
+                    seen_titles.add(t.strip().lower())
+                    if len(enriched_jobs) >= 10:
+                        break
 
-    # If still empty, provide general roles based on category
-    if not enriched_jobs:
-        default_titles = [f"{category} Specialist", f"Associate {category} Lead", f"Senior {category} Consultant"]
-        for dt in default_titles:
-            enriched_jobs.append(format_job_card(dt, category))
+    # If still fewer than 10, fill with calibrated Indian tech roles
+    if len(enriched_jobs) < 10:
+        prefix = "Junior" if exp_years == 0 else ("Senior" if exp_years >= 5 else "Mid-Level")
+        base_skill = "Software"
+        if user_profile and user_profile.get("skills"):
+            first_skill = user_profile.get("skills").split(",")[0].strip()
+            if first_skill:
+                base_skill = first_skill
 
-    parsed["open_jobs"] = enriched_jobs
-    # Also sync job_titles as list of strings
-    parsed["job_titles"] = [j["title"] for j in enriched_jobs]
+        sample_titles = [
+            f"{base_skill} Backend Engineer",
+            f"Associate {base_skill} Developer",
+            f"Full Stack {base_skill} Specialist",
+            f"Cloud & DevOps Engineer ({base_skill})",
+            f"Systems Engineer - {base_skill}",
+            f"API & Platform Engineer ({base_skill})",
+            f"{prefix} Application Developer",
+            f"{base_skill} Integration Engineer",
+            f"Data & Backend Specialist ({base_skill})",
+            f"Core {base_skill} Solutions Engineer"
+        ]
+        for st in sample_titles:
+            if st.lower() not in seen_titles and len(enriched_jobs) < 10:
+                enriched_jobs.append(format_job_card(st, category, exp_years, len(enriched_jobs)))
+                seen_titles.add(st.lower())
+
+    parsed["open_jobs"] = enriched_jobs[:10]
+    parsed["job_titles"] = [j["title"] for j in enriched_jobs[:10]]
     return parsed
 
 def build_system_message(user_profile: Optional[Dict[str, Any]] = None) -> str:
@@ -217,7 +296,7 @@ async def analyze_conversation_turn(
             if "career_category" not in parsed:
                 parsed["career_category"] = "Professional & Technology"
 
-            return sanitize_and_enrich_jobs(parsed)
+            return sanitize_and_enrich_jobs(parsed, user_profile)
 
     except json.JSONDecodeError:
         # Fallback if model returned plain conversational text instead of strict JSON
@@ -226,9 +305,9 @@ async def analyze_conversation_turn(
             "interests": [],
             "career_category": "Professional & Technology",
             "explanation": "Recommendations aligned with your skills and background.",
-            "job_titles": ["Software Engineer", "Solutions Architect", "Data Analyst"]
+            "job_titles": ["Software Engineer", "Backend Developer", "Full Stack Engineer"]
         }
-        return sanitize_and_enrich_jobs(fallback)
+        return sanitize_and_enrich_jobs(fallback, user_profile)
     except httpx.HTTPStatusError as e:
         raise HTTPException(status_code=502, detail=f"LLM API error: {str(e)}")
     except Exception as e:
