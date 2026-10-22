@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CareerBot AI — Multi-Turn AI Career Advisor</title>
+    <meta name="description" content="CareerBot AI - Multi-turn AI career advisor powered by LLM. Get personalized career recommendations and live job openings.">
+    <title>CareerBot AI - Multi-Turn AI Career Advisor</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -11,7 +12,6 @@
         :root {
             --primary: #4f46e5;
             --primary-hover: #4338ca;
-            --primary-light: #eef2ff;
             --accent: #06b6d4;
             --bg-page: #0f172a;
             --surface-card: #1e293b;
@@ -25,36 +25,43 @@
             --badge-border: rgba(99, 102, 241, 0.4);
             --radius-lg: 16px;
             --radius-md: 10px;
+            --header-h: 67px;
         }
 
-        * {
+        *, *::before, *::after {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+        }
+
+        html, body {
+            height: 100%;
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg-page);
             color: var(--text-main);
-            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow-x: hidden;
+            overflow: hidden;
         }
 
-        /* Top Header */
+        /* ===== HEADER ===== */
         header {
-            background: rgba(30, 41, 59, 0.85);
+            height: var(--header-h);
+            background: rgba(30, 41, 59, 0.92);
             backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border-color);
-            padding: 14px 28px;
+            padding: 0 28px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             position: sticky;
             top: 0;
-            z-index: 50;
+            z-index: 100;
+            flex-shrink: 0;
         }
 
         .brand-container {
@@ -74,27 +81,23 @@
             font-size: 1.2rem;
             color: white;
             box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+            flex-shrink: 0;
         }
 
         .brand-title {
-            font-size: 1.25rem;
+            font-size: 1.2rem;
             font-weight: 700;
             letter-spacing: -0.02em;
             background: linear-gradient(90deg, #ffffff, #cbd5e1);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .brand-subtitle {
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             color: var(--accent);
             font-weight: 500;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
         }
 
         .btn-profile-toggle {
@@ -106,6 +109,7 @@
             cursor: pointer;
             font-size: 0.85rem;
             font-weight: 500;
+            font-family: inherit;
             display: flex;
             align-items: center;
             gap: 6px;
@@ -117,73 +121,81 @@
             border-color: var(--accent);
         }
 
-        /* App Container */
+        /* ===== APP LAYOUT ===== */
         .app-layout {
             display: grid;
-            grid-template-columns: 320px 1fr;
-            max-width: 1400px;
-            width: 100%;
-            margin: 0 auto;
+            grid-template-columns: 300px 1fr;
             flex: 1;
-            height: calc(100vh - 67px);
+            height: calc(100vh - var(--header-h));
             overflow: hidden;
         }
 
-        /* Sidebar Profile & Sessions */
+        /* ===== SIDEBAR ===== */
         .sidebar {
-            background: rgba(15, 23, 42, 0.95);
+            background: rgba(10, 17, 33, 0.97);
             border-right: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
             overflow-y: auto;
-            padding: 20px;
-            gap: 20px;
+            overflow-x: hidden;
+            padding: 16px;
+            gap: 16px;
         }
 
         .sidebar-panel {
             background: var(--surface-card);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
-            padding: 16px;
+            padding: 14px;
         }
 
         .sidebar-title {
-            font-size: 0.9rem;
-            font-weight: 600;
+            font-size: 0.78rem;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.06em;
             color: var(--text-muted);
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
 
         .form-group {
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .form-group label {
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             color: var(--text-muted);
             display: block;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
+            font-weight: 500;
         }
 
-        .form-group input, .form-group textarea {
+        .form-group input,
+        .form-group textarea {
             width: 100%;
-            background: #0f172a;
+            background: #0a1121;
             border: 1px solid var(--border-color);
             color: var(--text-main);
-            padding: 8px 10px;
+            padding: 7px 10px;
             border-radius: 6px;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.18);
         }
 
         .form-group textarea {
             resize: vertical;
-            min-height: 48px;
+            min-height: 46px;
         }
 
         .btn-save-profile {
@@ -191,83 +203,92 @@
             background: linear-gradient(135deg, var(--primary), #6366f1);
             color: white;
             border: none;
-            padding: 8px;
-            border-radius: 6px;
+            padding: 9px;
+            border-radius: 8px;
             font-size: 0.85rem;
             font-weight: 600;
+            font-family: inherit;
             cursor: pointer;
-            transition: opacity 0.2s;
+            transition: opacity 0.2s, transform 0.1s;
+            margin-top: 4px;
         }
 
-        .btn-save-profile:hover {
-            opacity: 0.9;
-        }
+        .btn-save-profile:hover { opacity: 0.9; }
+        .btn-save-profile:active { transform: scale(0.98); }
 
         .btn-new-chat {
             width: 100%;
             background: transparent;
-            color: var(--text-main);
+            color: var(--accent);
             border: 1px dashed var(--accent);
-            padding: 10px;
+            padding: 9px;
             border-radius: var(--radius-md);
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             font-weight: 600;
+            font-family: inherit;
             cursor: pointer;
             margin-bottom: 10px;
             transition: background 0.2s;
         }
 
-        .btn-new-chat:hover {
-            background: rgba(6, 182, 212, 0.1);
-        }
+        .btn-new-chat:hover { background: rgba(6, 182, 212, 0.1); }
 
         .session-item {
-            padding: 10px 12px;
+            padding: 9px 12px;
             border-radius: 8px;
-            background: #0f172a;
+            background: rgba(15, 23, 42, 0.7);
             border: 1px solid transparent;
             color: var(--text-muted);
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             cursor: pointer;
-            margin-bottom: 6px;
-            transition: all 0.2s ease;
+            margin-bottom: 5px;
+            transition: all 0.18s ease;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        .session-item:hover, .session-item.active {
+        .session-item:hover,
+        .session-item.active {
             background: var(--surface-hover);
             color: var(--text-main);
             border-color: var(--primary);
         }
 
-        /* Main Chat Canvas */
+        /* ===== CHAT CANVAS ===== */
         .chat-container {
             display: flex;
             flex-direction: column;
             height: 100%;
-            background: radial-gradient(circle at 50% 0%, rgba(79, 70, 229, 0.08), transparent 70%);
+            background: radial-gradient(ellipse at 60% 0%, rgba(79, 70, 229, 0.07), transparent 65%);
+            overflow: hidden;
         }
 
         .chat-messages {
             flex: 1;
             overflow-y: auto;
-            padding: 24px;
+            overflow-x: hidden;
+            padding: 24px 28px;
             display: flex;
             flex-direction: column;
-            gap: 18px;
+            gap: 16px;
+            scroll-behavior: smooth;
         }
+
+        /* Custom scrollbar */
+        .chat-messages::-webkit-scrollbar { width: 5px; }
+        .chat-messages::-webkit-scrollbar-track { background: transparent; }
+        .chat-messages::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
 
         .msg-wrapper {
             display: flex;
-            gap: 12px;
-            max-width: 80%;
-            animation: fadeIn 0.25s ease-out;
+            gap: 10px;
+            max-width: 82%;
+            animation: fadeIn 0.22s ease-out;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
+            from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -277,14 +298,15 @@
         }
 
         .msg-avatar {
-            width: 34px;
-            height: 34px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             flex-shrink: 0;
+            margin-top: 2px;
         }
 
         .msg-wrapper.bot .msg-avatar {
@@ -298,16 +320,16 @@
         }
 
         .msg-bubble {
-            padding: 14px 18px;
+            padding: 12px 16px;
             border-radius: var(--radius-lg);
-            font-size: 0.95rem;
-            line-height: 1.55;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            font-size: 0.93rem;
+            line-height: 1.6;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
         }
 
         .msg-wrapper.user .msg-bubble {
             background: var(--bubble-user);
-            color: #ffffff;
+            color: #fff;
             border-bottom-right-radius: 4px;
         }
 
@@ -319,12 +341,12 @@
             width: 100%;
         }
 
-        /* AI Recommendation Cards inside Bot Messages */
+        /* ===== RECOMMENDATION BOX ===== */
         .recom-box {
-            margin-top: 14px;
-            padding: 14px;
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            margin-top: 12px;
+            padding: 12px;
+            background: rgba(10, 17, 33, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.07);
             border-radius: var(--radius-md);
         }
 
@@ -335,81 +357,103 @@
             margin-bottom: 8px;
         }
 
+        .recom-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
         .badge-cat {
             background: var(--badge-bg);
             border: 1px solid var(--badge-border);
             color: #818cf8;
-            font-weight: 600;
-            font-size: 0.75rem;
-            padding: 3px 10px;
+            font-weight: 700;
+            font-size: 0.72rem;
+            padding: 2px 10px;
             border-radius: 20px;
+        }
+
+        .explanation-text {
+            font-size: 0.83rem;
+            color: #cbd5e1;
+            margin-bottom: 8px;
+            line-height: 1.5;
         }
 
         .tags-list {
             display: flex;
             flex-wrap: wrap;
-            gap: 6px;
-            margin: 8px 0;
+            gap: 5px;
+            margin-bottom: 8px;
         }
 
         .tag-pill {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 0.75rem;
-            color: var(--text-muted);
+            background: rgba(79, 70, 229, 0.12);
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            font-size: 0.72rem;
+            color: #a5b4fc;
             padding: 2px 8px;
             border-radius: 4px;
+            font-weight: 500;
         }
 
         .jobs-title {
-            font-size: 0.8rem;
-            font-weight: 600;
+            font-size: 0.72rem;
+            font-weight: 700;
             color: var(--accent);
-            margin-top: 10px;
-            margin-bottom: 4px;
+            margin-bottom: 5px;
             text-transform: uppercase;
-            letter-spacing: 0.03em;
+            letter-spacing: 0.04em;
         }
 
         .jobs-list {
             list-style: none;
-            padding: 0;
         }
 
         .jobs-list li {
-            padding: 6px 8px;
-            margin-top: 4px;
-            background: rgba(255, 255, 255, 0.03);
+            padding: 5px 8px;
+            margin-top: 3px;
+            background: rgba(6, 182, 212, 0.04);
             border-radius: 6px;
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             display: flex;
             align-items: center;
             gap: 6px;
-            border-left: 2px solid var(--accent);
+            border-left: 2px solid rgba(6, 182, 212, 0.5);
+            color: var(--text-main);
+            transition: background 0.15s;
         }
 
-        /* Chat Input Bar */
+        .jobs-list li:hover {
+            background: rgba(6, 182, 212, 0.09);
+        }
+
+        /* ===== CHAT INPUT ===== */
         .chat-input-area {
-            padding: 18px 24px;
-            background: rgba(30, 41, 59, 0.85);
+            padding: 14px 24px 18px;
+            background: rgba(30, 41, 59, 0.9);
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border-top: 1px solid var(--border-color);
+            flex-shrink: 0;
         }
 
         .input-wrapper {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             align-items: center;
-            background: #0f172a;
+            background: #0a1121;
             border: 1px solid var(--border-color);
-            padding: 6px 12px;
-            border-radius: 12px;
-            transition: border-color 0.2s;
+            padding: 5px 10px 5px 16px;
+            border-radius: 14px;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
         .input-wrapper:focus-within {
             border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
         }
 
         .input-wrapper input {
@@ -418,41 +462,44 @@
             border: none;
             outline: none;
             color: var(--text-main);
-            font-size: 0.95rem;
-            padding: 8px 4px;
+            font-size: 0.93rem;
+            padding: 9px 0;
             font-family: inherit;
+        }
+
+        .input-wrapper input::placeholder {
+            color: var(--text-muted);
+            font-size: 0.88rem;
         }
 
         .btn-send {
             background: linear-gradient(135deg, var(--primary), #6366f1);
             color: white;
             border: none;
-            padding: 10px 18px;
-            border-radius: 8px;
+            padding: 9px 20px;
+            border-radius: 10px;
             font-size: 0.9rem;
             font-weight: 600;
+            font-family: inherit;
             cursor: pointer;
             transition: transform 0.1s ease, opacity 0.2s;
             display: flex;
             align-items: center;
             gap: 6px;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
-        .btn-send:hover {
-            opacity: 0.95;
-            transform: scale(1.02);
-        }
+        .btn-send:hover { opacity: 0.92; transform: scale(1.02); }
+        .btn-send:active { transform: scale(0.97); }
+        .btn-send:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
 
-        .btn-send:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
+        /* ===== LOADING DOTS ===== */
         .loading-dots {
             display: inline-flex;
             gap: 4px;
             align-items: center;
+            padding: 2px 0;
         }
 
         .loading-dots span {
@@ -460,32 +507,50 @@
             height: 6px;
             background: var(--text-muted);
             border-radius: 50%;
-            animation: bounce 1.2s infinite ease-in-out both;
+            animation: bounce 1.3s infinite ease-in-out both;
         }
 
         .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
         .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
 
         @keyframes bounce {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1); }
+            0%, 80%, 100% { transform: scale(0.3); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
         }
 
+        /* ===== SIDEBAR OVERLAY (mobile) ===== */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 39;
+        }
+
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 900px) {
             .app-layout {
                 grid-template-columns: 1fr;
             }
+
             .sidebar {
                 display: none;
-            }
-            .sidebar.mobile-open {
-                display: flex;
                 position: fixed;
-                top: 67px;
+                top: var(--header-h);
                 left: 0;
-                width: 100%;
-                height: calc(100vh - 67px);
+                width: 300px;
+                max-width: 85vw;
+                height: calc(100vh - var(--header-h));
                 z-index: 40;
+                box-shadow: 4px 0 24px rgba(0,0,0,0.4);
+            }
+
+            .sidebar.open {
+                display: flex;
+            }
+
+            .sidebar-overlay.visible {
+                display: block;
             }
         }
     </style>
@@ -493,88 +558,89 @@
 <body>
     <header>
         <div class="brand-container">
-            <div class="brand-icon">⚡</div>
+            <div class="brand-icon">&#9889;</div>
             <div>
                 <div class="brand-title">CareerBot AI</div>
-                <div class="brand-subtitle">Multi-Turn Context & Career Guidance</div>
+                <div class="brand-subtitle">Multi-Turn Context &amp; Career Guidance</div>
             </div>
         </div>
-        <div class="header-actions">
-            <button class="btn-profile-toggle" onclick="toggleSidebar()">
-                👤 <span id="profile_btn_text">My Profile & Sessions</span>
+        <div>
+            <button class="btn-profile-toggle" onclick="toggleSidebar()" aria-label="Toggle profile sidebar">
+                &#128100; <span>My Profile &amp; Sessions</span>
             </button>
         </div>
     </header>
 
+    <!-- Sidebar overlay for mobile -->
+    <div class="sidebar-overlay" id="sidebar_overlay" onclick="closeSidebar()"></div>
+
     <div class="app-layout">
-        <!-- Sidebar: User Profile & Past Sessions -->
+        <!-- Sidebar: Profile + Sessions -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-panel">
                 <div class="sidebar-title">
-                    <span>User Profile Context</span>
-                    <span id="saved_status" style="font-size: 0.7rem; color: #10b981; display: none;">Saved!</span>
+                    <span>User Profile</span>
+                    <span id="saved_status" style="font-size:0.7rem;color:#10b981;display:none;font-weight:600;">&#10003; Saved</span>
                 </div>
                 <div class="form-group">
-                    <label>Full Name</label>
-                    <input type="text" id="prof_name" placeholder="e.g. John Doe">
+                    <label for="prof_name">Full Name</label>
+                    <input type="text" id="prof_name" placeholder="e.g. Ravi Kumar" autocomplete="name">
                 </div>
                 <div class="form-group">
-                    <label>Education / Degree</label>
-                    <input type="text" id="prof_education" placeholder="e.g. B.Tech Computer Science">
+                    <label for="prof_education">Education / Degree</label>
+                    <input type="text" id="prof_education" placeholder="e.g. B.Tech Computer Science" autocomplete="off">
                 </div>
                 <div class="form-group">
-                    <label>Current Role / Experience</label>
-                    <input type="text" id="prof_role" placeholder="e.g. 2nd Year Student or Junior Dev">
+                    <label for="prof_role">Current Role / Year</label>
+                    <input type="text" id="prof_role" placeholder="e.g. 2nd Year Student / Junior Dev" autocomplete="off">
                 </div>
                 <div class="form-group">
-                    <label>Key Skills</label>
-                    <input type="text" id="prof_skills" placeholder="e.g. Python, SQL, Design">
+                    <label for="prof_skills">Key Skills</label>
+                    <input type="text" id="prof_skills" placeholder="e.g. Python, SQL, Figma" autocomplete="off">
                 </div>
                 <div class="form-group">
-                    <label>Interests / Passions</label>
-                    <textarea id="prof_interests" placeholder="e.g. Artificial Intelligence, Cloud, EdTech"></textarea>
+                    <label for="prof_interests">Interests / Passions</label>
+                    <textarea id="prof_interests" placeholder="e.g. AI, Cloud Computing, EdTech" autocomplete="off"></textarea>
                 </div>
                 <div class="form-group">
-                    <label>Target Industry</label>
-                    <input type="text" id="prof_industry" placeholder="e.g. Software & AI">
+                    <label for="prof_industry">Target Industry</label>
+                    <input type="text" id="prof_industry" placeholder="e.g. Software &amp; AI" autocomplete="off">
                 </div>
                 <button class="btn-save-profile" onclick="saveProfile()">Save Profile Context</button>
             </div>
 
-            <div class="sidebar-panel" style="flex: 1; display: flex; flex-direction: column;">
+            <div class="sidebar-panel" style="flex:1;display:flex;flex-direction:column;min-height:0;">
                 <button class="btn-new-chat" onclick="startNewSession()">+ New Conversation</button>
                 <div class="sidebar-title">Past Sessions</div>
-                <div id="session_list" style="overflow-y: auto; flex: 1;">
-                    <div style="font-size: 0.8rem; color: var(--text-muted); text-align: center; margin-top: 10px;">
-                        No past conversations yet
-                    </div>
+                <div id="session_list" style="overflow-y:auto;flex:1;">
+                    <div style="font-size:0.78rem;color:var(--text-muted);text-align:center;margin-top:12px;">No past conversations</div>
                 </div>
             </div>
         </aside>
 
-        <!-- Main Chat Area -->
+        <!-- Main Chat -->
         <main class="chat-container">
             <div class="chat-messages" id="chat_messages">
-                <!-- Welcome Bot Message -->
                 <div class="msg-wrapper bot">
-                    <div class="msg-avatar">🤖</div>
+                    <div class="msg-avatar">&#129302;</div>
                     <div class="msg-bubble">
-                        Hello! I am your AI Career Advisor. Tell me about your background, what subjects or activities excite you, or ask any career questions. 
-                        I retain our entire conversation context and your profile to give you personalized career recommendations and real-time job openings!
+                        Hello! I'm your AI Career Advisor. Tell me about your background, interests, or what career paths you're curious about. I'll remember our entire conversation and your profile to give you deeply personalized recommendations and live job openings!
                     </div>
                 </div>
             </div>
 
             <div class="chat-input-area">
                 <div class="input-wrapper">
-                    <input 
-                        type="text" 
-                        id="user_input" 
-                        placeholder="Type your response, thoughts, or questions (e.g. 'I enjoy problem solving and Python, what jobs suit me?')" 
-                        onkeydown="if(event.key === 'Enter') sendMessage()"
+                    <input
+                        type="text"
+                        id="user_input"
+                        placeholder="e.g. I enjoy Python and problem solving — what careers suit me?"
+                        onkeydown="if(event.key==='Enter' && !event.shiftKey) sendMessage()"
+                        autocomplete="off"
+                        spellcheck="true"
                     >
                     <button class="btn-send" id="btn_send" onclick="sendMessage()">
-                        <span>Send</span> ➔
+                        Send &#10148;
                     </button>
                 </div>
             </div>
@@ -582,63 +648,64 @@
     </div>
 
     <script>
-        let currentUserId = localStorage.getItem("career_bot_user_id") || null;
-        let currentSessionId = localStorage.getItem("career_bot_session_id") || null;
+        let currentUserId = localStorage.getItem('career_bot_user_id') || null;
+        let currentSessionId = localStorage.getItem('career_bot_session_id') || null;
 
-        // Initialize state on page load
-        window.addEventListener("DOMContentLoaded", async () => {
-            if (currentUserId) {
-                await loadProfile();
-            }
+        window.addEventListener('DOMContentLoaded', async () => {
+            if (currentUserId) await loadProfile();
             await loadSessions();
-
-            if (currentSessionId) {
-                await loadSessionMessages(currentSessionId);
-            }
+            if (currentSessionId) await loadSessionMessages(currentSessionId);
         });
 
+        /* ===== Sidebar ===== */
         function toggleSidebar() {
-            const sidebar = document.getElementById("sidebar");
-            sidebar.classList.toggle("mobile-open");
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar_overlay');
+            const isOpen = sidebar.classList.contains('open');
+            if (isOpen) {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('visible');
+            } else {
+                sidebar.classList.add('open');
+                overlay.classList.add('visible');
+            }
         }
 
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebar_overlay').classList.remove('visible');
+        }
+
+        /* ===== Profile ===== */
         async function saveProfile() {
-            const profileData = {
-                name: document.getElementById("prof_name").value.trim(),
-                education: document.getElementById("prof_education").value.trim(),
-                current_role: document.getElementById("prof_role").value.trim(),
-                skills: document.getElementById("prof_skills").value.trim(),
-                interests: document.getElementById("prof_interests").value.trim(),
-                target_industry: document.getElementById("prof_industry").value.trim()
+            const payload = {
+                name: document.getElementById('prof_name').value.trim(),
+                education: document.getElementById('prof_education').value.trim(),
+                current_role: document.getElementById('prof_role').value.trim(),
+                skills: document.getElementById('prof_skills').value.trim(),
+                interests: document.getElementById('prof_interests').value.trim(),
+                target_industry: document.getElementById('prof_industry').value.trim()
             };
 
             try {
-                let res;
-                if (currentUserId) {
-                    res = await fetch(`/profile/${currentUserId}`, {
-                        method: "PUT",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(profileData)
-                    });
-                } else {
-                    res = await fetch("/profile", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(profileData)
-                    });
-                }
+                const url = currentUserId ? `/profile/${currentUserId}` : '/profile';
+                const method = currentUserId ? 'PUT' : 'POST';
+                const res = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
 
                 if (res.ok) {
                     const data = await res.json();
                     currentUserId = data.id;
-                    localStorage.setItem("career_bot_user_id", currentUserId);
-
-                    const status = document.getElementById("saved_status");
-                    status.style.display = "inline";
-                    setTimeout(() => { status.style.display = "none"; }, 2500);
+                    localStorage.setItem('career_bot_user_id', currentUserId);
+                    const status = document.getElementById('saved_status');
+                    status.style.display = 'inline';
+                    setTimeout(() => { status.style.display = 'none'; }, 2500);
                 }
             } catch (err) {
-                console.error("Error saving profile:", err);
+                console.error('Error saving profile:', err);
             }
         }
 
@@ -647,114 +714,109 @@
                 const res = await fetch(`/profile/${currentUserId}`);
                 if (res.ok) {
                     const p = await res.json();
-                    document.getElementById("prof_name").value = p.name || "";
-                    document.getElementById("prof_education").value = p.education || "";
-                    document.getElementById("prof_role").value = p.current_role || "";
-                    document.getElementById("prof_skills").value = p.skills || "";
-                    document.getElementById("prof_interests").value = p.interests || "";
-                    document.getElementById("prof_industry").value = p.target_industry || "";
+                    document.getElementById('prof_name').value = p.name || '';
+                    document.getElementById('prof_education').value = p.education || '';
+                    document.getElementById('prof_role').value = p.current_role || '';
+                    document.getElementById('prof_skills').value = p.skills || '';
+                    document.getElementById('prof_interests').value = p.interests || '';
+                    document.getElementById('prof_industry').value = p.target_industry || '';
                 }
             } catch (err) {
-                console.error("Error loading profile:", err);
+                console.error('Error loading profile:', err);
             }
         }
 
+        /* ===== Sessions ===== */
         async function loadSessions() {
             try {
-                const url = currentUserId ? `/sessions?user_id=${currentUserId}` : "/sessions";
+                const url = currentUserId ? `/sessions?user_id=${currentUserId}` : '/sessions';
                 const res = await fetch(url);
-                if (res.ok) {
-                    const sessions = await res.json();
-                    const container = document.getElementById("session_list");
-                    if (sessions.length === 0) {
-                        container.innerHTML = `<div style="font-size:0.8rem;color:var(--text-muted);text-align:center;margin-top:10px;">No past conversations</div>`;
-                        return;
-                    }
-                    container.innerHTML = sessions.map(s => `
-                        <div class="session-item ${s.id === currentSessionId ? 'active' : ''}" onclick="selectSession('${s.id}')">
-                            ${escapeHtml(s.title || 'Conversation')}
-                        </div>
-                    `).join("");
+                if (!res.ok) return;
+                const sessions = await res.json();
+                const container = document.getElementById('session_list');
+                if (!sessions.length) {
+                    container.innerHTML = '<div style="font-size:0.78rem;color:var(--text-muted);text-align:center;margin-top:12px;">No past conversations</div>';
+                    return;
                 }
+                container.innerHTML = sessions.map(s => `
+                    <div class="session-item ${s.id === currentSessionId ? 'active' : ''}"
+                         onclick="selectSession('${s.id}')"
+                         title="${escapeHtml(s.title)}">
+                        ${escapeHtml(s.title || 'Conversation')}
+                    </div>
+                `).join('');
             } catch (err) {
-                console.error("Error loading sessions:", err);
+                console.error('Error loading sessions:', err);
             }
         }
 
         async function selectSession(sessionId) {
             currentSessionId = sessionId;
-            localStorage.setItem("career_bot_session_id", sessionId);
+            localStorage.setItem('career_bot_session_id', sessionId);
             await loadSessionMessages(sessionId);
             await loadSessions();
         }
 
         function startNewSession() {
             currentSessionId = null;
-            localStorage.removeItem("career_bot_session_id");
-            const container = document.getElementById("chat_messages");
+            localStorage.removeItem('career_bot_session_id');
+            const container = document.getElementById('chat_messages');
             container.innerHTML = `
                 <div class="msg-wrapper bot">
-                    <div class="msg-avatar">🤖</div>
-                    <div class="msg-bubble">
-                        Started a fresh session! What career topics or goals would you like to explore?
-                    </div>
-                </div>
-            `;
+                    <div class="msg-avatar">&#129302;</div>
+                    <div class="msg-bubble">Fresh start! What career goals or questions would you like to explore today?</div>
+                </div>`;
+            closeSidebar();
             loadSessions();
         }
 
         async function loadSessionMessages(sessionId) {
             try {
                 const res = await fetch(`/sessions/${sessionId}/messages`);
-                if (res.ok) {
-                    const messages = await res.json();
-                    const container = document.getElementById("chat_messages");
-                    container.innerHTML = "";
+                if (!res.ok) return;
+                const messages = await res.json();
+                if (!messages.length) { startNewSession(); return; }
 
-                    if (messages.length === 0) {
-                        startNewSession();
-                        return;
+                const container = document.getElementById('chat_messages');
+                container.innerHTML = '';
+                messages.forEach(m => {
+                    if (m.role === 'user') {
+                        appendUserMessage(m.content);
+                    } else {
+                        appendBotMessage(m.content, {
+                            interests: m.extracted_interests,
+                            career_category: m.career_category,
+                            explanation: m.explanation,
+                            job_titles: m.job_titles
+                        });
                     }
-
-                    messages.forEach(m => {
-                        if (m.role === "user") {
-                            appendUserMessage(m.content);
-                        } else {
-                            appendBotMessage(m.content, {
-                                interests: m.extracted_interests,
-                                career_category: m.career_category,
-                                explanation: m.explanation,
-                                job_titles: m.job_titles
-                            });
-                        }
-                    });
-                    scrollToBottom();
-                }
+                });
+                scrollToBottom();
             } catch (err) {
-                console.error("Error loading messages:", err);
+                console.error('Error loading messages:', err);
             }
         }
 
+        /* ===== Chat ===== */
         async function sendMessage() {
-            const inputEl = document.getElementById("user_input");
+            const inputEl = document.getElementById('user_input');
             const text = inputEl.value.trim();
             if (!text) return;
 
-            inputEl.value = "";
+            inputEl.value = '';
             appendUserMessage(text);
             scrollToBottom();
 
-            // Append loading indicator
             const loadingId = appendLoading();
             scrollToBottom();
 
-            const sendBtn = document.getElementById("btn_send");
+            const sendBtn = document.getElementById('btn_send');
             sendBtn.disabled = true;
 
             try {
-                const res = await fetch("/chat", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                const res = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         user_input: text,
                         session_id: currentSessionId,
@@ -765,89 +827,90 @@
                 removeLoading(loadingId);
 
                 if (!res.ok) {
-                    throw new Error(`Server returned ${res.status}`);
+                    const err = await res.json().catch(() => ({}));
+                    throw new Error(err.detail || `Server error ${res.status}`);
                 }
 
                 const data = await res.json();
                 currentSessionId = data.session_id;
-                localStorage.setItem("career_bot_session_id", currentSessionId);
+                localStorage.setItem('career_bot_session_id', currentSessionId);
 
                 appendBotMessage(data.message, data);
                 scrollToBottom();
                 loadSessions();
             } catch (err) {
-                console.error("Chat error:", err);
+                console.error('Chat error:', err);
                 removeLoading(loadingId);
-                appendBotMessage("Sorry, I encountered an issue communicating with the AI service. Please verify your API key or connection and try again.");
+                appendBotMessage('Sorry, something went wrong: ' + err.message + '. Please try again.');
                 scrollToBottom();
             } finally {
                 sendBtn.disabled = false;
+                document.getElementById('user_input').focus();
             }
         }
 
+        /* ===== DOM Helpers ===== */
         function appendUserMessage(text) {
-            const container = document.getElementById("chat_messages");
-            const div = document.createElement("div");
-            div.className = "msg-wrapper user";
+            const container = document.getElementById('chat_messages');
+            const div = document.createElement('div');
+            div.className = 'msg-wrapper user';
             div.innerHTML = `
-                <div class="msg-avatar">👤</div>
+                <div class="msg-avatar">&#128100;</div>
                 <div class="msg-bubble">${escapeHtml(text)}</div>
             `;
             container.appendChild(div);
         }
 
         function appendBotMessage(message, extra = {}) {
-            const container = document.getElementById("chat_messages");
-            const div = document.createElement("div");
-            div.className = "msg-wrapper bot";
+            const container = document.getElementById('chat_messages');
+            const div = document.createElement('div');
+            div.className = 'msg-wrapper bot';
 
-            let extraHtml = "";
-            const hasExtra = (extra.interests && extra.interests.length > 0) || (extra.job_titles && extra.job_titles.length > 0) || extra.career_category;
+            let extraHtml = '';
+            const hasInterests = Array.isArray(extra.interests) && extra.interests.length > 0;
+            const hasJobs = Array.isArray(extra.job_titles) && extra.job_titles.length > 0;
+            const hasExtra = hasInterests || hasJobs || extra.career_category;
 
             if (hasExtra) {
-                const tagsHtml = (extra.interests || []).map(i => `<span class="tag-pill">${escapeHtml(i)}</span>`).join("");
-                const jobsHtml = (extra.job_titles || []).map(j => `<li><span>💼</span> ${escapeHtml(j)}</li>`).join("");
+                const tagsHtml = hasInterests
+                    ? extra.interests.map(i => `<span class="tag-pill">${escapeHtml(i)}</span>`).join('')
+                    : '';
+                const jobsHtml = hasJobs
+                    ? extra.job_titles.map(j => `<li><span>&#128188;</span> ${escapeHtml(j)}</li>`).join('')
+                    : '';
 
                 extraHtml = `
                     <div class="recom-box">
                         <div class="recom-header">
-                            <span style="font-size:0.8rem; font-weight:600; color:var(--text-muted);">RECOMMENDATION INSIGHTS</span>
+                            <span class="recom-label">Recommendation Insights</span>
                             ${extra.career_category ? `<span class="badge-cat">${escapeHtml(extra.career_category)}</span>` : ''}
                         </div>
-                        ${extra.explanation ? `<div style="font-size:0.85rem; color:#cbd5e1; margin-bottom:8px;">${escapeHtml(extra.explanation)}</div>` : ''}
+                        ${extra.explanation ? `<div class="explanation-text">${escapeHtml(extra.explanation)}</div>` : ''}
                         ${tagsHtml ? `<div class="tags-list">${tagsHtml}</div>` : ''}
-                        ${jobsHtml ? `
-                            <div class="jobs-title">Recommended Jobs & Roles:</div>
-                            <ul class="jobs-list">${jobsHtml}</ul>
-                        ` : ''}
-                    </div>
-                `;
+                        ${jobsHtml ? `<div class="jobs-title">Jobs &amp; Roles</div><ul class="jobs-list">${jobsHtml}</ul>` : ''}
+                    </div>`;
             }
 
             div.innerHTML = `
-                <div class="msg-avatar">🤖</div>
+                <div class="msg-avatar">&#129302;</div>
                 <div class="msg-bubble">
                     <div>${escapeHtml(message)}</div>
                     ${extraHtml}
-                </div>
-            `;
+                </div>`;
             container.appendChild(div);
         }
 
         function appendLoading() {
-            const container = document.getElementById("chat_messages");
-            const id = "loading_" + Date.now();
-            const div = document.createElement("div");
+            const container = document.getElementById('chat_messages');
+            const id = 'loading_' + Date.now();
+            const div = document.createElement('div');
             div.id = id;
-            div.className = "msg-wrapper bot";
+            div.className = 'msg-wrapper bot';
             div.innerHTML = `
-                <div class="msg-avatar">🤖</div>
+                <div class="msg-avatar">&#129302;</div>
                 <div class="msg-bubble">
-                    <div class="loading-dots">
-                        <span></span><span></span><span></span>
-                    </div>
-                </div>
-            `;
+                    <div class="loading-dots"><span></span><span></span><span></span></div>
+                </div>`;
             container.appendChild(div);
             return id;
         }
@@ -858,18 +921,18 @@
         }
 
         function scrollToBottom() {
-            const container = document.getElementById("chat_messages");
-            container.scrollTop = container.scrollHeight;
+            const c = document.getElementById('chat_messages');
+            c.scrollTop = c.scrollHeight;
         }
 
         function escapeHtml(str) {
-            if (!str) return "";
-            return str
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
         }
     </script>
 </body>
