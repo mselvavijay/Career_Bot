@@ -68,3 +68,15 @@ def init_db():
                 # Column likely already exists or database engine handled it
                 pass
 
+    # Automatically purge conversations older than 30 days & expired cache on startup
+    try:
+        from services.response_cache import cleanup_expired_conversations
+        cleanup_db = SessionLocal()
+        try:
+            cleanup_expired_conversations(cleanup_db)
+        finally:
+            cleanup_db.close()
+    except Exception as e:
+        print(f"Notice during startup retention cleanup: {e}")
+
+

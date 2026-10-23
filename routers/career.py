@@ -1,7 +1,18 @@
 import asyncio
 import json
 import uuid
-from services.response_cache import build_cache_key, can_make_fresh_request, get_cached_response, is_cacheable_question, record_fresh_request, save_cached_response
+from services.response_cache import (
+    build_cache_key,
+    can_make_fresh_request,
+    cleanup_expired_conversations,
+    get_cached_response,
+    get_daily_fresh_requests_count,
+    get_target_job_count,
+    is_cacheable_question,
+    record_fresh_request,
+    save_cached_response,
+    DAILY_FRESH_REQUEST_LIMIT,
+)
 from services.llm_service import DEFAULT_MODEL
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -67,7 +78,10 @@ def get_profile(user_id: str, db: Session = Depends(get_db)):
 
 @router.get("/sessions", response_model=List[schemas.SessionSummaryResponse])
 def list_sessions(user_id: Optional[str] = Query(None), db: Session = Depends(get_db)):
-    """List recent conversation sessions."""
+    """List recent conversation sessions (within 30-day retention window)."""
+    # Enforce 30-day retention cleanup on Supabase / database storage
+    cleanup_expired_conversations(db)
+
     query = db.query(models.ConversationSession)
     if user_id:
         query = query.filter(models.ConversationSession.user_id == user_id)
@@ -210,19 +224,26 @@ async def multi_turn_chat(request: schemas.MultiTurnChatRequest, db: Session = D
     # Contextual follow-ups always use the LLM because earlier messages change their meaning.
     cache_key = None
     llm_result = None
+    current_fresh_count = get_daily_fresh_requests_count(db, models.DailyAIUsage, request.user_id)
+    target_job_count = get_target_job_count(current_fresh_count)
+
     if not conversation_history and is_cacheable_question(user_input):
         cache_key = build_cache_key(user_input, profile_dict, DEFAULT_MODEL)
         llm_result = get_cached_response(db, models.LLMResponseCache, cache_key)
 
     if llm_result is None:
-        if not can_make_fresh_request(db, models.DailyAIUsage, request.user_id):
-            raise HTTPException(status_code=429, detail="You have used your 3 free AI consultations for today. Please try again tomorrow.")
+        if current_fresh_count >= DAILY_FRESH_REQUEST_LIMIT:
+            raise HTTPException(
+                status_code=429,
+                detail="Daily limit reached. Come back tomorrow for new openings."
+            )
         llm_result = await analyze_conversation_turn(
             user_input=user_input,
             conversation_history=conversation_history,
-            user_profile=profile_dict
+            user_profile=profile_dict,
+            target_job_count=target_job_count
         )
-        record_fresh_request(db, models.DailyAIUsage, request.user_id)
+        current_fresh_count = record_fresh_request(db, models.DailyAIUsage, request.user_id)
         if cache_key:
             save_cached_response(db, models.LLMResponseCache, cache_key, llm_result)
 
@@ -246,8 +267,9 @@ async def multi_turn_chat(request: schemas.MultiTurnChatRequest, db: Session = D
         elif isinstance(item, schemas.JobListing):
             structured_jobs.append(item)
 
-    structured_jobs = structured_jobs[:5]
-    final_job_titles = [j.title for j in structured_jobs] or llm_job_titles[:5]
+    # Free-tier calibration: exactly target_job_count (4 on fresh initial, 2 on 1st show more, 2 on 2nd show more)
+    structured_jobs = structured_jobs[:target_job_count]
+    final_job_titles = [j.title for j in structured_jobs] or llm_job_titles[:target_job_count]
 
     # 5. Save assistant turn to database (including open_jobs JSON)
     open_jobs_json = json.dumps([j.model_dump() for j in structured_jobs])
@@ -274,6 +296,10 @@ async def multi_turn_chat(request: schemas.MultiTurnChatRequest, db: Session = D
     db.add(db_history)
     db.commit()
 
+    remaining_requests = max(0, DAILY_FRESH_REQUEST_LIMIT - current_fresh_count)
+    daily_limit_reached = (remaining_requests == 0)
+    openings_today = 4 if current_fresh_count == 1 else (6 if current_fresh_count == 2 else (8 if current_fresh_count >= 3 else len(structured_jobs)))
+
     return schemas.MultiTurnChatResponse(
         session_id=session_id,
         user_id=request.user_id,
@@ -282,7 +308,10 @@ async def multi_turn_chat(request: schemas.MultiTurnChatRequest, db: Session = D
         career_category=career_category,
         explanation=explanation,
         job_titles=final_job_titles,
-        open_jobs=structured_jobs
+        open_jobs=structured_jobs,
+        remaining_requests=remaining_requests,
+        daily_limit_reached=daily_limit_reached,
+        open_jobs_today=openings_today
     )
 
 

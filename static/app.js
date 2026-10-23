@@ -609,7 +609,9 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
                 loadSessions();
             } catch (err) {
                 removeLoadingCard(loadingId);
-                renderAssistantMessage(err.message.includes('Daily AI capacity reached') || err.message.includes('3 free AI consultations') ? err.message : 'An error occurred during talent assessment: ' + err.message + '. Please retry.');
+                const isDailyLimit = err.message.includes('Daily limit reached') || err.message.includes('3 free AI consultations') || err.message.includes('Daily AI capacity');
+                const errMsg = isDailyLimit ? 'Daily limit reached. Come back tomorrow for new openings.' : 'An error occurred during talent assessment: ' + err.message + '. Please retry.';
+                renderAssistantMessage(errMsg, { daily_limit_reached: true });
                 scrollStreamToBottom();
             } finally {
                 sendBtn.disabled = false;
@@ -693,6 +695,13 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
                     `;
                 }).join('');
 
+                let actionFooterHtml = '';
+                if (extra.daily_limit_reached || extra.remaining_requests === 0) {
+                    actionFooterHtml = `<div class="daily-limit-banner">Daily limit reached. Come back tomorrow for new openings.</div>`;
+                } else {
+                    actionFooterHtml = `<button type="button" class="btn-show-more-jobs" onclick="sendQuickPrompt('Show more matching roles that are different from the previous recommendations.')">Show more openings (+2)</button>`;
+                }
+
                 jobsHtml = `
                     <div class="open-jobs-section">
                         <div class="jobs-section-heading">
@@ -701,7 +710,7 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
                         <div class="job-cards-grid">
                             ${cardsHtml}
                         </div>
-                        <button type="button" class="btn-show-more-jobs" onclick="sendQuickPrompt('Show 5 more matching roles that are different from the previous recommendations.')">Show 5 more roles</button>
+                        ${actionFooterHtml}
                     </div>
                 `;
             } else if (hasLegacyJobs) {

@@ -38,8 +38,8 @@ Rules:
 CRITICAL INSTRUCTIONS FOR JOB RECOMMENDATIONS:
 1. RECENCY & LOCATION: Recommend only India-based Hybrid or Remote jobs posted within the last 7 days. Provide a LinkedIn search URL for each role; never include company names.
 2. COMPENSATION: Use Indian Rupee (INR) LPA ranges only; never use US dollars.
-3. JOB OPENINGS: Provide EXACTLY 5 job openings in the "open_jobs" array when addressing career questions. If the candidate asks for "5 more", provide 5 additional roles that differ from the earlier recommendations.
-4. 3-WEEK PREPARATION GUIDE: For EACH of the 5 job openings, you must include a "prep_guide" array of EXACTLY 3 concise bullet points:
+3. JOB OPENINGS: Provide tailored, high-relevance job openings in the "open_jobs" array when addressing career questions. For an initial consultation provide 4 curated roles; when the candidate asks to "show more", provide 2 additional roles that differ from earlier recommendations.
+4. 3-WEEK PREPARATION GUIDE: For EACH job opening, you must include a "prep_guide" array of EXACTLY 3 concise bullet points:
    - "Week 1: [DSA, Core Fundamentals & Language Concepts]"
    - "Week 2: [Key Frameworks, Databases & Live Project Implementation]"
    - "Week 3: [System Design, Mock Technical Interviews & Behavioral Rounds]"
@@ -181,7 +181,7 @@ def extract_experience_years(text: str = "", user_profile: Optional[Dict[str, An
 
     return 0
 
-def sanitize_and_enrich_jobs(parsed: dict, user_profile: Optional[Dict[str, Any]] = None, conversation_text: str = "") -> dict:
+def sanitize_and_enrich_jobs(parsed: dict, user_profile: Optional[Dict[str, Any]] = None, conversation_text: str = "", target_count: int = 4) -> dict:
     category = parsed.get("career_category", "Technology")
     open_jobs = parsed.get("open_jobs", [])
     job_titles = parsed.get("job_titles", [])
@@ -224,8 +224,8 @@ def sanitize_and_enrich_jobs(parsed: dict, user_profile: Optional[Dict[str, Any]
                     "apply_url": apply_url
                 })
 
-    # Fill up to 5 jobs if fewer than 10 returned
-    if len(enriched_jobs) < 5:
+    # Fill up to target_count jobs if fewer returned
+    if len(enriched_jobs) < target_count:
         seen_titles = {j["title"].lower() for j in enriched_jobs}
         # Check job_titles first
         if isinstance(job_titles, list):
@@ -233,11 +233,11 @@ def sanitize_and_enrich_jobs(parsed: dict, user_profile: Optional[Dict[str, Any]
                 if isinstance(t, str) and t.strip() and t.strip().lower() not in seen_titles:
                     enriched_jobs.append(format_job_card(t.strip(), category, exp_years, len(enriched_jobs)))
                     seen_titles.add(t.strip().lower())
-                    if len(enriched_jobs) >= 5:
+                    if len(enriched_jobs) >= target_count:
                         break
 
-    # If still fewer than 10, fill with calibrated Indian tech roles
-    if len(enriched_jobs) < 5:
+    # If still fewer than target_count, fill with calibrated Indian tech roles
+    if len(enriched_jobs) < target_count:
         prefix = "Junior" if exp_years == 0 else ("Senior" if exp_years >= 5 else "Mid-Level")
         base_skill = "Software"
         if user_profile and user_profile.get("skills"):
@@ -258,12 +258,12 @@ def sanitize_and_enrich_jobs(parsed: dict, user_profile: Optional[Dict[str, Any]
             f"Core {base_skill} Solutions Engineer"
         ]
         for st in sample_titles:
-            if st.lower() not in seen_titles and len(enriched_jobs) < 5:
+            if st.lower() not in seen_titles and len(enriched_jobs) < target_count:
                 enriched_jobs.append(format_job_card(st, category, exp_years, len(enriched_jobs)))
                 seen_titles.add(st.lower())
 
-    parsed["open_jobs"] = enriched_jobs[:5]
-    parsed["job_titles"] = [j["title"] for j in enriched_jobs[:5]]
+    parsed["open_jobs"] = enriched_jobs[:target_count]
+    parsed["job_titles"] = [j["title"] for j in enriched_jobs[:target_count]]
     return parsed
 
 def build_system_message(user_profile: Optional[Dict[str, Any]] = None) -> str:
@@ -289,7 +289,8 @@ def build_system_message(user_profile: Optional[Dict[str, Any]] = None) -> str:
 async def analyze_conversation_turn(
     user_input: str,
     conversation_history: Optional[List[Dict[str, str]]] = None,
-    user_profile: Optional[Dict[str, Any]] = None
+    user_profile: Optional[Dict[str, Any]] = None,
+    target_job_count: int = 4
 ) -> dict:
     """
     Context-aware multi-turn analysis.
@@ -362,7 +363,7 @@ async def analyze_conversation_turn(
                         user_texts.append(m["content"])
             full_user_context = " ".join(user_texts)
 
-            return sanitize_and_enrich_jobs(parsed, user_profile, full_user_context)
+            return sanitize_and_enrich_jobs(parsed, user_profile, full_user_context, target_count=target_job_count)
 
     except json.JSONDecodeError:
         # Fallback if model returned plain conversational text instead of strict JSON
@@ -375,7 +376,7 @@ async def analyze_conversation_turn(
             "explanation": "Recommendations aligned with your skills and background.",
             "job_titles": ["Software Engineer", "Backend Developer", "Full Stack Engineer"]
         }
-        return sanitize_and_enrich_jobs(fallback, user_profile, user_input)
+        return sanitize_and_enrich_jobs(fallback, user_profile, user_input, target_count=target_job_count)
     except httpx.HTTPStatusError as e:
         if e.response.status_code == 429:
             raise HTTPException(status_code=429, detail="Daily AI capacity reached—please try again later.")

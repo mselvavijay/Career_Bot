@@ -49,20 +49,93 @@ def save_cached_response(db, cache_model, cache_key: str, response: Dict[str, An
     db.add(entry)
     db.commit()
 DAILY_FRESH_REQUEST_LIMIT = 3
+CONVERSATION_RETENTION_DAYS = 30
+
+def get_daily_fresh_requests_count(db, usage_model, user_id: Optional[str]) -> int:
+    """Return the number of fresh AI consultations made by the candidate today."""
+    if not user_id:
+        return 0
+    today = date.today().isoformat()
+    usage = db.query(usage_model).filter_by(user_id=user_id, usage_date=today).first()
+    return usage.fresh_requests if usage else 0
 
 def can_make_fresh_request(db, usage_model, user_id: Optional[str]) -> bool:
-    if not user_id:
-        return False
-    usage = db.query(usage_model).filter_by(user_id=user_id, usage_date=date.today().isoformat()).first()
-    return not usage or usage.fresh_requests < DAILY_FRESH_REQUEST_LIMIT
+    """Check if candidate has not exceeded their 3 fresh AI consultations for the day."""
+    return get_daily_fresh_requests_count(db, usage_model, user_id) < DAILY_FRESH_REQUEST_LIMIT
 
-def record_fresh_request(db, usage_model, user_id: Optional[str]) -> None:
+def get_target_job_count(fresh_requests_used: int) -> int:
+    """
+    Candidate Free-Tier Plan:
+    - 1st request (Initial consultation, 0 used prior): 4 job openings
+    - 2nd request (1st 'Show more', 1 used prior): 2 additional job openings
+    - 3rd request (2nd 'Show more', 2 used prior): 2 additional job openings
+    Total: 8 job openings per candidate per day across 3 requests.
+    """
+    if fresh_requests_used <= 0:
+        return 4
+    elif fresh_requests_used == 1:
+        return 2
+    elif fresh_requests_used == 2:
+        return 2
+    return 0
+
+def record_fresh_request(db, usage_model, user_id: Optional[str]) -> int:
+    """Record a fresh AI request and return the updated count for today."""
     if not user_id:
-        return
+        return 1
+    
+    from models import models
+    user_exists = db.query(models.UserProfile.id).filter_by(id=user_id).first()
+    if not user_exists:
+        return 1
+
     today = date.today().isoformat()
     usage = db.query(usage_model).filter_by(user_id=user_id, usage_date=today).first()
     if usage:
         usage.fresh_requests += 1
+        new_count = usage.fresh_requests
     else:
+        new_count = 1
         db.add(usage_model(user_id=user_id, usage_date=today, fresh_requests=1))
     db.commit()
+    return new_count
+
+def cleanup_expired_conversations(db) -> dict:
+    """
+    Enforce 30-day retention period on conversation history to recover Supabase / database space.
+    - Candidates can revisit recent consultations within 30 days.
+    - Old conversation sessions and their chat messages are automatically deleted after 30 days.
+    - AI response cache remains 7 days (cleans expired entries).
+    - User Profiles remain PERMANENT and are never purged.
+    """
+    now = datetime.now(timezone.utc)
+    cutoff = now - timedelta(days=CONVERSATION_RETENTION_DAYS)
+    
+    cleaned_sessions = 0
+    try:
+        from models import models
+        # Find expired sessions older than 30 days
+        expired_sessions = db.query(models.ConversationSession).filter(
+            models.ConversationSession.created_at < cutoff
+        ).all()
+        cleaned_sessions = len(expired_sessions)
+        for s in expired_sessions:
+            db.delete(s)
+            
+        # Clean legacy chat_history older than 30 days
+        db.query(models.ChatHistory).filter(
+            models.ChatHistory.created_at < cutoff
+        ).delete(synchronize_session=False)
+
+        # Clean AI response cache older than 7 days
+        db.query(models.LLMResponseCache).filter(
+            models.LLMResponseCache.expires_at <= now
+        ).delete(synchronize_session=False)
+
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        # Non-blocking cleanup logger
+        print(f"Notice during conversation retention cleanup: {e}")
+
+    return {"cleaned_sessions": cleaned_sessions, "cutoff": cutoff.isoformat()}

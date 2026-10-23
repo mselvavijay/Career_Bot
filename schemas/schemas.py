@@ -79,6 +79,9 @@ class MultiTurnChatResponse(BaseModel):
     explanation: Optional[str] = None
     job_titles: List[str] = Field(default_factory=list)
     open_jobs: List[JobListing] = Field(default_factory=list)
+    remaining_requests: Optional[int] = None
+    daily_limit_reached: Optional[bool] = False
+    open_jobs_today: Optional[int] = None
 
 class SessionSummaryResponse(BaseModel):
     id: str
