@@ -687,22 +687,6 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
             const hasLegacyJobs = Array.isArray(extra.job_titles) && extra.job_titles.length > 0;
 
             let insightsHtml = '';
-            if (hasInterests || extra.career_category || extra.explanation) {
-                const skillsHtml = hasInterests
-                    ? extra.interests.map(i => `<span class="skill-pill">${escapeHtml(i)}</span>`).join('')
-                    : '';
-
-                insightsHtml = `
-                    <div class="career-insight-panel">
-                        <div class="insight-top-bar">
-                            <span style="font-size:0.75rem; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.05em;">Strategic Alignment</span>
-                            ${extra.career_category ? `<span class="category-badge">${escapeHtml(extra.career_category)}</span>` : ''}
-                        </div>
-                        ${extra.explanation ? `<div class="insight-explanation">${escapeHtml(extra.explanation)}</div>` : ''}
-                        ${skillsHtml ? `<div class="skills-tag-group">${skillsHtml}</div>` : ''}
-                    </div>
-                `;
-            }
 
             let jobsHtml = '';
             if (hasOpenJobs) {

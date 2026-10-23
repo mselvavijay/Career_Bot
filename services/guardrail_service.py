@@ -246,6 +246,62 @@ def detect_small_talk(original_text: str, normalized: str) -> Tuple[bool, Option
     # If meaningful words remain (like "i know python and fastapi"), it is NOT just small talk
     return False, None
 
+def is_gibberish(normalized: str) -> Tuple[bool, Optional[str]]:
+    """
+    Detect random/meaningless input (e.g. 'asdfjkl', 'qwerty123', 'xyzabc').
+    Strategy:
+    - Very short input (1-3 chars) with no recognizable word -> gibberish
+    - Input where >60% of characters are consonant clusters (no vowels in any token) -> gibberish
+    - Input matching purely random keyboard-mash patterns
+    Returns greeting_reply so the user gets a helpful nudge.
+    """
+    if not normalized:
+        return False, None
+
+    msgs = CONFIG.get("messages", {})
+    words = normalized.split()
+
+    # Single token checks
+    VOWELS = set('aeiou')
+
+    def looks_like_gibberish_word(w: str) -> bool:
+        if len(w) < 3:
+            return False  # too short to judge
+        letters = [c for c in w if c.isalpha()]
+        if not letters:
+            return False
+        # No vowels at all in a word of 4+ letters -> gibberish
+        if len(letters) >= 4 and not any(c in VOWELS for c in letters):
+            return True
+        # Ratio of consecutive consonants extremely high (keyboard-mash)
+        consonant_run = 0
+        max_run = 0
+        for c in letters:
+            if c not in VOWELS:
+                consonant_run += 1
+                max_run = max(max_run, consonant_run)
+            else:
+                consonant_run = 0
+        # 5+ consecutive consonants in a word -> gibberish (e.g. "sdfjk", "qwrtp")
+        if max_run >= 5:
+            return True
+        return False
+
+    if not words:
+        return False, None
+
+    gibberish_count = sum(1 for w in words if looks_like_gibberish_word(w))
+
+    # If ALL tokens look like gibberish (and there are 1-3 tokens), treat as gibberish
+    if gibberish_count == len(words) and len(words) <= 3:
+        return True, msgs.get("greeting_reply")
+
+    # If more than half the words are gibberish in a short message -> gibberish
+    if len(words) <= 4 and gibberish_count > len(words) / 2:
+        return True, msgs.get("greeting_reply")
+
+    return False, None
+
 def is_out_of_scope(normalized: str) -> Tuple[bool, Optional[str]]:
     """
     STEP 4: SCOPE CHECK (cheap, rule-based first)
@@ -338,7 +394,12 @@ def run_guardrails_pipeline(
     if is_small_talk:
         return True, reply, "small_talk"
 
-    # Step 4: Scope check
+    # Step 4b: Gibberish / keyboard-mash detection -> returns greeting nudge
+    gibberish, gibberish_reply = is_gibberish(normalized)
+    if gibberish:
+        return True, gibberish_reply, "small_talk"
+
+    # Step 5: Scope check
     out_of_scope, scope_refusal = is_out_of_scope(normalized)
     if out_of_scope:
         return True, scope_refusal, "scope_filter"
