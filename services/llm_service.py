@@ -382,6 +382,103 @@ async def analyze_conversation_turn(
         raise HTTPException(status_code=500, detail=f"Error communicating with LLM: {str(e)}")
 
 
+async def analyze_show_more(
+    user_input: str,
+    excluded_titles: List[str],
+    user_profile: Optional[Dict[str, Any]] = None,
+    target_job_count: int = 2
+) -> dict:
+    """
+    Lightweight path for 'Show more (+N)' turns.
+    Instead of replaying the full conversation history (which bloats tokens and triggers 400s),
+    we send only:
+      - the system prompt + user profile
+      - a short instruction listing already-shown job titles to exclude
+    This keeps the prompt tiny and deterministic regardless of how long the session is.
+    """
+    system_prompt = build_system_message(user_profile)
+    messages = [{"role": "system", "content": system_prompt}]
+
+    exclude_str = ", ".join(f'"{t}"' for t in excluded_titles) if excluded_titles else "none"
+    minimal_instruction = (
+        f"The candidate asked for {target_job_count} more job opening(s). "
+        f"Jobs already shown to them (DO NOT repeat any of these): [{exclude_str}]. "
+        f"Provide exactly {target_job_count} NEW, DIFFERENT job openings that match their profile. "
+        f"Follow all the same JSON format rules."
+    )
+    messages.append({"role": "user", "content": minimal_instruction})
+
+    payload = {
+        "model": DEFAULT_MODEL,
+        "messages": messages,
+        "temperature": 0.4,
+        "max_tokens": 1800,
+        "response_format": {"type": "json_object"}
+    }
+
+    try:
+        async with httpx.AsyncClient(timeout=25.0) as client:
+            response = await client.post(BASE_URL, headers=HEADERS, json=payload)
+            response.raise_for_status()
+            result = response.json()
+
+            if "choices" not in result or len(result["choices"]) == 0:
+                raise HTTPException(status_code=502, detail="Invalid response from LLM model.")
+
+            raw_content = result["choices"][0]["message"]["content"].strip()
+
+            if raw_content.startswith("```"):
+                raw_lines = raw_content.splitlines()
+                if raw_lines[0].startswith("```"):
+                    raw_lines = raw_lines[1:]
+                if raw_lines and raw_lines[-1].startswith("```"):
+                    raw_lines = raw_lines[:-1]
+                raw_content = "\n".join(raw_lines).strip()
+
+            parsed = json.loads(raw_content)
+
+            if "reply" not in parsed:
+                parsed["reply"] = parsed.get("explanation", "Here are more job openings for you.")
+
+            from services.guardrail_service import check_output
+            parsed["reply"] = check_output(parsed["reply"])
+
+            if "interests" not in parsed or not isinstance(parsed["interests"], list):
+                parsed["interests"] = []
+            if "career_category" not in parsed:
+                parsed["career_category"] = "Professional & Technology"
+
+            result_parsed = sanitize_and_enrich_jobs(parsed, user_profile, user_input, target_count=target_job_count)
+
+            # Filter out any titles that still slipped through the exclusion list
+            excluded_lower = {t.lower() for t in excluded_titles}
+            result_parsed["open_jobs"] = [
+                j for j in result_parsed.get("open_jobs", [])
+                if j.get("title", "").lower() not in excluded_lower
+            ][:target_job_count]
+            result_parsed["job_titles"] = [j["title"] for j in result_parsed["open_jobs"]]
+
+            return result_parsed
+
+    except json.JSONDecodeError:
+        from services.guardrail_service import check_output
+        safe_reply = check_output(raw_content if 'raw_content' in locals() else "I received your message.")
+        fallback = {
+            "reply": safe_reply,
+            "interests": [],
+            "career_category": "Professional & Technology",
+            "explanation": "Here are more opportunities aligned with your profile.",
+            "job_titles": []
+        }
+        return sanitize_and_enrich_jobs(fallback, user_profile, user_input, target_count=target_job_count)
+    except httpx.HTTPStatusError as e:
+        if e.response.status_code == 429:
+            raise HTTPException(status_code=429, detail="Daily AI capacity reached—please try again later.")
+        raise HTTPException(status_code=502, detail=f"LLM API error: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error communicating with LLM: {str(e)}")
+
+
 # Backward compatibility wrapper for old single-turn calls
 async def analyze_user_input(user_input: str) -> dict:
     return await analyze_conversation_turn(user_input=user_input)

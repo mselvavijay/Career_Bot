@@ -20,7 +20,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 from models import models
 from schemas import schemas
-from services.llm_service import analyze_conversation_turn, analyze_user_input
+from services.llm_service import analyze_conversation_turn, analyze_show_more, analyze_user_input
 from services.jsearch_service import get_recent_jobs_from_jsearch
 
 router = APIRouter()
@@ -268,12 +268,37 @@ async def multi_turn_chat(request: schemas.MultiTurnChatRequest, db: Session = D
         llm_result = get_cached_response(db, models.LLMResponseCache, cache_key)
 
     if llm_result is None:
-        llm_result = await analyze_conversation_turn(
-            user_input=user_input,
-            conversation_history=conversation_history,
-            user_profile=profile_dict,
-            target_job_count=target_job_count
-        )
+        if session_jobs_turns > 0:
+            # --- "Show more" path: lightweight, no conversation history ---
+            # Collect every job title already shown in this session to exclude them
+            past_assistant_msgs = (
+                db.query(models.ChatMessage)
+                .filter(
+                    models.ChatMessage.session_id == session_id,
+                    models.ChatMessage.role == "assistant",
+                    models.ChatMessage.job_titles.isnot(None),
+                    models.ChatMessage.job_titles != ""
+                )
+                .all()
+            )
+            excluded_titles: List[str] = []
+            for msg in past_assistant_msgs:
+                excluded_titles.extend([t.strip() for t in msg.job_titles.split(" || ") if t.strip()])
+
+            llm_result = await analyze_show_more(
+                user_input=user_input,
+                excluded_titles=excluded_titles,
+                user_profile=profile_dict,
+                target_job_count=target_job_count
+            )
+        else:
+            # --- Initial consultation path: full conversation context ---
+            llm_result = await analyze_conversation_turn(
+                user_input=user_input,
+                conversation_history=conversation_history,
+                user_profile=profile_dict,
+                target_job_count=target_job_count
+            )
         current_fresh_count = record_fresh_request(db, models.DailyAIUsage, request.user_id)
         if cache_key:
             save_cached_response(db, models.LLMResponseCache, cache_key, llm_result)
