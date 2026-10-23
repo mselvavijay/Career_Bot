@@ -299,13 +299,7 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
                     if (data.email) localStorage.setItem('career_bot_user_email', data.email);
 
                     renderUserAccountBadge(data);
-
-                    const pill = document.getElementById('saved_status_indicator');
-                    pill.style.display = 'inline-block';
-                    setTimeout(() => {
-                        pill.style.display = 'none';
-                        closeProfileModal();
-                    }, 1800);
+                    closeProfileModal();
                 }
             } catch (err) {
                 console.error('Error saving profile:', err);
@@ -546,7 +540,10 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
             document.getElementById('roadmap_modal_title').textContent = 'Free 3-Week Roadmap';
             document.getElementById('roadmap_modal_subtitle').textContent = title;
             const list = document.getElementById('roadmap_modal_list');
-            list.innerHTML = guide.map(item => `<li>${escapeHtml(item)}</li>`).join('');
+            list.innerHTML = guide.map((item, index) => {
+                const bullets = String(item).split(/\s*[,;]\s*/).filter(Boolean);
+                return `<li><span class="roadmap-week">Week ${index + 1}</span><ul>${bullets.map(bullet => `<li>${escapeHtml(bullet)}</li>`).join('')}</ul></li>`;
+            }).join('');
             document.getElementById('roadmap_modal_overlay').classList.add('open');
         }
 

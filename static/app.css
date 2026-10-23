@@ -514,25 +514,11 @@
             margin: 0 auto 20px;
         }
 
-        .text-gradient {
-            background: linear-gradient(110deg, #a5f3fc 4%, #60a5fa 35%, #818cf8 67%, #f0abfc 100%);
-            background-size: 180% 180%;
-            animation: hero-gradient-shift 7s ease infinite;
+        .hero-title .text-gradient,
+        .hero-title .text-gradient-purple {
+            background: linear-gradient(100deg, #c084fc 0%, #9c8cff 42%, #64c8ff 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-        }
-
-        .text-gradient-purple {
-            background: linear-gradient(110deg, #f0abfc 0%, #c084fc 34%, #818cf8 70%, #67e8f9 100%);
-            background-size: 180% 180%;
-            animation: hero-gradient-shift 7s ease infinite reverse;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        @keyframes hero-gradient-shift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
         }
 
         .hero-subtitle {
@@ -1557,7 +1543,8 @@
             line-height: 1.7;
             color: var(--consult-muted);
             max-width: 560px;
-            margin: 0 0 36px;
+            margin: 0 auto 36px;
+            text-align: center;
         }
 
         /* Starter Prompts 2x2 Grid */
@@ -2084,7 +2071,7 @@
             gap: 16px; /* Space after every week point */
         }
 
-        .roadmap-list li {
+        .roadmap-list > li {
             padding: 14px 18px;
             border-radius: 12px;
             background: var(--consult-bg, #081528);
@@ -2095,6 +2082,26 @@
             margin: 0;
         }
 
+        .roadmap-week {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--consult-accent-text, #4C8DFF);
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .roadmap-list > li > ul {
+            display: grid;
+            gap: 6px;
+            margin: 0;
+            padding-left: 19px;
+        }
+
+        .roadmap-list > li > ul li::marker {
+            color: var(--consult-accent-text, #4C8DFF);
+        }
         .typing-loader {
             display: inline-flex;
             gap: 5px;

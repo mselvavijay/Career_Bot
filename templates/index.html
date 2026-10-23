@@ -483,9 +483,6 @@
             <div class="modal-header">
                 <div>
                     <h3 class="modal-title">Candidate Profile &amp; Calibration</h3>
-                    <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:2px;">
-                        Saved to your Google account &bull; Directs Groq LLM Tri-Factor recommendations
-                    </p>
                 </div>
                 <button class="btn-modal-close" onclick="closeProfileModal()">
                     <svg class="icon" viewBox="0 0 24 24">
@@ -497,7 +494,7 @@
 
             <div class="field-group">
                 <label for="prof_name">Full Name</label>
-                <input type="text" id="prof_name" placeholder="e.g. Alex Morgan" autocomplete="name">
+                <input type="text" id="prof_name" placeholder="Your Google name" autocomplete="name" readonly style="opacity:0.7; cursor:not-allowed;">
             </div>
 
             <div class="field-group">
@@ -529,9 +526,6 @@
             </div>
 
             <div style="display:flex; align-items:center; justify-content:space-between; margin-top:16px;">
-                <span class="status-pill" id="saved_status_indicator" style="display:none;">
-                    Saved &amp; Synced to Google Profile
-                </span>
                 <button class="btn-primary-action" onclick="saveCandidateProfile()"
                     style="margin-left:auto; width:auto; padding:9px 20px;">
                     <svg class="icon icon-sm" viewBox="0 0 24 24">
