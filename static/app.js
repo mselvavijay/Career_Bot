@@ -668,7 +668,6 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
                             <div>
                                 <div class="job-card-top">
                                     <div class="job-role-title">${escapeHtml(job.title)}</div>
-                                    <span class="job-type-tag">${escapeHtml(job.job_type || 'Full-time')}</span>
                                 </div>
                                 <div class="job-company-meta">
                                     <span class="meta-item">

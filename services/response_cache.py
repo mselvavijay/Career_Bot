@@ -50,12 +50,17 @@ def save_cached_response(db, cache_model, cache_key: str, response: Dict[str, An
     db.commit()
 DAILY_FRESH_REQUEST_LIMIT = 3
 CONVERSATION_RETENTION_DAYS = 30
+IST = timezone(timedelta(hours=5, minutes=30))
+
+def get_today_ist() -> str:
+    """Return today's date in Indian Standard Time (IST, UTC+05:30) so daily quotas reset at midnight in India."""
+    return datetime.now(IST).date().isoformat()
 
 def get_daily_fresh_requests_count(db, usage_model, user_id: Optional[str]) -> int:
     """Return the number of fresh AI consultations made by the candidate today."""
     if not user_id:
         return 0
-    today = date.today().isoformat()
+    today = get_today_ist()
     usage = db.query(usage_model).filter_by(user_id=user_id, usage_date=today).first()
     return usage.fresh_requests if usage else 0
 
@@ -63,19 +68,25 @@ def can_make_fresh_request(db, usage_model, user_id: Optional[str]) -> bool:
     """Check if candidate has not exceeded their 3 fresh AI consultations for the day."""
     return get_daily_fresh_requests_count(db, usage_model, user_id) < DAILY_FRESH_REQUEST_LIMIT
 
-def get_target_job_count(fresh_requests_used: int) -> int:
+def get_target_job_count(fresh_requests_used: int, session_jobs_count: Optional[int] = None) -> int:
     """
-    Candidate Free-Tier Plan:
+    Candidate Free-Tier Plan (4 + 2 + 2 Model):
     - 1st request (Initial consultation, 0 used prior): 4 job openings
     - 2nd request (1st 'Show more', 1 used prior): 2 additional job openings
     - 3rd request (2nd 'Show more', 2 used prior): 2 additional job openings
     Total: 8 job openings per candidate per day across 3 requests.
     """
+    if fresh_requests_used >= DAILY_FRESH_REQUEST_LIMIT:
+        return 0
+    if session_jobs_count is not None:
+        if session_jobs_count == 0:
+            return 4
+        elif session_jobs_count in (1, 2):
+            return 2
+        return 0
     if fresh_requests_used <= 0:
         return 4
-    elif fresh_requests_used == 1:
-        return 2
-    elif fresh_requests_used == 2:
+    elif fresh_requests_used in (1, 2):
         return 2
     return 0
 
@@ -89,7 +100,7 @@ def record_fresh_request(db, usage_model, user_id: Optional[str]) -> int:
     if not user_exists:
         return 1
 
-    today = date.today().isoformat()
+    today = get_today_ist()
     usage = db.query(usage_model).filter_by(user_id=user_id, usage_date=today).first()
     if usage:
         usage.fresh_requests += 1

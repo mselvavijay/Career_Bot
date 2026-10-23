@@ -80,9 +80,50 @@ class TestFreeTierAndRetention(unittest.TestCase):
 
         # Step 4: Daily limit reached!
         self.assertFalse(can_make_fresh_request(self.db, models.DailyAIUsage, test_user_id))
+        self.assertEqual(get_target_job_count(3), 0)
 
         # Cleanup
         self.db.query(models.DailyAIUsage).filter_by(user_id=test_user_id).delete()
+        self.db.delete(test_user)
+        self.db.commit()
+
+    def test_daily_limit_bot_response(self):
+        """Verify that when daily limit is reached, bot responds with 'Daily limit reached. Come back tomorrow for new openings.'"""
+        from fastapi.testclient import TestClient
+        from app import app
+        from services.response_cache import get_today_ist
+        
+        client = TestClient(app)
+        test_user = models.UserProfile(
+            name="Limit Test Candidate",
+            email=f"limit_{int(datetime.now().timestamp())}@example.com"
+        )
+        self.db.add(test_user)
+        self.db.commit()
+        self.db.refresh(test_user)
+
+        # Mark user as having used all 3 requests today
+        today = get_today_ist()
+        usage = models.DailyAIUsage(user_id=test_user.id, usage_date=today, fresh_requests=3)
+        self.db.add(usage)
+        self.db.commit()
+
+        # Send request
+        res = client.post("/chat", json={
+            "user_input": "Show more job openings",
+            "user_id": test_user.id
+        })
+        self.assertEqual(res.status_code, 200)
+        data = res.json()
+        self.assertEqual(data["message"], "Daily limit reached. Come back tomorrow for new openings.")
+        self.assertEqual(len(data["open_jobs"]), 0)
+        self.assertTrue(data["daily_limit_reached"])
+        self.assertEqual(data["remaining_requests"], 0)
+
+        # Cleanup
+        self.db.query(models.DailyAIUsage).filter_by(user_id=test_user.id).delete()
+        self.db.query(models.ChatMessage).filter_by(session_id=data["session_id"]).delete()
+        self.db.query(models.ConversationSession).filter_by(id=data["session_id"]).delete()
         self.db.delete(test_user)
         self.db.commit()
 
