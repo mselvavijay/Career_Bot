@@ -1,0 +1,79 @@
+{
+  "safety": {
+    "explicit_terms": [
+      "porn", "xxx", "nsfw", "nude", "nudes", "nudity", "escort", "erotic", "sex", "sexy", "boobs", "penis", "vagina", "dick", "pussy", "fuck", "bitch", "slut", "whore", "blowjob", "choot", "bhadwe", "chutiya", "gaand", "lund", "randi", "mutthal"
+    ],
+    "hate_and_harassment": [
+      "nigger", "nigga", "faggot", "kike", "retard", "terrorist", "suicide bomber"
+    ],
+    "harm_illegal_fraud": [
+      "suicide", "kill myself", "end my life", "self harm", "cut myself", "hang myself",
+      "make a bomb", "pipe bomb", "build weapons", "buy drugs", "illegal drugs", "cocaine", "heroin", "meth",
+      "hack account", "hack instagram", "hack someone", "hack whatsapp", "hack facebook", "make fake certificate", "fake degree", "counterfeit", "credit card fraud"
+    ],
+    "prompt_injection": [
+      "ignore previous instructions", "ignore all previous instructions", "disregard previous instructions",
+      "reveal your system prompt", "show your system prompt", "print your system prompt", "tell me your system prompt",
+      "what is your system prompt", "repeat the prompt above", "repeat instructions",
+      "act as dan", "jailbreak", "dan mode", "developer mode"
+    ],
+    "harm_regex_patterns": [
+      "hack(?:ing)?\\s+(?:someone|friend|friends|account|insta|instagram|facebook|fb|whatsapp|email|wifi|phone|system)",
+      "(?:make|create|buy)\\s+(?:fake|fraudulent)\\s+(?:certificate|degree|experience|marksheets|resume|pan|aadhaar)",
+      "(?:how\\s+to\\s+)?(?:kill|hurt|harm|cut|end)\\s+(?:myself|my\\s+life)"
+    ],
+    "prompt_injection_patterns": [
+      "ignore\\s+(?:all\\s+)?(?:previous|prior|above)\\s+instructions?",
+      "(?:reveal|show|display|print|tell\\s+me|output|give\\s+me)\\s+(?:your\\s+)?(?:system\\s+)?(?:prompt|instructions?|rules)",
+      "act\\s+as\\s+(?:dan|jailbreak|unfiltered|an\\s+ai\\s+without\\s+rules)",
+      "(?:bypass|disable)\\s+(?:safety|guardrails|filters)"
+    ]
+  },
+  "smalltalk": {
+    "greetings": [
+      "hi", "hii", "hiii", "hiiii", "hello", "helloo", "hellooo", "hey", "heyy", "heyyy", "hola",
+      "namaste", "namaskar", "good morning", "good afternoon", "good evening", "gm", "yo", "sup",
+      "how are you", "how r u", "kaise ho", "kya haal hai", "whats up", "what's up", "wassup", "wazzup"
+    ],
+    "thanks": [
+      "thanks", "thank you", "thank u", "thx", "dhanyawad", "shukriya", "many thanks", "thank you so much", "thanks a lot"
+    ],
+    "goodbyes": [
+      "bye", "bye bye", "byebye", "see you", "cya", "see ya", "alvida", "goodbye", "good night", "gn", "talk later"
+    ]
+  },
+  "scope": {
+    "allowed_tech_keywords": [
+      "tech", "technology", "software", "developer", "development", "engineer", "engineering",
+      "programmer", "programming", "coder", "coding", "code", "devops", "cloud", "aws", "azure", "gcp",
+      "data", "frontend", "backend", "fullstack", "full stack", "ai", "ml", "machine learning",
+      "deep learning", "cybersecurity", "security", "tester", "qa", "quality assurance", "automation",
+      "python", "java", "javascript", "typescript", "react", "node", "angular", "vue", "golang", "go",
+      "rust", "c++", "c#", "dotnet", ".net", "sql", "nosql", "mongodb", "postgresql", "mysql", "redis",
+      "docker", "kubernetes", "k8s", "linux", "git", "api", "rest", "graphql", "microservices",
+      "system design", "dsa", "algorithms", "data structures", "leetcode", "resume", "cv", "portfolio",
+      "interview", "interviews", "mock interview", "salary", "lpa", "ctc", "package", "hiring",
+      "job", "jobs", "opening", "openings", "vacancy", "vacancies", "intern", "internship", "internships",
+      "fresher", "career", "careers", "roadmap", "switch", "upskill", "learn", "learning", "certification",
+      "certifications", "course", "courses", "remote", "hybrid", "bangalore", "hyderabad", "pune", "gurgaon",
+      "noida", "mumbai", "chennai", "india", "faang", "product company", "service company", "it", "experience"
+    ],
+    "disallowed_domains": [
+      "cricket", "ipl", "football", "fifa", "match", "movie", "movies", "cinema", "bollywood", "hollywood",
+      "actor", "actress", "song", "songs", "lyrics", "politics", "election", "bjp", "congress", "modi",
+      "president", "minister", "medical", "disease", "medicine", "doctor", "tablet", "symptoms", "prescription",
+      "legal", "lawsuit", "lawyer", "court", "ipc", "police", "fir", "homework", "essay", "write an essay",
+      "write me a story", "poem", "recipe", "cook", "cooking", "astrology", "horoscope", "kundali",
+      "relationship", "breakup", "girlfriend", "boyfriend", "dating", "tinder"
+    ]
+  },
+  "messages": {
+    "safety_refusal": "I can only help with tech jobs, careers and learning roadmaps. Please ask me something related to your tech career.",
+    "self_harm_refusal": "It sounds like you're going through a very difficult time. Please reach out to someone you trust or contact a local helpline (in India: Tele-MANAS at 14416 or Vandrevala Foundation at 9999 666 555) for support. When you are ready, I am here to help you with your tech career journey.",
+    "greeting_reply": "Hi! I'm an AI assistant that helps you find tech jobs and build a career roadmap based on your skills and background. Tell me your target role, years of experience, or core skills to get started.",
+    "thanks_reply": "You're welcome! Ask me anything about tech jobs or your career roadmap.",
+    "goodbye_reply": "Take care! Come back anytime for job or roadmap help.",
+    "scope_refusal": "I'm focused on tech jobs and career roadmaps. Share your skills, experience or target role and I'll help from there.",
+    "rate_limit_cooldown": "You have made several requests that violated our safety policies. Please wait 60 seconds before sending another message."
+  }
+}

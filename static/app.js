@@ -711,7 +711,7 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
                         ? job.skills_required.map(s => `<span class="job-skill-chip">${escapeHtml(s)}</span>`).join('')
                         : '';
 
-                    const applyUrl = job.apply_url || `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(job.title)}`;
+                    const applyUrl = job.apply_url || `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(job.title)}&location=India&f_TPR=r604800`;
 
                     return `
                         <div class="job-card">
@@ -759,7 +759,7 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
                 const listItems = extra.job_titles.map(title => `
                     <div class="job-card" style="padding:10px 14px;">
                         <div style="font-weight:600; color:#fff; font-size:0.86rem; margin-bottom:6px;">${escapeHtml(title)}</div>
-                        <a href="https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(title)}" target="_blank" rel="noopener noreferrer" class="btn-apply-job">
+                        <a href="https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(title)}&location=India&f_TPR=r604800" target="_blank" rel="noopener noreferrer" class="btn-apply-job">
                             <span>View Openings</span>
                             <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
                         </a>

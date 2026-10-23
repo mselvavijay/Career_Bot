@@ -78,7 +78,7 @@ async def get_recent_jobs_from_jsearch(job_titles: list[str], location: str = "I
                 "job_type": mode,
                 "skills_required": [],
                 "description": "Posted within the past week; review the live listing on LinkedIn.",
-                "apply_url": job.get("job_apply_link") or f"https://www.linkedin.com/jobs/search/?keywords={title_text.replace(' ', '+')}&location=India"
+                "apply_url": job.get("job_apply_link") or f"https://www.linkedin.com/jobs/search/?keywords={title_text.replace(' ', '+')}&location=India&f_TPR=r604800"
             })
         return results
 

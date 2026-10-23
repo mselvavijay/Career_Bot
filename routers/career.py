@@ -173,7 +173,38 @@ async def multi_turn_chat(request: schemas.MultiTurnChatRequest, db: Session = D
     db.add(user_msg_record)
     db.commit()
 
-    # 4. Invoke LLM with multi-turn context + profile (guarantees structured open_jobs)
+    # 4. STEP 1 - 4: Message-Gating Layer & Topic Guardrails (Rule-based, instant, $0 cost)
+    from services.guardrail_service import run_guardrails_pipeline
+    gated_id = request.user_id or session_id or "anonymous"
+    should_stop, gated_reply, stage = run_guardrails_pipeline(user_input, gated_id)
+
+    if should_stop and gated_reply:
+        # Save guarded assistant turn (no LLM call, no job search, clean consistent thread)
+        assistant_msg = models.ChatMessage(
+            session_id=session_id,
+            role="assistant",
+            content=gated_reply,
+            extracted_interests="",
+            career_category="Technology",
+            explanation=None,
+            job_titles="",
+            open_jobs="[]"
+        )
+        db.add(assistant_msg)
+        db.commit()
+
+        return schemas.MultiTurnChatResponse(
+            session_id=session_id,
+            user_id=request.user_id,
+            message=gated_reply,
+            interests=[],
+            career_category="Technology",
+            explanation=None,
+            job_titles=[],
+            open_jobs=[]
+        )
+
+    # 5. STEP 5: Invoke Groq LLM with multi-turn context + profile (bound by system prompt)
     llm_result = await analyze_conversation_turn(
         user_input=user_input,
         conversation_history=conversation_history,
