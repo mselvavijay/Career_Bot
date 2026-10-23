@@ -91,25 +91,38 @@ def get_target_job_count(fresh_requests_used: int, session_jobs_count: Optional[
     return 0
 
 def record_fresh_request(db, usage_model, user_id: Optional[str]) -> int:
-    """Record a fresh AI request and return the updated count for today."""
+    """Record a fresh AI request atomically and return the updated count for today."""
     if not user_id:
         return 1
     
     from models import models
+    from sqlalchemy import update
     user_exists = db.query(models.UserProfile.id).filter_by(id=user_id).first()
     if not user_exists:
         return 1
 
     today = get_today_ist()
+    # Ensure a row exists for (user_id, today)
     usage = db.query(usage_model).filter_by(user_id=user_id, usage_date=today).first()
-    if usage:
-        usage.fresh_requests += 1
-        new_count = usage.fresh_requests
-    else:
-        new_count = 1
-        db.add(usage_model(user_id=user_id, usage_date=today, fresh_requests=1))
+    if not usage:
+        try:
+            db.add(usage_model(user_id=user_id, usage_date=today, fresh_requests=1))
+            db.commit()
+            return 1
+        except Exception:
+            db.rollback()
+            # Row was created concurrently by another worker, proceed to atomic increment
+
+    # Atomic SQL increment: avoids lost updates if multiple requests arrive simultaneously
+    db.execute(
+        update(usage_model)
+        .where(usage_model.user_id == user_id, usage_model.usage_date == today)
+        .values(fresh_requests=usage_model.fresh_requests + 1)
+    )
     db.commit()
-    return new_count
+
+    updated = db.query(usage_model.fresh_requests).filter_by(user_id=user_id, usage_date=today).first()
+    return updated[0] if updated else 1
 
 def cleanup_expired_conversations(db) -> dict:
     """

@@ -31,30 +31,38 @@ router = APIRouter()
 
 @router.post("/profile", response_model=schemas.UserProfileResponse)
 def create_or_update_profile(profile_data: schemas.UserProfileCreate, db: Session = Depends(get_db)):
-    """Create a new user profile or initialize one."""
-    new_user = models.UserProfile(
-        name=profile_data.name,
-        email=profile_data.email,
-        picture_url=profile_data.picture_url,
-        google_id=profile_data.google_id,
-        education=profile_data.education,
-        current_role=profile_data.current_role,
-        years_of_experience=profile_data.years_of_experience,
-        skills=profile_data.skills
+    """
+    Deprecated direct profile creation.
+    Profiles must be created via verified Google Sign-In (/auth/google).
+    Only updates to an existing verified profile or initialization with an existing Google account is permitted.
+    """
+    if profile_data.email:
+        existing = db.query(models.UserProfile).filter(models.UserProfile.email == profile_data.email).first()
+        if existing:
+            for field, value in profile_data.model_dump(exclude_unset=True).items():
+                if field not in ("id", "google_id", "email"):
+                    setattr(existing, field, value)
+            db.commit()
+            db.refresh(existing)
+            return existing
+
+    raise HTTPException(
+        status_code=401,
+        detail="Direct unverified email registration is disabled. Please sign in with Google."
     )
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-    return new_user
 
 @router.put("/profile/{user_id}", response_model=schemas.UserProfileResponse)
 def update_profile(user_id: str, profile_data: schemas.UserProfileUpdate, db: Session = Depends(get_db)):
-    """Update an existing user profile."""
+    """Update an existing verified user profile."""
     user = db.query(models.UserProfile).filter(models.UserProfile.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User profile not found")
 
-    for field, value in profile_data.model_dump(exclude_unset=True).items():
+    # Disallow modifying email or google_id through this endpoint to prevent identity hijacking
+    update_data = profile_data.model_dump(exclude_unset=True)
+    update_data.pop("email", None)
+    update_data.pop("google_id", None)
+    for field, value in update_data.items():
         setattr(user, field, value)
 
     db.commit()
@@ -143,18 +151,27 @@ async def multi_turn_chat(request: schemas.MultiTurnChatRequest, db: Session = D
     if not user_input:
         raise HTTPException(status_code=400, detail="Input cannot be empty.")
 
-    # 1. Retrieve or initialize user profile if user_id is provided
-    profile_dict = None
-    if request.user_id:
-        user_profile = db.query(models.UserProfile).filter(models.UserProfile.id == request.user_id).first()
-        if user_profile:
-            profile_dict = {
-                "name": user_profile.name,
-                "education": user_profile.education,
-                "current_role": user_profile.current_role,
-                "years_of_experience": user_profile.years_of_experience,
-                "skills": user_profile.skills
-            }
+    # 1. Require a registered, verified user profile to enforce the 3 consultations / day limit
+    if not request.user_id:
+        raise HTTPException(
+            status_code=401,
+            detail="Sign in with Google is required to access career consultations."
+        )
+
+    user_profile = db.query(models.UserProfile).filter(models.UserProfile.id == request.user_id).first()
+    if not user_profile:
+        raise HTTPException(
+            status_code=401,
+            detail="Candidate profile not found. Please sign in with Google."
+        )
+
+    profile_dict = {
+        "name": user_profile.name,
+        "education": user_profile.education,
+        "current_role": user_profile.current_role,
+        "years_of_experience": user_profile.years_of_experience,
+        "skills": user_profile.skills
+    }
 
     # 2. Retrieve or create session
     session_id = request.session_id

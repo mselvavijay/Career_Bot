@@ -71,7 +71,7 @@ MANDATORY TRI-FACTOR CALIBRATION RULES (EXPERIENCE + SKILLS + DEGREE):
       * 1-3 Years: Junior to Mid-Level software roles (8 - 16 LPA).
       * 4-7 Years: Mid-Senior, Specialist, or Technical Lead roles (18 - 32 LPA).
       * 8+ Years: Senior Staff, Principal, or Engineering Manager roles (35 - 60 LPA).
-2. CORE SKILLS: The 10 roles must directly utilize the candidate's declared programming languages, frameworks, and domain competencies.
+2. CORE SKILLS: The recommended roles must directly utilize the candidate's declared programming languages, frameworks, and domain competencies.
 """
 
 INDIAN_TECH_HUBS = [
