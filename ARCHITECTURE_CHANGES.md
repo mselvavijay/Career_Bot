@@ -1,63 +1,114 @@
 # Project Architecture Update: Layman's Guide
 
-This document explains exactly what we changed in the Career Bot project, step-by-step, and **why** we made those changes. The goal of these updates was to take a prototype script and turn it into a **production-ready backend**—something you can deploy to AWS and connect to a real database. The latest update focused on making the app significantly faster by reducing API call time by ~70%.
+This document explains what has been updated in the HireKrkeDekho / Career Bot project, step-by-step, and **why** those changes were made. The goal of these updates is to provide an **enterprise-grade, production-ready, cost-effective, and mobile-responsive AI talent advisory platform**.
 
 ---
 
 ## 1. Creating `requirements.txt` (The Grocery List)
-**What we did:** We created a file that lists all the external packages our project needs (like FastAPI, SQLAlchemy, `httpx`).
-**Why we did it:** Imagine trying to bake a cake without knowing the ingredients. Before this file, if another developer (or a cloud server like AWS) tried to run your code, they wouldn't know which tools to install. `requirements.txt` acts as the official "grocery list" for your project. We also swapped the old `requests` library for `httpx` because `httpx` supports **async (non-blocking)** HTTP calls, which is critical for our speed optimizations.
-
-## 2. Introducing a Database (Memory)
-**What we did:** We added `database.py` and a `models/` folder.
-**Why we did it:** In the old version, every time a user asked the bot a question, the bot would answer and immediately "forget" the conversation. 
-- **SQLAlchemy** is a tool that lets our Python code talk to a database (like SQLite for local testing, or PostgreSQL for AWS).
-- **models.py** is where we drew the "blueprint" of a table called `ChatHistory`. Now, every time someone uses the bot, their input, the extracted interests, and the recommended jobs are safely saved into a long-term memory bank (database).
-
-## 3. Creating "Schemas" (The Bouncer)
-**What we did:** We added a `schemas/` folder using a tool called Pydantic.
-**Why we did it:** When users send data to our API (like their `user_input`), we need to make sure the data is exactly what we expect. Schemas act like a bouncer at a club. They check the incoming data to ensure it's correct, and they also format the outgoing data (the bot's response) so the frontend always receives perfectly structured information.
-
-## 4. Organizing with "Services" (The Workers)
-**What we did:** We moved the code that talks to Mistral AI and JSearch into a `services/` folder. Both services were later upgraded to be **async** (see Section 7).
-**Why we did it:** Previously, all the logic was crammed into one place. By moving the AI logic into `llm_service.py` and the job search logic into `jsearch_service.py`, we created dedicated "workers". If the JSearch API changes tomorrow, we only have to update the `jsearch_service.py` worker. The rest of the app doesn't care *how* the worker gets the jobs, just that it brings them back.
-
-## 5. Setting up "Routers" (The Traffic Cops)
-**What we did:** We created `routers/career.py`.
-**Why we did it:** This is the Traffic Cop of our app. When a request comes in to `/career-bot`, the router:
-1. Takes the user's input.
-2. Makes a **single LLM call** to get interests, career category, explanation, and job titles all at once.
-3. Fires **multiple JSearch job searches simultaneously** (in parallel).
-4. Saves everything to the Database.
-5. Returns the final answer to the user.
-By keeping this step-by-step recipe in the router, it makes the code incredibly easy to read and manage.
-
-## 6. Cleaning up `app.py` & Removing `main.py`
-**What we did:** We deleted `main.py` and made `app.py` extremely short.
-**Why we did it:** Before, you had two separate files doing almost the same thing (`main.py` for terminal, `app.py` for the web). This caused a split personality where one file had features the other didn't. We deleted `main.py` so there is only **one source of truth**. Now, `app.py` just starts the server, connects to the database, and hands all the actual work over to the "Traffic Cop" (the router). 
-
-## 7. Speed Optimizations: Async & Concurrent API Calls
-**What we did:** We rewrote `llm_service.py`, `jsearch_service.py`, and `routers/career.py` to use **async** programming with `httpx` and `asyncio`.
-**Why we did it:** The old app made **7 API calls one after another** (4 to Mistral AI + 3 to JSearch), which was slow—each call had to wait for the previous one to finish.
-
-Here is what changed:
-- **`llm_service.py`:** Instead of calling Mistral 4 separate times, we now send a **single smart prompt** that asks the AI to return everything (interests, category, explanation, job titles) as one JSON object in one shot.
-- **`jsearch_service.py`:** Converted to a fully `async` function using `httpx` instead of the old blocking `requests` library.
-- **`routers/career.py`:** Used `asyncio.gather()` to fire all 3 JSearch searches **at the exact same time** instead of one by one.
-
-**The result:**
-| | Before | After |
-|---|---|---|
-| LLM calls | 4 sequential calls (~16 sec) | 1 single call (~4 sec) |
-| JSearch calls | 3 sequential calls (~9 sec) | 3 parallel calls (~3 sec) |
-| **Total estimated time** | **~25 seconds** | **~7 seconds** |
+**What we did:** We created a file that lists all external dependencies (`fastapi`, `uvicorn`, `sqlalchemy`, `httpx`, `psycopg2-binary`, `python-dotenv`).
+**Why we did it:** Acting as the official recipe ingredient list, it ensures seamless installation on local machines, Vercel, Docker, and AWS without missing libraries.
 
 ---
 
-### Summary
-Your app went from being a messy, single-file script to a **fast, modular, enterprise-grade architecture**.
-- It now has **memory** (Database).
-- It is **organized** (Routers and Services).
-- It is **safe** (Schemas and Error Handling).
-- It is **ready to travel** (Requirements list).
-- It is **fast** (Async & Concurrent API calls).
+## 2. Introducing a Database (Memory & Multi-Engine Compatibility)
+**What we did:** Added `database.py` and `models/models.py`.
+**Why we did it:** The bot needs to remember sessions, conversations, and candidate profiles.
+- **Dual Support:** Uses SQLite locally for rapid development and seamlessly connects to managed PostgreSQL (Supabase) in production.
+- **Connection Pooling:** Serverless-aware with `NullPool` so connection limits are never exhausted on cloud deployments.
+
+---
+
+## 3. Creating "Schemas" (The Bouncer & Formatter)
+**What we did:** Added `schemas/schemas.py` using Pydantic.
+**Why we did it:** Validates all incoming API payloads and ensures the frontend consistently receives strict, structured data (e.g. `JobListing`, `MultiTurnChatResponse`).
+
+---
+
+## 4. Organizing with "Services" (The Specialized Workers)
+**What we did:** Separated business logic into dedicated service modules:
+- `llm_service.py`: Handles Groq / OpenRouter API interaction and structured JSON output.
+- `jsearch_service.py`: Real-time job retrieval with fallback.
+- `guardrail_service.py`: Zero-cost rule-based input/output security and topic gating.
+- `response_cache.py`: 7-day response cache, daily candidate usage tracking, and 30-day retention cleanup.
+
+---
+
+## 5. Setting up "Routers" (The Traffic Controllers)
+**What we did:** Organized HTTP endpoints into dedicated routers:
+- `routers/career.py`: Multi-turn chat, session history, profile management, and job recommendations.
+- `routers/auth.py`: Google Identity OAuth and profile synchronization.
+- `routers/race.py`: Daily contest status and Razorpay checkout orders.
+
+---
+
+## 6. Single Source of Truth for App Entry & Styling
+**What we did:** Cleaned up `app.py` as a lightweight app orchestrator and **deleted redundant `style.css`**.
+**Why we did it:** 
+- `app.py` simply mounts routes, static files, and initializes tables.
+- `style.css` was an obsolete 93-line file overridden by `app.css`. Consolidating into `static/app.css` eliminates duplicate styles and creates a single styling source of truth.
+
+---
+
+## 7. Speed Optimizations: Async & Parallel API Calls
+**What we did:** Implemented async HTTP (`httpx`) and `asyncio.gather()`.
+**Why we did it:** Reduced overall query latency by ~70% (from ~25 seconds down to ~4–7 seconds) by sending parallel requests instead of blocking sequential queries.
+
+---
+
+## 8. Multi-Turn Conversation Memory & Sessions
+**What we did:** Created `ConversationSession` and `ChatMessage` models with `/sessions` endpoints.
+**Why we did it:** Candidates can have persistent, threaded dialogues. The advisor remembers previous roles recommended and builds on earlier answers across turns.
+
+---
+
+## 9. Six-Layer Guardrails Pipeline ($0-Cost Safety & Topic Gating)
+**What we did:** Added `services/guardrail_service.py` evaluated before any LLM call:
+1. **Normalization:** Strips zero-width characters, spacing tricks, and leetspeak.
+2. **Safety & Abuse Filter:** Rejects harmful, illegal, explicit, or malicious content instantly.
+3. **Small-Talk & Greetings:** Fast friendly responses for "hi", "bye", or "thanks" at $0 cost without calling the LLM.
+4. **Scope Gating:** Politely declines non-tech questions and steers back to tech careers.
+5. **Prompt Injection Defense:** Neutralizes system prompt override attempts.
+6. **Output Hallucination & PII Check:** Ensures assistant responses contain no inappropriate output or sensitive leaked keys.
+
+---
+
+## 10. Tri-Factor Grounding (Degree + Experience + Skills)
+**What we did:** Grounded AI recommendations directly in the candidate's profile:
+- **Degree:** Foundation and qualification requirements.
+- **Experience:** Seniority level and calibrated Indian tech compensation (e.g. 0 yrs: 4–9 LPA, 1–3 yrs: 8–16 LPA, 4–7 yrs: 18–32 LPA, 8+ yrs: 35–60 LPA).
+- **Core Skills:** Specific frameworks, languages, and technical competencies.
+- **Prep Guide:** Each job listing includes a structured 3-Week Preparation Roadmap.
+
+---
+
+## 11. Free-Tier Daily Plan & Job Openings Calibration
+**What we did:** Aligned job openings with candidate daily AI usage:
+- **Initial Fresh Consultation:** **4 curated job openings**
+- **First "Show More":** **2 additional openings**
+- **Second "Show More":** **2 additional openings**
+- **Total Quota:** **8 openings per candidate per day** across 3 fresh requests.
+- **Daily Limit Behavior:**
+  - After 3 requests, requests return: `"Daily limit reached. Come back tomorrow for new openings."`
+  - The UI dynamically displays a clear daily limit banner and disables further quota consumption until the next day.
+
+---
+
+## 12. 30-Day Chat Retention & Supabase Space Recovery
+**What we did:** Implemented automated 30-day data retention:
+- **Conversations:** Sessions and messages older than 30 days are automatically purged via `cleanup_expired_conversations(db)`.
+- **Space Recovery:** Prevents unlimited database growth and stays comfortably within Supabase free-tier limits.
+- **AI Response Cache:** Cached standalone questions expire after 7 days (`CACHE_TTL = 7 days`).
+- **Permanent Profiles:** Candidate user profiles (`user_profiles`) are **permanent** and never deleted.
+
+---
+
+## Summary of Current Architecture
+
+| Component | Responsibility | Tech / Mechanism |
+|---|---|---|
+| **Frontend** | Dark mode UI, glassmorphism, responsive chat workspace | Vanilla HTML, CSS (`app.css`), JavaScript (`app.js`) |
+| **API Server** | Async REST endpoints, routing, static hosting | FastAPI, Uvicorn |
+| **Guardrails** | Instant zero-cost filtering, safety, topic gating | Regex, leetspeak decoder, in-memory cache |
+| **Intelligence** | Structured JSON generation, career guidance | Groq / OpenRouter, `gpt-oss-120b` / `mistral-7b` |
+| **Storage** | Relational data, candidate profiles, session history | PostgreSQL (Supabase) / SQLite via SQLAlchemy |
+| **Cache & Quota** | 7-day LLM cache, daily 4/2/2 opening limit, 30-day retention | `DailyAIUsage`, `LLMResponseCache`, cascade deletion |
