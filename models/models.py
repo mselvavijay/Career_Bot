@@ -77,3 +77,13 @@ class ChatHistory(Base):
     explanation = Column(Text, nullable=True)
     job_titles = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class LLMResponseCache(Base):
+    __tablename__ = "llm_response_cache"
+
+    id = Column(Integer, primary_key=True, index=True)
+    cache_key = Column(String(64), unique=True, index=True, nullable=False)
+    response_payload = Column(Text, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    expires_at = Column(DateTime(timezone=True), index=True, nullable=False)

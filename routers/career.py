@@ -1,6 +1,8 @@
 import asyncio
 import json
 import uuid
+from services.response_cache import build_cache_key, get_cached_response, is_cacheable_question, save_cached_response
+from services.llm_service import DEFAULT_MODEL
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
@@ -204,12 +206,22 @@ async def multi_turn_chat(request: schemas.MultiTurnChatRequest, db: Session = D
             open_jobs=[]
         )
 
-    # 5. STEP 5: Invoke Groq LLM with multi-turn context + profile (bound by system prompt)
-    llm_result = await analyze_conversation_turn(
-        user_input=user_input,
-        conversation_history=conversation_history,
-        user_profile=profile_dict
-    )
+    # 5. Reuse a profile-aware response for standalone, non-time-sensitive questions.
+    # Contextual follow-ups always use the LLM because earlier messages change their meaning.
+    cache_key = None
+    llm_result = None
+    if not conversation_history and is_cacheable_question(user_input):
+        cache_key = build_cache_key(user_input, profile_dict, DEFAULT_MODEL)
+        llm_result = get_cached_response(db, models.LLMResponseCache, cache_key)
+
+    if llm_result is None:
+        llm_result = await analyze_conversation_turn(
+            user_input=user_input,
+            conversation_history=conversation_history,
+            user_profile=profile_dict
+        )
+        if cache_key:
+            save_cached_response(db, models.LLMResponseCache, cache_key, llm_result)
 
     reply_text = llm_result.get("reply") or llm_result.get("explanation") or "Here are your career recommendations."
     interests_list = llm_result.get("interests", [])
