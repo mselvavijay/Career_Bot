@@ -112,11 +112,19 @@
         }
 
         .header-brand {
-            display: flex;
+            display: inline-flex;
+            flex: 0 0 auto;
             align-items: center;
-            gap: 12px;
             text-decoration: none;
-            color: inherit;
+            line-height: 0;
+        }
+
+        .brand-wordmark {
+            display: block;
+            width: auto;
+            height: 36px;
+            max-width: 250px;
+            object-fit: contain;
         }
 
         .brand-logo {
@@ -1764,7 +1772,11 @@
                 padding: 0 16px;
             }
 
-            .brand-meta p,
+            .brand-wordmark {
+                height: 26px;
+                max-width: 172px;
+            }
+
             .btn-hero-cta span {
                 display: none;
             }
