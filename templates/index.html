@@ -9,7 +9,7 @@
     <title>HireKrkeDekho | Executive Talent & Career Intelligence</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -95,124 +95,154 @@
 
             <!-- The Real Working Workspace Frame -->
             <div class="workspace-frame">
-                <!-- Sidebar: Consultation History -->
-                <aside class="frame-sidebar">
-                    <button class="btn-outline-action" onclick="startNewSession()">
-                        <svg class="icon icon-sm" viewBox="0 0 24 24">
-                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
-                        </svg>
-                        <span>New Consultation</span>
+                <!-- Mobile Navigation Bar (visible below 1000px) -->
+                <div class="mobile-consultation-bar">
+                    <button class="mobile-menu-btn" type="button" onclick="toggleMobileSidebar()" aria-label="Toggle consultation menu">
+                        <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+                    </button>
+                    <div class="mobile-bar-title">AI Career Guidance</div>
+                    <button class="ghost-close-btn" type="button" onclick="closeConsultation()" aria-label="Close">
+                        <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                    </button>
+                </div>
+
+                <!-- 1. LEFT RAIL (264px) -->
+                <aside class="frame-sidebar" id="consultation_left_rail">
+                    <!-- Brand Wordmark -->
+                    <div class="rail-brand-wordmark" aria-label="HireKrkeDekho">
+                        <span class="wm-hire">Hire</span><span class="wm-krke">Krke</span><span class="wm-d">D</span><span class="wm-ekho">ekho</span>
+                    </div>
+
+                    <!-- Outlined New Consultation Button -->
+                    <button class="btn-new-consultation" type="button" onclick="startNewSession()">
+                        <span>New consultation</span>
+                        <svg class="icon icon-sm icon-plus" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
                     </button>
 
-                    <div class="panel-card" style="flex:1; display:flex; flex-direction:column; min-height:0;">
-                        <div class="panel-header">
-                            <span class="panel-title">
-                                <svg class="icon icon-sm" viewBox="0 0 24 24">
-                                    <path
-                                        d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z" />
-                                </svg>
-                                Consultations
-                            </span>
-                        </div>
-
+                    <!-- Consultations Section -->
+                    <div class="rail-consultations-section">
+                        <div class="rail-section-label">CONSULTATIONS</div>
                         <div class="sessions-scroll-area" id="session_list_container">
-                            <div style="font-size:0.75rem; color:var(--text-muted); text-align:center; padding:16px 0;">
-                                No past records found</div>
+                            <div class="session-empty-text">Your past consultations will appear here.</div>
                         </div>
                     </div>
 
-                    <!-- Active Profile Indicator in Sidebar -->
-                    <div class="panel-card" id="sidebar_profile_badge" style="display:none; padding:12px;">
-                        <div
-                            style="font-size:0.68rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px;">
-                            Profile Synced</div>
-                        <div style="font-size:0.83rem; font-weight:600; color:#fff;" id="sidebar_profile_name">Candidate
+                    <!-- Bottom Profile Card -->
+                    <div class="rail-profile-card" id="sidebar_profile_badge" onclick="openProfileModal()" role="button" tabindex="0" aria-label="User Profile">
+                        <div class="profile-avatar-circle" id="sidebar_user_initials">MS</div>
+                        <div class="profile-info-block">
+                            <div class="profile-user-name" id="sidebar_profile_name">Candidate</div>
+                            <div class="profile-synced-label">Profile synced</div>
                         </div>
-                        <button onclick="openProfileModal()"
-                            style="background:transparent; border:none; color:var(--accent); font-size:0.75rem; font-weight:600; cursor:pointer; padding:0; margin-top:6px; display:inline-flex; align-items:center; gap:4px;">
-                            <span>Update Profile &amp; Skills</span> &rarr;
-                        </button>
                     </div>
                 </aside>
 
-                <!-- Main Dialogue Console -->
+                <!-- 2. CENTER COLUMN -->
                 <main class="frame-main">
-                    <!-- Executive Consultant Header -->
-                    <div class="chat-consultant-header">
-                        <div class="consultant-avatar-wrap">
-                            <div class="consultant-avatar">
-                                <svg class="icon icon-sm" viewBox="0 0 24 24">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
-                                </svg>
-                                <span class="status-indicator-dot online"></span>
+                    <!-- Center Header -->
+                    <header class="center-chat-header">
+                        <div class="bot-header-group">
+                            <div class="hk-bot-avatar" aria-label="HireKrkeDekho AI Avatar">
+                                <img src="/static/bot-logo.png" alt="HK" class="bot-logo-img">
                             </div>
-                            <div class="consultant-details">
-                                <div class="consultant-name-row">
-                                    <span class="consultant-name">HireKrkeDekho Executive Advisor</span>
-                                    <span class="consultant-badge">Verified Partner</span>
-                                </div>
-                                <div class="consultant-subtitle">Senior India Tech &amp; Corporate Career Strategist &bull; Online</div>
+                            <h1 class="header-guidance-title">AI Career Guidance</h1>
+                        </div>
+                        <button class="ghost-close-btn" type="button" onclick="closeConsultation()" aria-label="Close">
+                            <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                        </button>
+                    </header>
+
+                    <!-- Center Body Scroll Container -->
+                    <div class="center-body-scroll" id="center_scroll_wrapper">
+                        <!-- Empty State Hero & Prompts -->
+                        <div class="center-empty-hero" id="center_empty_hero">
+                            <div class="empty-hero-eyebrow">CAREER ADVISORY &bull; INDIA</div>
+                            <h2 class="empty-hero-heading">
+                                <span class="heading-line-light">Tell me where you are.</span>
+                                <span class="heading-line-bold">We'll map where to go next.</span>
+                            </h2>
+                            <p class="empty-hero-desc">
+                                Share your target domain, years of experience, or core skill stack to begin.
+                            </p>
+
+                            <!-- 2x2 Starter Prompts Grid -->
+                            <div class="starter-prompts-grid" id="starter_prompts_grid">
+                                <button class="starter-prompt-card" type="button"
+                                    onclick="sendQuickPrompt('I have 2 years of Python, SQL, and FastAPI experience with a B.Tech. Recommend 10 matching jobs in India with 3-week prep roadmaps.')">
+                                    <span class="prompt-card-title">2 yrs Python and FastAPI</span>
+                                    <span class="prompt-card-sub">Find roles that fit your stack</span>
+                                </button>
+                                <button class="starter-prompt-card" type="button"
+                                    onclick="sendQuickPrompt('Fresher college graduate with Computer Science degree seeking software engineering openings in India with prep guides.')">
+                                    <span class="prompt-card-title">Fresher CS graduate</span>
+                                    <span class="prompt-card-sub">Build a first-job plan</span>
+                                </button>
+                                <button class="starter-prompt-card" type="button"
+                                    onclick="sendQuickPrompt('5+ years Senior Developer aiming for Tech Lead and Staff Engineer roles in Bangalore/Hyderabad.')">
+                                    <span class="prompt-card-title">5+ yrs senior or lead</span>
+                                    <span class="prompt-card-sub">Plan a lead-level move</span>
+                                </button>
+                                <button class="starter-prompt-card" type="button"
+                                    onclick="sendQuickPrompt('Show me 10 competitive remote engineering positions in India with salary ranges.')">
+                                    <span class="prompt-card-title">Remote tech roles</span>
+                                    <span class="prompt-card-sub">Explore remote-first openings in India</span>
+                                </button>
                             </div>
                         </div>
-                        <div class="consultant-actions">
-                            <span class="consultancy-pill"><svg class="icon icon-xs" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg> Confidential Advisory</span>
-                        </div>
+
+                        <!-- Messages Stream (Thread) -->
+                        <div class="messages-container" id="messages_stream"></div>
                     </div>
 
-                    <div class="messages-container" id="messages_stream">
-                        <!-- Welcome Advisor Message -->
-                        <div class="message-row assistant">
-                            <div class="msg-sender-icon">
-                                <svg class="icon icon-sm" viewBox="0 0 24 24">
-                                    <path d="M12 2L2 7l10 5 10-5-10-5zm0 9.5l-8-4v6.5l8 4 8-4v-6.5l-8 4z" />
-                                </svg>
-                            </div>
-                            <div class="msg-body-wrapper">
-                                <div class="msg-card-assistant">
-                                    <div class="msg-text-main welcome-message">
-                                        <p><strong>Welcome to HireKrkeDekho Advisory.</strong> Let's turn your background into a high-impact, India-focused career growth plan.</p>
-                                        <p>Share your target domain, years of experience, or core skill stack to begin.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Input Console with Quick Inquiries -->
-                    <div class="workspace-input-bar">
-                        <div class="prompt-chips-bar">
-                            <button class="chip-button"
-                                onclick="sendQuickPrompt('I have 2 years of Python, SQL, and FastAPI experience with a B.Tech. Recommend 10 matching jobs in India with 3-week prep roadmaps.')">
-                                2 Yrs Python &amp; FastAPI (India)
-                            </button>
-                            <button class="chip-button"
-                                onclick="sendQuickPrompt('Fresher college graduate with Computer Science degree seeking software engineering openings in India with prep guides.')">
-                                Fresher CS Graduate
-                            </button>
-                            <button class="chip-button"
-                                onclick="sendQuickPrompt('5+ years Senior Developer aiming for Tech Lead and Staff Engineer roles in Bangalore/Hyderabad.')">
-                                5+ Yrs Senior / Lead Roles
-                            </button>
-                            <button class="chip-button"
-                                onclick="sendQuickPrompt('Show me 10 competitive remote engineering positions in India with salary ranges.')">
-                                Remote Tech Roles (India)
-                            </button>
-                        </div>
-
-                        <div class="input-box-wrapper">
+                    <!-- 5. COMPOSER (Pinned at bottom of center column) -->
+                    <div class="composer-container">
+                        <div class="composer-surface-bar">
+                            <label for="user_input_field" class="visually-hidden">Describe your background, target role or question</label>
                             <input type="text" id="user_input_field"
-                                placeholder="Detail your background, target roles in India, or career questions..."
+                                placeholder="Describe your background, target role or question"
                                 onkeydown="if(event.key==='Enter' && !event.shiftKey) submitMessage()"
                                 autocomplete="off" spellcheck="true">
-                            <button class="btn-send-msg" id="btn_send_action" onclick="submitMessage()">
-                                <span>Send</span>
-                                <svg class="icon icon-sm" viewBox="0 0 24 24">
-                                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
-                                </svg>
+                            <button class="btn-composer-send" id="btn_send_action" type="button" onclick="submitMessage()">
+                                Send
                             </button>
+                        </div>
+                        <div class="composer-footnote">
+                            Advice is guidance, not a guarantee of outcomes.
                         </div>
                     </div>
                 </main>
+
+                <!-- 6. RIGHT PANEL "ADVISOR CONTEXT" (300px) -->
+                <aside class="advisor-context-panel" id="consultation_right_panel">
+                    <div class="context-panel-label">ADVISOR CONTEXT</div>
+
+                    <div class="context-surface-card">
+                        <div class="context-field">
+                            <div class="context-field-label">Name</div>
+                            <div class="context-field-value" id="ctx_user_name">[Not set]</div>
+                        </div>
+                        <div class="context-field">
+                            <div class="context-field-label">Target domain</div>
+                            <div class="context-field-value" id="ctx_target_domain">[Not set]</div>
+                        </div>
+                        <div class="context-field">
+                            <div class="context-field-label">Experience</div>
+                            <div class="context-field-value" id="ctx_experience">[Not set]</div>
+                        </div>
+                        <div class="context-field">
+                            <div class="context-field-label">Core skills</div>
+                            <div class="context-field-value" id="ctx_skills">[Not set]</div>
+                        </div>
+
+                        <a href="javascript:void(0)" onclick="openProfileModal()" class="context-update-link">
+                            Update profile and skills
+                        </a>
+                    </div>
+
+                    <p class="context-helper-text">
+                        The more you add, the sharper the advice. Your details stay private to this consultation.
+                    </p>
+                </aside>
             </div>
         </div>
 

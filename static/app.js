@@ -194,29 +194,61 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
             if (googleBtn) googleBtn.style.display = 'none';
 
             const badge = document.getElementById('user_account_badge');
-            badge.style.display = 'inline-flex';
+            if (badge) badge.style.display = 'inline-flex';
 
-            document.getElementById('user_display_name').textContent = user.name || 'Candidate';
-            document.getElementById('user_display_email').textContent = user.email || 'Verified Profile';
+            const userDisplayName = document.getElementById('user_display_name');
+            if (userDisplayName) userDisplayName.textContent = user.name || 'Candidate';
+            const userDisplayEmail = document.getElementById('user_display_email');
+            if (userDisplayEmail) userDisplayEmail.textContent = user.email || 'Verified Profile';
 
             const avatarImg = document.getElementById('user_avatar_img');
             const avatarInitials = document.getElementById('user_avatar_initials');
 
-            if (user.picture_url) {
-                avatarImg.src = user.picture_url;
-                avatarImg.style.display = 'block';
-                avatarInitials.style.display = 'none';
-            } else {
-                avatarImg.style.display = 'none';
-                avatarInitials.style.display = 'flex';
-                const initial = (user.name || user.email || 'C').charAt(0).toUpperCase();
-                avatarInitials.textContent = initial;
+            const nameParts = (user.name || '').trim().split(/\s+/).filter(Boolean);
+            let initials = 'U';
+            if (nameParts.length >= 2) {
+                initials = (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase();
+            } else if (nameParts.length === 1) {
+                initials = nameParts[0].slice(0, 2).toUpperCase();
+            } else if (user.email) {
+                initials = user.email.slice(0, 2).toUpperCase();
+            }
+
+            if (avatarImg && avatarInitials) {
+                if (user.picture_url) {
+                    avatarImg.src = user.picture_url;
+                    avatarImg.style.display = 'block';
+                    avatarInitials.style.display = 'none';
+                } else {
+                    avatarImg.style.display = 'none';
+                    avatarInitials.style.display = 'flex';
+                    avatarInitials.textContent = initials;
+                }
             }
 
             const sidebarBadge = document.getElementById('sidebar_profile_badge');
             if (sidebarBadge) {
-                sidebarBadge.style.display = 'block';
-                document.getElementById('sidebar_profile_name').textContent = user.name || user.email || 'Candidate';
+                sidebarBadge.style.display = 'flex';
+                const sidebarName = document.getElementById('sidebar_profile_name');
+                if (sidebarName) sidebarName.textContent = user.name || user.email || 'Candidate';
+                const sidebarInitials = document.getElementById('sidebar_user_initials');
+                if (sidebarInitials) sidebarInitials.textContent = initials;
+            }
+
+            // Sync Advisor Context right panel
+            const ctxName = document.getElementById('ctx_user_name');
+            if (ctxName) ctxName.textContent = user.name || user.email || '[Not set]';
+            if (user.current_role) {
+                const ctxRole = document.getElementById('ctx_target_domain');
+                if (ctxRole) ctxRole.textContent = user.current_role;
+            }
+            if (user.years_of_experience) {
+                const ctxExp = document.getElementById('ctx_experience');
+                if (ctxExp) ctxExp.textContent = user.years_of_experience;
+            }
+            if (user.skills) {
+                const ctxSkills = document.getElementById('ctx_skills');
+                if (ctxSkills) ctxSkills.textContent = user.skills;
             }
         }
 
@@ -229,8 +261,19 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
             localStorage.removeItem('career_bot_user_pic');
             localStorage.removeItem('career_bot_session_id');
 
-            const sidebarBadge = document.getElementById('sidebar_profile_badge');
-            if (sidebarBadge) sidebarBadge.style.display = 'none';
+            const sidebarName = document.getElementById('sidebar_profile_name');
+            if (sidebarName) sidebarName.textContent = 'Candidate';
+            const sidebarInitials = document.getElementById('sidebar_user_initials');
+            if (sidebarInitials) sidebarInitials.textContent = 'CA';
+
+            const ctxName = document.getElementById('ctx_user_name');
+            if (ctxName) ctxName.textContent = '[Not set]';
+            const ctxRole = document.getElementById('ctx_target_domain');
+            if (ctxRole) ctxRole.textContent = '[Not set]';
+            const ctxExp = document.getElementById('ctx_experience');
+            if (ctxExp) ctxExp.textContent = '[Not set]';
+            const ctxSkills = document.getElementById('ctx_skills');
+            if (ctxSkills) ctxSkills.textContent = '[Not set]';
 
             // Reset login button
             const googleBtn = document.getElementById('google_btn_container');
@@ -332,6 +375,27 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
 
             const sidebarName = document.getElementById('sidebar_profile_name');
             if (sidebarName) sidebarName.textContent = p.name || p.email || 'Candidate';
+
+            const nameParts = (p.name || '').trim().split(/\s+/).filter(Boolean);
+            let initials = 'U';
+            if (nameParts.length >= 2) {
+                initials = (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase();
+            } else if (nameParts.length === 1) {
+                initials = nameParts[0].slice(0, 2).toUpperCase();
+            } else if (p.email) {
+                initials = p.email.slice(0, 2).toUpperCase();
+            }
+            const sidebarInitials = document.getElementById('sidebar_user_initials');
+            if (sidebarInitials) sidebarInitials.textContent = initials;
+
+            const ctxName = document.getElementById('ctx_user_name');
+            if (ctxName) ctxName.textContent = p.name || p.email || '[Not set]';
+            const ctxRole = document.getElementById('ctx_target_domain');
+            if (ctxRole) ctxRole.textContent = p.current_role || '[Not set]';
+            const ctxExp = document.getElementById('ctx_experience');
+            if (ctxExp) ctxExp.textContent = p.years_of_experience || '[Not set]';
+            const ctxSkills = document.getElementById('ctx_skills');
+            if (ctxSkills) ctxSkills.textContent = p.skills || '[Not set]';
         }
 
         /* ===== SESSIONS ===== */
@@ -344,7 +408,7 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
                 const container = document.getElementById('session_list_container');
 
                 if (!sessions.length) {
-                    container.innerHTML = '<div style="font-size:0.75rem; color:var(--text-muted); text-align:center; padding:16px 0;">No past records found</div>';
+                    container.innerHTML = '<div class="session-empty-text">Your past consultations will appear here.</div>';
                     return;
                 }
 
@@ -371,22 +435,12 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
             currentSessionId = null;
             localStorage.removeItem('career_bot_session_id');
             const stream = document.getElementById('messages_stream');
-            stream.innerHTML = `
-                <div class="message-row assistant">
-                    <div class="msg-sender-icon">
-                        <svg class="icon icon-sm" viewBox="0 0 24 24">
-                            <path d="M12 2L2 7l10 5 10-5-10-5zm0 9.5l-8-4v6.5l8 4 8-4v-6.5l-8 4z"/>
-                        </svg>
-                    </div>
-                    <div class="msg-body-wrapper">
-                        <div class="msg-card-assistant">
-                            <div class="msg-text-main welcome-message">
-                                <p><strong>Fresh consultation ready.</strong> What role or career direction would you like to explore today?</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
+            if (stream) {
+                stream.innerHTML = '';
+            }
+            if (typeof updateConversationVisibility === 'function') {
+                updateConversationVisibility();
+            }
             loadSessions();
         }
 
@@ -599,22 +653,28 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
             }
         }
 
+        function updateConversationVisibility() {
+            const stream = document.getElementById('messages_stream');
+            const hero = document.getElementById('center_empty_hero');
+            if (!hero || !stream) return;
+            const hasMessages = stream.children.length > 0;
+            if (hasMessages) {
+                hero.classList.add('hero-hidden');
+            } else {
+                hero.classList.remove('hero-hidden');
+            }
+        }
+
         /* ===== MESSAGE RENDERERS ===== */
         function renderUserMessage(text) {
             const stream = document.getElementById('messages_stream');
             const row = document.createElement('div');
             row.className = 'message-row user';
             row.innerHTML = `
-                <div class="msg-sender-icon">
-                    <svg class="icon icon-sm" viewBox="0 0 24 24">
-                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                    </svg>
-                </div>
-                <div class="msg-body-wrapper">
-                    <div class="msg-bubble-user">${escapeHtml(text)}</div>
-                </div>
+                <div class="msg-bubble-user">${escapeHtml(text)}</div>
             `;
             stream.appendChild(row);
+            updateConversationVisibility();
         }
 
         function renderAssistantMessage(message, extra = {}) {
@@ -662,7 +722,6 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
                                 </div>
                                 <div class="job-company-meta">
                                     <span class="meta-item">
-                                        <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>
                                         India &middot; ${escapeHtml(job.job_type || 'Hybrid')}
                                     </span>
                                 </div>
@@ -689,9 +748,6 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
                 jobsHtml = `
                     <div class="open-jobs-section">
                         <div class="jobs-section-heading">
-                            <svg class="icon icon-sm" viewBox="0 0 24 24">
-                                <path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/>
-                            </svg>
                             Curated Open Positions &amp; Roles
                         </div>
                         <div class="job-cards-grid">
@@ -719,10 +775,8 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
             }
 
             row.innerHTML = `
-                <div class="msg-sender-icon">
-                    <svg class="icon icon-sm" viewBox="0 0 24 24">
-                        <path d="M12 2L2 7l10 5 10-5-10-5zm0 9.5l-8-4v6.5l8 4 8-4v-6.5l-8 4z"/>
-                    </svg>
+                <div class="msg-sender-icon hk-bot-avatar">
+                    <img src="/static/bot-logo.png" alt="HK" class="bot-logo-img">
                 </div>
                 <div class="msg-body-wrapper">
                     <div class="msg-card-assistant">
@@ -734,6 +788,7 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
             `;
 
             stream.appendChild(row);
+            updateConversationVisibility();
         }
 
         function renderLoadingCard() {
@@ -743,10 +798,8 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
             row.id = id;
             row.className = 'message-row assistant';
             row.innerHTML = `
-                <div class="msg-sender-icon">
-                    <svg class="icon icon-sm" viewBox="0 0 24 24">
-                        <path d="M12 2L2 7l10 5 10-5-10-5zm0 9.5l-8-4v6.5l8 4 8-4v-6.5l-8 4z"/>
-                    </svg>
+                <div class="msg-sender-icon hk-bot-avatar">
+                    <img src="/static/bot-logo.png" alt="HK" class="bot-logo-img">
                 </div>
                 <div class="msg-body-wrapper">
                     <div class="msg-card-assistant" style="padding:14px 18px;">
@@ -755,17 +808,32 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
                 </div>
             `;
             stream.appendChild(row);
+            updateConversationVisibility();
             return id;
         }
 
         function removeLoadingCard(id) {
             const el = document.getElementById(id);
             if (el) el.remove();
+            updateConversationVisibility();
         }
 
         function scrollStreamToBottom() {
-            const c = document.getElementById('messages_stream');
-            c.scrollTop = c.scrollHeight;
+            const scrollWrap = document.getElementById('center_scroll_wrapper');
+            if (scrollWrap) {
+                scrollWrap.scrollTop = scrollWrap.scrollHeight;
+            }
+            const stream = document.getElementById('messages_stream');
+            if (stream) {
+                stream.scrollTop = stream.scrollHeight;
+            }
+        }
+
+        function toggleMobileSidebar() {
+            const rail = document.getElementById('consultation_left_rail');
+            if (rail) {
+                rail.classList.toggle('mobile-open');
+            }
         }
 
         function escapeHtml(str) {
