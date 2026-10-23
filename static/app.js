@@ -834,3 +834,77 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
         if (window.location.pathname === '/consultation') {
             window.addEventListener('DOMContentLoaded', openConsultation);
         }
+
+        /* ===== ANTIGRAVITY-INSPIRED CURSOR BACKGROUND INTERACTION ===== */
+        (function initAntigravityCursor() {
+            if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+            const canvas = document.createElement('canvas');
+            canvas.className = 'cursor-canvas-bg';
+            const orb = document.createElement('div');
+            orb.className = 'cursor-glow-orb';
+            document.body.prepend(canvas);
+            document.body.prepend(orb);
+
+            const ctx = canvas.getContext('2d');
+            let width = (canvas.width = window.innerWidth);
+            let height = (canvas.height = window.innerHeight);
+
+            window.addEventListener('resize', () => {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            });
+
+            const particles = [];
+            let mouseX = -1000;
+            let mouseY = -1000;
+            let targetX = -1000;
+            let targetY = -1000;
+
+            window.addEventListener('pointermove', (e) => {
+                targetX = e.clientX;
+                targetY = e.clientY;
+
+                if (Math.random() < 0.6) {
+                    particles.push({
+                        x: e.clientX,
+                        y: e.clientY,
+                        vx: (Math.random() - 0.5) * 0.8,
+                        vy: (Math.random() - 0.5) * 0.8,
+                        size: Math.random() * 2 + 1,
+                        alpha: 0.7,
+                        color: Math.random() > 0.5 ? '99, 102, 241' : '6, 182, 212'
+                    });
+                }
+            });
+
+            function animate() {
+                mouseX += (targetX - mouseX) * 0.12;
+                mouseY += (targetY - mouseY) * 0.12;
+                orb.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+
+                ctx.clearRect(0, 0, width, height);
+
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    const p = particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.alpha -= 0.015;
+
+                    if (p.alpha <= 0) {
+                        particles.splice(i, 1);
+                        continue;
+                    }
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(${p.color}, ${p.alpha})`;
+                    ctx.shadowColor = `rgba(${p.color}, 0.5)`;
+                    ctx.shadowBlur = 6;
+                    ctx.fill();
+                }
+
+                requestAnimationFrame(animate);
+            }
+            requestAnimationFrame(animate);
+        })();
