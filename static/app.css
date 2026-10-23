@@ -3033,10 +3033,31 @@
             color: #1F6BFF;
         }
 
+        .footer-social-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 9px;
+        }
+
         .footer-social-wrap {
             display: inline-flex;
             align-items: center;
             gap: 12px;
+        }
+
+        .footer-enquiry-btn {
+            color: #c7d7ff;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .footer-enquiry-btn:hover,
+        .footer-enquiry-btn:focus-visible {
+            color: #ffffff;
+            text-decoration: underline;
         }
 
         .footer-follow-label {
@@ -3086,5 +3107,9 @@
                 flex-direction: column;
                 text-align: center;
                 gap: 14px;
+            }
+
+            .footer-social-group {
+                align-items: center;
             }
         }
