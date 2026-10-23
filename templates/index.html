@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="description"
         content="HireKrkeDekho - Next-Gen AI Talent & Career Advisory Platform inspired by modern design. Calibrated by Degree, Experience, and Technical Stack.">
     <title>HireKrkeDekho | Executive Talent & Career Intelligence</title>
@@ -26,32 +26,39 @@
     <!-- Header Navigation -->
     <header class="site-header">
         <a href="/" class="header-brand" aria-label="HireKrkeDekho home">
-            <img class="brand-wordmark" src="/static/hirekrkedekho-logo.png" alt="HireKrkeDekho">
+            <img class="brand-wordmark" src="/static/hirekrkedekho-logo.png" alt="HireKrkeDekho" width="220" height="36">
         </a>
 
-        <nav class="nav-links">
-            <a href="#how_it_works" class="nav-link">Tri-Factor Matching</a>
-            <a href="#ai_race" class="nav-link">Daily Contest</a>
-            <a href="#about_section" class="nav-link">About</a>
+        <nav class="nav-links" id="site_nav_links">
+            <a href="#how_it_works" class="nav-link" onclick="closeSiteMobileNav()">Tri-Factor Matching</a>
+            <a href="#ai_race" class="nav-link" onclick="closeSiteMobileNav()">Daily Contest</a>
+            <a href="#about_section" class="nav-link" onclick="closeSiteMobileNav()">About</a>
         </nav>
 
         <div class="header-actions">
             <button class="btn-hero-cta" onclick="openPremiumModal()"><span>Start Prep</span><svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" /></svg></button>
             <div class="auth-widget" id="auth_widget">
                 <div id="google_btn_container" style="display:none;"></div>
-                <button class="btn-google-auth" id="btn_login_trigger" onclick="openAuthModal()">
+                <button class="btn-google-auth" id="btn_login_trigger" onclick="openAuthModal()" aria-label="Sign in">
                     <svg class="icon" style="width:16px;height:16px;" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
                     <span>Sign in</span>
                 </button>
                 <div class="user-account-badge" id="user_account_badge" onclick="openProfileModal()" title="Click to view candidate profile">
-                    <img id="user_avatar_img" class="user-avatar" src="" alt="Profile" style="display:none;">
+                    <img id="user_avatar_img" class="user-avatar" src="" alt="Profile" style="display:none;" width="30" height="30">
                     <div id="user_avatar_initials" class="user-avatar">U</div>
                     <div class="user-info-text"><span class="user-name-label" id="user_display_name">Candidate</span><span class="user-email-label" id="user_display_email" hidden>candidate@example.com</span></div>
-                    <button class="btn-signout" onclick="event.stopPropagation(); signOutUser();" title="Sign Out"><svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M16 17v-3H9v-4h7V7l5 5-5 5M14 2a2 2 0 0 1 2 2v2h-2V4H5v16h9v-2h2v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9z" /></svg></button>
+                    <button class="btn-signout" onclick="event.stopPropagation(); signOutUser();" title="Sign Out" aria-label="Sign Out"><svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M16 17v-3H9v-4h7V7l5 5-5 5M14 2a2 2 0 0 1 2 2v2h-2V4H5v16h9v-2h2v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9z" /></svg></button>
                 </div>
             </div>
+            <!-- Mobile Site Navigation Hamburger Toggle -->
+            <button class="site-mobile-menu-toggle" id="site_mobile_menu_btn" type="button" onclick="toggleSiteMobileNav()" aria-label="Toggle Navigation Menu" aria-expanded="false">
+                <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+            </button>
         </div>
     </header>
+
+    <!-- Mobile Navigation Drawer Overlay -->
+    <div class="site-nav-drawer-overlay" id="site_nav_drawer_overlay" onclick="closeSiteMobileNav()" aria-hidden="true"></div>
 
     <!-- Hero Section with Immediate Live Advisory Console -->
     <section class="hero-section" id="app_workspace">
@@ -99,21 +106,38 @@
             <div class="workspace-frame">
                 <!-- Mobile Navigation Bar (visible below 1000px) -->
                 <div class="mobile-consultation-bar">
-                    <button class="mobile-menu-btn" type="button" onclick="toggleMobileSidebar()" aria-label="Toggle consultation menu">
+                    <button class="mobile-menu-btn" type="button" onclick="toggleMobileSidebar()" aria-label="Toggle consultation menu" title="History & New Consultation">
                         <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
                     </button>
-                    <div class="mobile-bar-title">AI Career Guidance</div>
-                    <button class="ghost-close-btn" type="button" onclick="closeConsultation()" aria-label="Close">
-                        <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-                    </button>
+                    <div class="mobile-bar-title-wrap">
+                        <div class="hk-bot-avatar" aria-hidden="true">
+                            <img src="/static/bot-logo.png" alt="HK" class="bot-logo-img" width="28" height="28">
+                        </div>
+                        <div class="mobile-bar-title">AI Career Guidance</div>
+                    </div>
+                    <div class="mobile-bar-actions">
+                        <button class="mobile-context-btn" type="button" onclick="toggleMobileContextPanel()" aria-label="Toggle advisor context details" title="Advisor Context">
+                            <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                        </button>
+                        <button class="ghost-close-btn" type="button" onclick="closeConsultation()" aria-label="Close consultation">
+                            <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                        </button>
+                    </div>
                 </div>
+
+                <!-- Backdrop overlay for mobile drawer -->
+                <div class="sidebar-backdrop-overlay" id="sidebar_backdrop_overlay" onclick="toggleMobileSidebar()" aria-hidden="true"></div>
+                <div class="context-backdrop-overlay" id="context_backdrop_overlay" onclick="toggleMobileContextPanel()" aria-hidden="true"></div>
 
                 <!-- 1. LEFT RAIL (264px) -->
                 <aside class="frame-sidebar" id="consultation_left_rail">
-                    <!-- Brand Wordmark (links to home page) -->
-                    <a href="/" class="rail-brand-wordmark" onclick="closeConsultation(); return false;" aria-label="HireKrkeDekho Home">
-                        <span class="wm-hire">Hire</span><span class="wm-krke">Krke</span><span class="wm-d">D</span><span class="wm-ekho">ekho</span>
-                    </a>
+                    <div class="rail-header-row">
+                        <!-- Brand Wordmark (links to home page) -->
+                        <a href="/" class="rail-brand-wordmark" onclick="closeConsultation(); return false;" aria-label="HireKrkeDekho Home">
+                            <span class="wm-hire">Hire</span><span class="wm-krke">Krke</span><span class="wm-d">D</span><span class="wm-ekho">ekho</span>
+                        </a>
+                        <button class="rail-drawer-close" type="button" onclick="toggleMobileSidebar()" aria-label="Close menu">&times;</button>
+                    </div>
 
                     <!-- Outlined New Consultation Button -->
                     <button class="btn-new-consultation" type="button" onclick="startNewSession()">
@@ -216,7 +240,10 @@
 
                 <!-- 6. RIGHT PANEL "ADVISOR CONTEXT" (300px) -->
                 <aside class="advisor-context-panel" id="consultation_right_panel">
-                    <div class="context-panel-label">ADVISOR CONTEXT</div>
+                    <div class="context-panel-header">
+                        <div class="context-panel-label">ADVISOR CONTEXT</div>
+                        <button class="context-drawer-close" type="button" onclick="toggleMobileContextPanel()" aria-label="Close advisor context">&times;</button>
+                    </div>
 
                     <div class="context-surface-card">
                         <div class="context-field">

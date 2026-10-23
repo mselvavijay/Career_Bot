@@ -815,10 +815,66 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
 
         function toggleMobileSidebar() {
             const rail = document.getElementById('consultation_left_rail');
+            const backdrop = document.getElementById('sidebar_backdrop_overlay');
             if (rail) {
-                rail.classList.toggle('mobile-open');
+                const isOpen = rail.classList.toggle('mobile-open');
+                if (backdrop) {
+                    backdrop.classList.toggle('active', isOpen);
+                }
             }
         }
+
+        function toggleMobileContextPanel() {
+            const panel = document.getElementById('consultation_right_panel');
+            const backdrop = document.getElementById('context_backdrop_overlay');
+            if (panel) {
+                const isOpen = panel.classList.toggle('mobile-open');
+                if (backdrop) {
+                    backdrop.classList.toggle('active', isOpen);
+                }
+            }
+        }
+
+        function toggleSiteMobileNav() {
+            const nav = document.getElementById('site_nav_links');
+            const overlay = document.getElementById('site_nav_drawer_overlay');
+            const btn = document.getElementById('site_mobile_menu_btn');
+            if (nav) {
+                const isOpen = nav.classList.toggle('mobile-nav-open');
+                if (overlay) overlay.classList.toggle('open', isOpen);
+                if (btn) btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                document.body.style.overflow = isOpen ? 'hidden' : '';
+            }
+        }
+
+        function closeSiteMobileNav() {
+            const nav = document.getElementById('site_nav_links');
+            const overlay = document.getElementById('site_nav_drawer_overlay');
+            const btn = document.getElementById('site_mobile_menu_btn');
+            if (nav) nav.classList.remove('mobile-nav-open');
+            if (overlay) overlay.classList.remove('open');
+            if (btn) btn.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = '';
+        }
+
+        // Close drawers on Escape key
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeSiteMobileNav();
+                const rail = document.getElementById('consultation_left_rail');
+                const railBackdrop = document.getElementById('sidebar_backdrop_overlay');
+                if (rail && rail.classList.contains('mobile-open')) {
+                    rail.classList.remove('mobile-open');
+                    if (railBackdrop) railBackdrop.classList.remove('active');
+                }
+                const panel = document.getElementById('consultation_right_panel');
+                const panelBackdrop = document.getElementById('context_backdrop_overlay');
+                if (panel && panel.classList.contains('mobile-open')) {
+                    panel.classList.remove('mobile-open');
+                    if (panelBackdrop) panelBackdrop.classList.remove('active');
+                }
+            }
+        });
 
         function escapeHtml(str) {
             if (str === null || str === undefined) return '';
