@@ -219,20 +219,55 @@ async def multi_turn_chat(request: schemas.MultiTurnChatRequest, db: Session = D
     # 5. Reuse a profile-aware response for standalone, non-time-sensitive questions.
     # Contextual follow-ups always use the LLM because earlier messages change their meaning.
     cache_key = None
-    llm_result = None
+    session_jobs_turns = (
+        db.query(models.ChatMessage)
+        .filter(
+            models.ChatMessage.session_id == session_id,
+            models.ChatMessage.role == "assistant",
+            models.ChatMessage.open_jobs.isnot(None),
+            models.ChatMessage.open_jobs != "[]"
+        )
+        .count()
+    )
     current_fresh_count = get_daily_fresh_requests_count(db, models.DailyAIUsage, request.user_id)
-    target_job_count = get_target_job_count(current_fresh_count)
+    target_job_count = get_target_job_count(current_fresh_count, session_jobs_turns)
 
+    # If the candidate has reached their daily limit (or exceeded allowed job turns today)
+    if current_fresh_count >= DAILY_FRESH_REQUEST_LIMIT or target_job_count == 0:
+        limit_reply = "Daily limit reached. Come back tomorrow for new openings."
+        assistant_msg = models.ChatMessage(
+            session_id=session_id,
+            role="assistant",
+            content=limit_reply,
+            extracted_interests="",
+            career_category="Professional & Technology",
+            explanation=limit_reply,
+            job_titles="",
+            open_jobs="[]"
+        )
+        db.add(assistant_msg)
+        db.commit()
+
+        return schemas.MultiTurnChatResponse(
+            session_id=session_id,
+            user_id=request.user_id,
+            message=limit_reply,
+            interests=[],
+            career_category="Professional & Technology",
+            explanation=limit_reply,
+            job_titles=[],
+            open_jobs=[],
+            remaining_requests=0,
+            daily_limit_reached=True,
+            open_jobs_today=8
+        )
+
+    llm_result = None
     if not conversation_history and is_cacheable_question(user_input):
         cache_key = build_cache_key(user_input, profile_dict, DEFAULT_MODEL)
         llm_result = get_cached_response(db, models.LLMResponseCache, cache_key)
 
     if llm_result is None:
-        if current_fresh_count >= DAILY_FRESH_REQUEST_LIMIT:
-            raise HTTPException(
-                status_code=429,
-                detail="Daily limit reached. Come back tomorrow for new openings."
-            )
         llm_result = await analyze_conversation_turn(
             user_input=user_input,
             conversation_history=conversation_history,
