@@ -38,8 +38,8 @@ Rules:
 CRITICAL INSTRUCTIONS FOR JOB RECOMMENDATIONS:
 1. RECENCY & LOCATION: Recommend only India-based Hybrid or Remote jobs posted within the last 7 days. Provide a LinkedIn search URL for each role; never include company names.
 2. COMPENSATION: Use Indian Rupee (INR) LPA ranges only; never use US dollars.
-3. 10 JOB OPENINGS: You must ALWAYS provide EXACTLY 10 job openings in the "open_jobs" array when addressing career questions.
-4. 3-WEEK PREPARATION GUIDE: For EACH of the 10 job openings, you must include a "prep_guide" array of EXACTLY 3 concise bullet points:
+3. JOB OPENINGS: Provide EXACTLY 5 job openings in the "open_jobs" array when addressing career questions. If the candidate asks for "5 more", provide 5 additional roles that differ from the earlier recommendations.
+4. 3-WEEK PREPARATION GUIDE: For EACH of the 5 job openings, you must include a "prep_guide" array of EXACTLY 3 concise bullet points:
    - "Week 1: [DSA, Core Fundamentals & Language Concepts]"
    - "Week 2: [Key Frameworks, Databases & Live Project Implementation]"
    - "Week 3: [System Design, Mock Technical Interviews & Behavioral Rounds]"
@@ -52,7 +52,7 @@ Expected JSON format:
   "interests": ["Skill/Domain 1", "Skill/Domain 2"],
   "career_category": "Technology",
   "explanation": "Brief 1-sentence alignment with candidate profile.",
-  "job_titles": ["Job 1", "Job 2", "Job 3", "Job 4", "Job 5", "Job 6", "Job 7", "Job 8", "Job 9", "Job 10"],
+  "job_titles": ["Job 1", "Job 2", "Job 3", "Job 4", "Job 5"],
   "open_jobs": [
     {{
       "title": "Exact Role Title (e.g. Backend Developer - Python)",
@@ -224,8 +224,8 @@ def sanitize_and_enrich_jobs(parsed: dict, user_profile: Optional[Dict[str, Any]
                     "apply_url": apply_url
                 })
 
-    # Fill up to 10 jobs if fewer than 10 returned
-    if len(enriched_jobs) < 10:
+    # Fill up to 5 jobs if fewer than 10 returned
+    if len(enriched_jobs) < 5:
         seen_titles = {j["title"].lower() for j in enriched_jobs}
         # Check job_titles first
         if isinstance(job_titles, list):
@@ -233,11 +233,11 @@ def sanitize_and_enrich_jobs(parsed: dict, user_profile: Optional[Dict[str, Any]
                 if isinstance(t, str) and t.strip() and t.strip().lower() not in seen_titles:
                     enriched_jobs.append(format_job_card(t.strip(), category, exp_years, len(enriched_jobs)))
                     seen_titles.add(t.strip().lower())
-                    if len(enriched_jobs) >= 10:
+                    if len(enriched_jobs) >= 5:
                         break
 
     # If still fewer than 10, fill with calibrated Indian tech roles
-    if len(enriched_jobs) < 10:
+    if len(enriched_jobs) < 5:
         prefix = "Junior" if exp_years == 0 else ("Senior" if exp_years >= 5 else "Mid-Level")
         base_skill = "Software"
         if user_profile and user_profile.get("skills"):
@@ -258,12 +258,12 @@ def sanitize_and_enrich_jobs(parsed: dict, user_profile: Optional[Dict[str, Any]
             f"Core {base_skill} Solutions Engineer"
         ]
         for st in sample_titles:
-            if st.lower() not in seen_titles and len(enriched_jobs) < 10:
+            if st.lower() not in seen_titles and len(enriched_jobs) < 5:
                 enriched_jobs.append(format_job_card(st, category, exp_years, len(enriched_jobs)))
                 seen_titles.add(st.lower())
 
-    parsed["open_jobs"] = enriched_jobs[:10]
-    parsed["job_titles"] = [j["title"] for j in enriched_jobs[:10]]
+    parsed["open_jobs"] = enriched_jobs[:5]
+    parsed["job_titles"] = [j["title"] for j in enriched_jobs[:5]]
     return parsed
 
 def build_system_message(user_profile: Optional[Dict[str, Any]] = None) -> str:
@@ -315,7 +315,7 @@ async def analyze_conversation_turn(
         "model": DEFAULT_MODEL,
         "messages": messages,
         "temperature": 0.3,
-        "max_tokens": 1500,
+        "max_tokens": 1100,
         "response_format": {"type": "json_object"}
     }
 
@@ -377,6 +377,8 @@ async def analyze_conversation_turn(
         }
         return sanitize_and_enrich_jobs(fallback, user_profile, user_input)
     except httpx.HTTPStatusError as e:
+        if e.response.status_code == 429:
+            raise HTTPException(status_code=429, detail="Daily AI capacity reached—please try again later.")
         raise HTTPException(status_code=502, detail=f"LLM API error: {str(e)}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error communicating with LLM: {str(e)}")

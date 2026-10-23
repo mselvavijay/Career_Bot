@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, UniqueConstraint
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from database import Base
@@ -87,3 +87,12 @@ class LLMResponseCache(Base):
     response_payload = Column(Text, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     expires_at = Column(DateTime(timezone=True), index=True, nullable=False)
+
+class DailyAIUsage(Base):
+    __tablename__ = "daily_ai_usage"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(String(36), ForeignKey("user_profiles.id"), nullable=False)
+    usage_date = Column(String(10), nullable=False)
+    fresh_requests = Column(Integer, nullable=False, default=0)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    __table_args__ = (UniqueConstraint("user_id", "usage_date", name="uq_daily_ai_usage_user_date"),)

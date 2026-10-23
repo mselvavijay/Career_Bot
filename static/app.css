@@ -1845,6 +1845,29 @@
             margin-top: 10px;
         }
 
+        .btn-show-more-jobs {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 16px;
+            padding: 10px 16px;
+            border: 1px solid rgba(31, 107, 255, 0.45);
+            border-radius: var(--radius-buttons);
+            background: rgba(31, 107, 255, 0.1);
+            color: #bcd4ff;
+            font: inherit;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-show-more-jobs:hover {
+            background: rgba(31, 107, 255, 0.2);
+            border-color: #1F6BFF;
+            color: #ffffff;
+        }
+
         .btn-apply-job {
             display: inline-flex;
             align-items: center;

@@ -1,7 +1,7 @@
 import asyncio
 import json
 import uuid
-from services.response_cache import build_cache_key, get_cached_response, is_cacheable_question, save_cached_response
+from services.response_cache import build_cache_key, can_make_fresh_request, get_cached_response, is_cacheable_question, record_fresh_request, save_cached_response
 from services.llm_service import DEFAULT_MODEL
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -168,7 +168,7 @@ async def multi_turn_chat(request: schemas.MultiTurnChatRequest, db: Session = D
         .order_by(models.ChatMessage.created_at.asc())
         .all()
     )
-    conversation_history = [{"role": m.role, "content": m.content} for m in past_db_messages]
+    conversation_history = [{"role": m.role, "content": m.content + (f"\nPreviously suggested roles: {m.job_titles}" if m.role == "assistant" and m.job_titles else "")} for m in past_db_messages]
 
     # Save incoming user message
     user_msg_record = models.ChatMessage(session_id=session_id, role="user", content=user_input)
@@ -215,11 +215,14 @@ async def multi_turn_chat(request: schemas.MultiTurnChatRequest, db: Session = D
         llm_result = get_cached_response(db, models.LLMResponseCache, cache_key)
 
     if llm_result is None:
+        if not can_make_fresh_request(db, models.DailyAIUsage, request.user_id):
+            raise HTTPException(status_code=429, detail="You have used your 3 free AI consultations for today. Please try again tomorrow.")
         llm_result = await analyze_conversation_turn(
             user_input=user_input,
             conversation_history=conversation_history,
             user_profile=profile_dict
         )
+        record_fresh_request(db, models.DailyAIUsage, request.user_id)
         if cache_key:
             save_cached_response(db, models.LLMResponseCache, cache_key, llm_result)
 
@@ -243,7 +246,8 @@ async def multi_turn_chat(request: schemas.MultiTurnChatRequest, db: Session = D
         elif isinstance(item, schemas.JobListing):
             structured_jobs.append(item)
 
-    final_job_titles = [j.title for j in structured_jobs] or llm_job_titles
+    structured_jobs = structured_jobs[:5]
+    final_job_titles = [j.title for j in structured_jobs] or llm_job_titles[:5]
 
     # 5. Save assistant turn to database (including open_jobs JSON)
     open_jobs_json = json.dumps([j.model_dump() for j in structured_jobs])

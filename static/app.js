@@ -609,7 +609,7 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
                 loadSessions();
             } catch (err) {
                 removeLoadingCard(loadingId);
-                renderAssistantMessage('An error occurred during talent assessment: ' + err.message + '. Please retry.');
+                renderAssistantMessage(err.message.includes('Daily AI capacity reached') || err.message.includes('3 free AI consultations') ? err.message : 'An error occurred during talent assessment: ' + err.message + '. Please retry.');
                 scrollStreamToBottom();
             } finally {
                 sendBtn.disabled = false;
@@ -701,6 +701,7 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
                         <div class="job-cards-grid">
                             ${cardsHtml}
                         </div>
+                        <button type="button" class="btn-show-more-jobs" onclick="sendQuickPrompt('Show 5 more matching roles that are different from the previous recommendations.')">Show 5 more roles</button>
                     </div>
                 `;
             } else if (hasLegacyJobs) {

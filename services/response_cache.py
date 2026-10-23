@@ -1,7 +1,7 @@
 import hashlib
 import json
 import re
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from typing import Any, Dict, Optional
 
 CACHE_TTL = timedelta(days=7)
@@ -47,4 +47,22 @@ def save_cached_response(db, cache_model, cache_key: str, response: Dict[str, An
     db.query(cache_model).filter(cache_model.expires_at <= now).delete(synchronize_session=False)
     entry = cache_model(cache_key=cache_key, response_payload=json.dumps(response), expires_at=now + CACHE_TTL)
     db.add(entry)
+    db.commit()
+DAILY_FRESH_REQUEST_LIMIT = 3
+
+def can_make_fresh_request(db, usage_model, user_id: Optional[str]) -> bool:
+    if not user_id:
+        return False
+    usage = db.query(usage_model).filter_by(user_id=user_id, usage_date=date.today().isoformat()).first()
+    return not usage or usage.fresh_requests < DAILY_FRESH_REQUEST_LIMIT
+
+def record_fresh_request(db, usage_model, user_id: Optional[str]) -> None:
+    if not user_id:
+        return
+    today = date.today().isoformat()
+    usage = db.query(usage_model).filter_by(user_id=user_id, usage_date=today).first()
+    if usage:
+        usage.fresh_requests += 1
+    else:
+        db.add(usage_model(user_id=user_id, usage_date=today, fresh_requests=1))
     db.commit()
