@@ -295,10 +295,14 @@ async def analyze_conversation_turn(
 
     # Context management: retain the last 8 messages (4 turns) to balance context depth & token cost
     if conversation_history:
-        recent_history = conversation_history[-8:]
+        recent_history = conversation_history[-6:]
         for msg in recent_history:
             role = "assistant" if msg.get("role") == "assistant" else "user"
             content = msg.get("content", "")
+            # Trim assistant messages to the reply portion only (before any appended metadata)
+            # to avoid Groq 400 from oversized payloads on follow-up turns
+            if role == "assistant" and content:
+                content = content.split("\nPreviously suggested roles:")[0].strip()
             if content:
                 messages.append({"role": role, "content": content})
 
@@ -309,7 +313,7 @@ async def analyze_conversation_turn(
         "model": DEFAULT_MODEL,
         "messages": messages,
         "temperature": 0.3,
-        "max_tokens": 1100,
+        "max_tokens": 2500,
         "response_format": {"type": "json_object"}
     }
 
