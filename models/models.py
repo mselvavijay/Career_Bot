@@ -16,8 +16,6 @@ class UserProfile(Base):
     current_role = Column(String(100), nullable=True)
     years_of_experience = Column(String(50), nullable=True)
     skills = Column(Text, nullable=True)  # Comma-separated or free text
-    interests = Column(Text, nullable=True)  # Legacy compatibility
-    target_industry = Column(String(100), nullable=True)  # Legacy compatibility
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 

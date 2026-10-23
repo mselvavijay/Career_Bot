@@ -68,6 +68,13 @@ def init_db():
                 # Column likely already exists or database engine handled it
                 pass
 
+        # Safely drop deprecated legacy columns from user_profiles if present
+        for col in ("interests", "target_industry"):
+            try:
+                conn.execute(text(f"ALTER TABLE user_profiles DROP COLUMN {col}"))
+            except Exception:
+                pass
+
     # Automatically purge conversations older than 30 days & expired cache on startup
     try:
         from services.response_cache import cleanup_expired_conversations

@@ -21,7 +21,7 @@ def build_cache_key(question: str, profile: Optional[Dict[str, Any]], model_name
     normalized_question = " ".join(question.lower().split())
     profile_context = {
         field: (profile or {}).get(field) or ""
-        for field in ("education", "current_role", "years_of_experience", "skills", "interests", "target_industry")
+        for field in ("education", "current_role", "years_of_experience", "skills")
     }
     payload = json.dumps(
         {"question": normalized_question, "profile": profile_context, "model": model_name, "prompt": CACHE_PROMPT_VERSION},

@@ -40,9 +40,7 @@ def create_or_update_profile(profile_data: schemas.UserProfileCreate, db: Sessio
         education=profile_data.education,
         current_role=profile_data.current_role,
         years_of_experience=profile_data.years_of_experience,
-        skills=profile_data.skills,
-        interests=profile_data.interests,
-        target_industry=profile_data.target_industry
+        skills=profile_data.skills
     )
     db.add(new_user)
     db.commit()
@@ -155,9 +153,7 @@ async def multi_turn_chat(request: schemas.MultiTurnChatRequest, db: Session = D
                 "education": user_profile.education,
                 "current_role": user_profile.current_role,
                 "years_of_experience": user_profile.years_of_experience,
-                "skills": user_profile.skills,
-                "interests": user_profile.interests,
-                "target_industry": user_profile.target_industry
+                "skills": user_profile.skills
             }
 
     # 2. Retrieve or create session

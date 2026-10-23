@@ -11,8 +11,6 @@ class UserProfileBase(BaseModel):
     current_role: Optional[str] = None
     years_of_experience: Optional[str] = None
     skills: Optional[str] = None
-    interests: Optional[str] = None
-    target_industry: Optional[str] = None
 
 class UserProfileCreate(UserProfileBase):
     google_id: Optional[str] = None
