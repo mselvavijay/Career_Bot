@@ -696,7 +696,7 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
 
                 let actionFooterHtml = '';
                 if (extra.daily_limit_reached || extra.remaining_requests === 0) {
-                    actionFooterHtml = `<div class="daily-limit-banner">Daily limit reached. Come back tomorrow for new openings.</div>`;
+                    actionFooterHtml = `<div class="daily-limit-banner">Oops! Daily limit reached. Come back tomorrow for new openings.</div>`;
                 } else {
                     actionFooterHtml = `<button type="button" class="btn-show-more-jobs" onclick="sendQuickPrompt('Show more matching roles that are different from the previous recommendations.')">Show more openings (+2)</button>`;
                 }
@@ -731,18 +731,19 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
                 `;
             }
 
-            row.innerHTML = `
-                <div class="msg-sender-icon hk-bot-avatar">
-                    <img src="/static/bot-logo.png" alt="HK" class="bot-logo-img">
-                </div>
-                <div class="msg-body-wrapper">
-                    <div class="msg-card-assistant">
-                        <div class="msg-text-main">${escapeHtml(message)}</div>
-                        ${insightsHtml}
-                        ${jobsHtml}
+                const isLimitText = message.includes('Daily limit reached');
+                row.innerHTML = `
+                    <div class="msg-sender-icon hk-bot-avatar">
+                        <img src="/static/bot-logo.png" alt="HK" class="bot-logo-img">
                     </div>
-                </div>
-            `;
+                    <div class="msg-body-wrapper">
+                        <div class="msg-card-assistant">
+                            <div class="msg-text-main ${isLimitText ? 'daily-limit-text' : ''}">${escapeHtml(message)}</div>
+                            ${insightsHtml}
+                            ${jobsHtml}
+                        </div>
+                    </div>
+                `;
 
             stream.appendChild(row);
             updateConversationVisibility();
