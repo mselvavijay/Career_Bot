@@ -14,7 +14,7 @@ OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 if GROQ_API_KEY:
     API_KEY = GROQ_API_KEY
     BASE_URL = "https://api.groq.com/openai/v1/chat/completions"
-    DEFAULT_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+    DEFAULT_MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
 else:
     API_KEY = OPENROUTER_API_KEY
     BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
