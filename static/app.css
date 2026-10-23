@@ -3019,20 +3019,6 @@
             letter-spacing: -0.01em;
         }
 
-        .footer-email {
-            display: inline-block;
-            margin-top: 5px;
-            color: var(--text-secondary);
-            font-size: 0.82rem;
-            text-decoration: none;
-            transition: color 0.2s ease;
-        }
-
-        .footer-email:hover,
-        .footer-email:focus-visible {
-            color: #1F6BFF;
-        }
-
         .footer-social-group {
             display: flex;
             flex-direction: column;
@@ -3046,18 +3032,41 @@
             gap: 12px;
         }
 
-        .footer-enquiry-btn {
-            color: #c7d7ff;
-            font-size: 0.78rem;
-            font-weight: 600;
-            text-decoration: none;
-            transition: color 0.2s ease;
+        .footer-enquiry-wrap {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        .footer-enquiry-btn:hover,
-        .footer-enquiry-btn:focus-visible {
+        .footer-linkedin-btn,
+        .footer-email-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #f1f5f9;
+            padding: 8px 16px;
+            border-radius: 9999px;
+            font-size: 0.84rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+        }
+
+        .footer-email-btn:hover,
+        .footer-email-btn:focus-visible {
+            background: #ea4335;
+            border-color: #ea4335;
             color: #ffffff;
-            text-decoration: underline;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(234, 67, 53, 0.35);
+        }
+
+        .footer-email-btn .email-svg-icon {
+            width: 16px;
+            height: 16px;
         }
 
         .footer-follow-label {
