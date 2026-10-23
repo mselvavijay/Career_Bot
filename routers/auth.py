@@ -25,32 +25,31 @@ async def google_auth(auth_req: schemas.GoogleAuthRequest, db: Session = Depends
     Authenticate user via Google Sign-In token or profile credential.
     Verifies token with Google and creates/fetches the user profile in database.
     """
-    google_id = auth_req.google_id
-    email = auth_req.email
-    name = auth_req.name
-    picture = auth_req.picture
+    google_id = None
+    email = None
+    name = None
+    picture = None
 
-    # If Google credential token was provided, verify with Google tokeninfo
-    if auth_req.credential:
-        try:
-            async with httpx.AsyncClient(timeout=8.0) as client:
-                res = await client.get(
-                    f"https://oauth2.googleapis.com/tokeninfo?id_token={auth_req.credential}"
-                )
-                if res.status_code == 200:
-                    data = res.json()
-                    google_id = data.get("sub") or google_id
-                    email = data.get("email") or email
-                    name = data.get("name") or name
-                    picture = data.get("picture") or picture
-        except Exception as e:
-            # Token verify error; will fall back to request fields if provided
-            pass
-
-    # Ensure we have at least an email or google_id
-    if not email and not google_id:
-        raise HTTPException(status_code=400, detail="Invalid Google authentication payload: email or ID required.")
-
+    # Accept only a Google-issued ID token; client-submitted profile fields are not trusted.
+    if not auth_req.credential:
+        raise HTTPException(status_code=401, detail="Sign in with Google is required.")
+    if not GOOGLE_CLIENT_ID:
+        raise HTTPException(status_code=503, detail="Google sign-in is not configured.")
+    try:
+        async with httpx.AsyncClient(timeout=8.0) as client:
+            res = await client.get(f"https://oauth2.googleapis.com/tokeninfo?id_token={auth_req.credential}")
+        if res.status_code != 200:
+            raise HTTPException(status_code=401, detail="Google sign-in could not be verified.")
+        data = res.json()
+        if data.get("aud") != GOOGLE_CLIENT_ID or data.get("email_verified") != "true":
+            raise HTTPException(status_code=401, detail="Google sign-in could not be verified.")
+        google_id, email, name, picture = data.get("sub"), data.get("email"), data.get("name"), data.get("picture")
+    except HTTPException:
+        raise
+    except httpx.HTTPError as exc:
+        raise HTTPException(status_code=503, detail="Google sign-in verification is temporarily unavailable.") from exc
+    if not email or not google_id:
+        raise HTTPException(status_code=401, detail="Google sign-in could not be verified.")
     # 1. Look up existing user by google_id or email
     user = None
     if google_id:

@@ -515,15 +515,24 @@
         }
 
         .text-gradient {
-            background: linear-gradient(135deg, #ffffff 15%, #93c5fd 55%, #38bdf8 100%);
+            background: linear-gradient(110deg, #a5f3fc 4%, #60a5fa 35%, #818cf8 67%, #f0abfc 100%);
+            background-size: 180% 180%;
+            animation: hero-gradient-shift 7s ease infinite;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         .text-gradient-purple {
-            background: linear-gradient(135deg, #c084fc 0%, #a855f7 45%, #6366f1 100%);
+            background: linear-gradient(110deg, #f0abfc 0%, #c084fc 34%, #818cf8 70%, #67e8f9 100%);
+            background-size: 180% 180%;
+            animation: hero-gradient-shift 7s ease infinite reverse;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+        }
+
+        @keyframes hero-gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
         }
 
         .hero-subtitle {
@@ -1139,6 +1148,10 @@
         .race-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
         .race-actions .btn-primary-hero { min-width: 168px; justify-content: center; }
         .race-actions .btn-secondary-hero { border-radius: 8px; background: transparent; border-color: #394968; color: #d7deec; }
+        .race-actions .btn-race-invite { min-height: 38px; padding: 8px 13px; font-size: .8rem; }
+        .auth-login-copy { margin: 4px 0 20px; color: var(--text-secondary); font-size: .9rem; line-height: 1.55; }
+        .google-login-slot { display: flex; justify-content: center; min-height: 44px; }
+        .auth-login-note { margin: 16px 0 0; color: var(--text-muted); font-size: .75rem; text-align: center; }
         .race-result-card { position: relative; isolation: isolate; overflow: hidden; max-width: 640px; margin-top: 30px; padding: 24px; border: 1px solid #a88a52; border-radius: 15px; background: linear-gradient(135deg, #101827 0%, #0b1220 58%, #171d29 100%); box-shadow: inset 0 0 0 4px rgba(197, 163, 98, .08), 0 16px 34px rgba(0, 0, 0, .28); }
         .race-result-card::before, .race-result-card::after { position: absolute; z-index: -1; width: 110px; height: 110px; border-color: rgba(210, 180, 111, .38); content: ""; pointer-events: none; }
         .race-result-card::before { top: 11px; left: 11px; border-top: 1px solid; border-left: 1px solid; }
@@ -2666,6 +2679,7 @@
             }
 
             .hero-subtitle {
+
                 font-size: 0.94rem;
                 line-height: 1.55;
                 margin-bottom: 24px;

@@ -2,6 +2,8 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
         let currentSessionId = localStorage.getItem('career_bot_session_id') || null;
         let currentUserData = null;
         let googleClientId = "";
+        let googleIdentityInitialized = false;
+        let pendingAuthAction = null;
 
         window.addEventListener('DOMContentLoaded', async () => {
             await initializeAuth();
@@ -22,9 +24,7 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
                     const data = await res.json();
                     googleClientId = data.google_client_id || "";
 
-                    if (googleClientId && window.google && google.accounts && google.accounts.id) {
-                        setupGoogleIdentity(googleClientId);
-                    }
+                    if (googleClientId) waitForGoogleIdentity();
                 }
             } catch (err) {
                 console.warn('Auth config init note:', err);
@@ -45,50 +45,43 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
             }
         }
 
+        function waitForGoogleIdentity(attempts = 20) {
+            if (googleClientId && window.google && google.accounts && google.accounts.id) {
+                setupGoogleIdentity(googleClientId);
+            } else if (attempts > 0) {
+                window.setTimeout(() => waitForGoogleIdentity(attempts - 1), 250);
+            }
+        }
         function setupGoogleIdentity(clientId) {
             googleClientId = clientId;
+            if (!window.google || !google.accounts || !google.accounts.id) return;
             try {
-                google.accounts.id.initialize({
-                    client_id: googleClientId,
-                    callback: handleGoogleCredentialResponse,
-                    auto_select: false
-                });
-
-                // Display official Google rendered button in header
-                const btnContainer = document.getElementById('google_btn_container');
-                const triggerBtn = document.getElementById('btn_login_trigger');
-                if (btnContainer) {
-                    btnContainer.innerHTML = '';
-                    btnContainer.style.display = 'block';
-                    if (triggerBtn) triggerBtn.style.display = 'none';
-
-                    google.accounts.id.renderButton(btnContainer, {
-                        theme: 'outline',
-                        size: 'medium',
-                        text: 'signin_with',
-                        shape: 'rectangular',
-                        logo_alignment: 'left'
-                    });
+                if (!googleIdentityInitialized) {
+                    google.accounts.id.initialize({ client_id: googleClientId, callback: handleGoogleCredentialResponse, auto_select: false });
+                    googleIdentityInitialized = true;
                 }
+                renderGoogleLoginButton();
+            } catch (e) { console.warn('Google setup error:', e); }
+        }
 
-                // Also render into modal slot
-                const slot = document.getElementById('modal_google_btn_slot');
-                if (slot) {
-                    slot.innerHTML = '';
-                    google.accounts.id.renderButton(slot, {
-                        theme: 'filled_blue',
-                        size: 'large',
-                        text: 'signin_with',
-                        shape: 'rectangular',
-                        width: 320
-                    });
-                }
+        function renderGoogleLoginButton() {
+            const slot = document.getElementById('modal_google_btn_slot');
+            if (!slot || !googleIdentityInitialized) return;
+            slot.innerHTML = '';
+            google.accounts.id.renderButton(slot, { theme: 'filled_blue', size: 'large', text: 'continue_with', shape: 'pill', width: 320 });
+        }
 
-                // Prompt Google One Tap popup
-                google.accounts.id.prompt();
-            } catch (e) {
-                console.warn('Google setup error:', e);
-            }
+        function requireAuthentication(continuation) {
+            if (currentUserId) return true;
+            pendingAuthAction = continuation;
+            openAuthModal();
+            return false;
+        }
+
+        function runPendingAuthAction() {
+            const continuation = pendingAuthAction;
+            pendingAuthAction = null;
+            if (typeof continuation === 'function') window.setTimeout(continuation, 0);
         }
 
         async function handleGoogleCredentialResponse(response) {
@@ -131,36 +124,6 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
             }
         }
 
-        async function authenticateViaDirectEmail() {
-            const name = document.getElementById('auth_input_name').value.trim();
-            const email = document.getElementById('auth_input_email').value.trim();
-
-            if (!email) {
-                alert('Please enter a valid email address.');
-                return;
-            }
-
-            try {
-                const res = await fetch('/auth/google', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        name: name || email.split('@')[0],
-                        email: email
-                    })
-                });
-
-                if (!res.ok) throw new Error('Could not authenticate profile.');
-
-                const user = await res.json();
-                onUserAuthenticated(user, true);
-                closeAuthModal();
-            } catch (err) {
-                console.error('Direct auth error:', err);
-                alert('Sign in failed: ' + err.message);
-            }
-        }
-
         function onUserAuthenticated(user, checkFirstTime = false) {
             currentUserId = user.id;
             currentUserData = user;
@@ -182,8 +145,9 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
                 document.getElementById('sidebar_profile_name').textContent = user.name || user.email || 'Candidate';
             }
 
-            // If user has not filled education or skills yet, open the profile modal automatically!
-            if (checkFirstTime && (!user.education || !user.skills)) {
+            if (pendingAuthAction) {
+                runPendingAuthAction();
+            } else if (checkFirstTime && (!user.education || !user.skills)) {
                 openProfileModal();
             }
         }
@@ -275,13 +239,8 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
             const ctxSkills = document.getElementById('ctx_skills');
             if (ctxSkills) ctxSkills.textContent = '[Not set]';
 
-            // Reset login button
-            const googleBtn = document.getElementById('google_btn_container');
-            if (googleBtn && googleClientId) {
-                googleBtn.style.display = 'block';
-            } else {
-                document.getElementById('btn_login_trigger').style.display = 'inline-flex';
-            }
+            // Restore the branded login entry point.
+            document.getElementById('btn_login_trigger').style.display = 'inline-flex';
             document.getElementById('user_account_badge').style.display = 'none';
 
             // Clear inputs
@@ -297,6 +256,7 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
 
         function openAuthModal() {
             document.getElementById('auth_modal_overlay').classList.add('open');
+            if (googleClientId) waitForGoogleIdentity();
         }
 
         function closeAuthModal() {
@@ -483,6 +443,8 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
             if (!date) return;
             const formattedDate = new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date());
             date.textContent = `Contest date: ${formattedDate}`;
+            const heroDate = document.getElementById('race_contest_date');
+            if (heroDate) heroDate.textContent = formattedDate;
         }
 
         async function loadRaceStatus() {
@@ -491,7 +453,7 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
                 if (!response.ok) return;
                 const race = await response.json();
                 const label = document.getElementById('race_seat_status');
-                if (label) label.textContent = `${race.seats_left} of ${race.capacity} daily seats left`;
+                if (label) label.textContent = `${race.seats_left}/${race.capacity} seats available`;
                 const button = document.getElementById('race_checkout_button');
                 if (button && race.seats_left === 0) { button.disabled = true; button.textContent = 'Today\'s Race Is Full'; }
             } catch (error) {
@@ -511,6 +473,7 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
         }
 
         async function startRaceCheckout() {
+            if (!requireAuthentication(startRaceCheckout)) return;
             const status = document.getElementById('race_payment_status');
             const button = document.getElementById('race_checkout_button');
             button.disabled = true;
@@ -540,6 +503,7 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
             }
         }
         function openRaceModal() {
+            if (!requireAuthentication(openRaceModal)) return;
             document.getElementById('race_modal_overlay').classList.add('open');
         }
 
@@ -547,6 +511,7 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
             document.getElementById('race_modal_overlay').classList.remove('open');
         }
         function openPremiumModal() {
+            if (!requireAuthentication(openPremiumModal)) return;
             document.getElementById('premium_modal_overlay').classList.add('open');
         }
 
@@ -554,6 +519,7 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
             document.getElementById('premium_modal_overlay').classList.remove('open');
         }
         function openConsultation() {
+            if (!requireAuthentication(openConsultation)) return;
             if (window.location.pathname !== '/consultation') {
                 window.location.assign('/consultation');
                 return;
@@ -604,6 +570,7 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
         }
 
         async function submitMessage() {
+            if (!requireAuthentication(submitMessage)) return;
             const inputEl = document.getElementById('user_input_field');
             const text = inputEl.value.trim();
             if (!text) return;
