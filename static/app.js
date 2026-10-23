@@ -1,9 +1,18 @@
 let currentUserId = localStorage.getItem('career_bot_user_id') || null;
+        let currentUserToken = localStorage.getItem('career_bot_token') || null;
         let currentSessionId = localStorage.getItem('career_bot_session_id') || null;
         let currentUserData = null;
         let googleClientId = "";
         let googleIdentityInitialized = false;
         let pendingAuthAction = null;
+
+        function getAuthHeaders() {
+            const headers = { 'Content-Type': 'application/json' };
+            if (currentUserToken) {
+                headers['Authorization'] = `Bearer ${currentUserToken}`;
+            }
+            return headers;
+        }
 
         window.addEventListener('DOMContentLoaded', async () => {
             await initializeAuth();
@@ -129,6 +138,10 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
             currentUserData = user;
 
             localStorage.setItem('career_bot_user_id', user.id);
+            if (user.access_token) {
+                currentUserToken = user.access_token;
+                localStorage.setItem('career_bot_token', user.access_token);
+            }
             if (user.name) localStorage.setItem('career_bot_user_name', user.name);
             if (user.email) localStorage.setItem('career_bot_user_email', user.email);
             if (user.picture_url) localStorage.setItem('career_bot_user_pic', user.picture_url);
@@ -218,8 +231,10 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
 
         function signOutUser() {
             currentUserId = null;
+            currentUserToken = null;
             currentUserData = null;
             localStorage.removeItem('career_bot_user_id');
+            localStorage.removeItem('career_bot_token');
             localStorage.removeItem('career_bot_user_name');
             localStorage.removeItem('career_bot_user_email');
             localStorage.removeItem('career_bot_user_pic');
@@ -273,9 +288,9 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
         }
 
         async function saveCandidateProfile() {
+            if (!currentUserId) return;
             const payload = {
                 name: document.getElementById('prof_name').value.trim(),
-                email: document.getElementById('prof_email').value.trim(),
                 education: document.getElementById('prof_education').value.trim(),
                 current_role: document.getElementById('prof_role').value.trim(),
                 years_of_experience: document.getElementById('prof_experience').value.trim(),
@@ -283,21 +298,15 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
             };
 
             try {
-                const url = currentUserId ? `/profile/${currentUserId}` : '/profile';
-                const method = currentUserId ? 'PUT' : 'POST';
-                const res = await fetch(url, {
-                    method,
-                    headers: { 'Content-Type': 'application/json' },
+                const res = await fetch(`/profile/${currentUserId}`, {
+                    method: 'PUT',
+                    headers: getAuthHeaders(),
                     body: JSON.stringify(payload)
                 });
 
                 if (res.ok) {
                     const data = await res.json();
-                    currentUserId = data.id;
-                    localStorage.setItem('career_bot_user_id', currentUserId);
                     if (data.name) localStorage.setItem('career_bot_user_name', data.name);
-                    if (data.email) localStorage.setItem('career_bot_user_email', data.email);
-
                     renderUserAccountBadge(data);
                     closeProfileModal();
                 }
@@ -308,7 +317,9 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
 
         async function loadUserProfile() {
             try {
-                const res = await fetch(`/profile/${currentUserId}`);
+                const res = await fetch(`/profile/${currentUserId}`, {
+                    headers: getAuthHeaders()
+                });
                 if (res.ok) {
                     const p = await res.json();
                     populateProfileForm(p);
@@ -354,9 +365,11 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
 
         /* ===== SESSIONS ===== */
         async function loadSessions() {
+            if (!currentUserId) return;
             try {
-                const url = currentUserId ? `/sessions?user_id=${currentUserId}` : '/sessions';
-                const res = await fetch(url);
+                const res = await fetch('/sessions', {
+                    headers: getAuthHeaders()
+                });
                 if (!res.ok) return;
                 const sessions = await res.json();
                 const container = document.getElementById('session_list_container');
@@ -400,7 +413,9 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
 
         async function loadSessionMessages(sessionId) {
             try {
-                const res = await fetch(`/sessions/${sessionId}/messages`);
+                const res = await fetch(`/sessions/${sessionId}/messages`, {
+                    headers: getAuthHeaders()
+                });
                 if (!res.ok) return;
                 const messages = await res.json();
                 if (!messages.length) { startNewSession(); return; }
@@ -550,6 +565,40 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
         function closeRoadmapModal() {
             document.getElementById('roadmap_modal_overlay').classList.remove('open');
         }
+
+        function openPrivacyModal() {
+            const overlay = document.getElementById('privacy_modal_overlay');
+            if (overlay) overlay.classList.add('open');
+        }
+
+        function closePrivacyModal() {
+            const overlay = document.getElementById('privacy_modal_overlay');
+            if (overlay) overlay.classList.remove('open');
+        }
+
+        async function deleteCandidateAccount() {
+            if (!currentUserId) return;
+            const confirmDelete = window.confirm("Are you sure you want to permanently delete your candidate profile, consultation sessions, and usage records? This cannot be undone.");
+            if (!confirmDelete) return;
+
+            try {
+                const res = await fetch(`/profile/${currentUserId}`, {
+                    method: 'DELETE',
+                    headers: getAuthHeaders()
+                });
+                if (res.ok) {
+                    alert("Your profile and consultation data have been permanently deleted.");
+                    closeProfileModal();
+                    signOutUser();
+                    window.location.reload();
+                } else {
+                    const err = await res.json().catch(() => ({}));
+                    alert("Could not delete account: " + (err.detail || "Server error"));
+                }
+            } catch (e) {
+                alert("Account deletion failed: " + e.message);
+            }
+        }
         /* ===== CHAT DISPATCH ===== */
         function submitHeroPrompt() {
             const input = document.getElementById('hero_prompt_input');
@@ -585,7 +634,7 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
             try {
                 const res = await fetch('/chat', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: getAuthHeaders(),
                     body: JSON.stringify({
                         user_input: text,
                         session_id: currentSessionId,

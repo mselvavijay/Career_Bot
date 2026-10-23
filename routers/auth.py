@@ -83,7 +83,10 @@ async def google_auth(auth_req: schemas.GoogleAuthRequest, db: Session = Depends
         db.commit()
         db.refresh(user)
 
-    return user
+    from services.auth_token_service import create_access_token
+    user_resp = schemas.UserProfileResponse.model_validate(user)
+    user_resp.access_token = create_access_token(user.id, user.email)
+    return user_resp
 
 @router.get("/me", response_model=schemas.UserProfileResponse)
 def get_current_user(user_id: str = Query(...), db: Session = Depends(get_db)):

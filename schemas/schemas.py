@@ -22,6 +22,7 @@ class UserProfileResponse(UserProfileBase):
     id: str
     google_id: Optional[str] = None
     created_at: Optional[datetime] = None
+    access_token: Optional[str] = None
 
     class Config:
         from_attributes = True

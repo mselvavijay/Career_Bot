@@ -85,15 +85,35 @@ def cancel_race_entry(payload: RaceEntryCancellation, db: Session = Depends(get_
     if entry:
         db.delete(entry)
         db.commit()
-    return {"status": "released"}@router.post("/verify")
+    return {"status": "released"}
+
+@router.post("/verify")
 def verify_race_payment(payload: RacePaymentVerification, db: Session = Depends(get_db)):
-    _, key_secret, _ = payment_settings()
-    entry = db.query(RaceEntry).filter(RaceEntry.id == payload.entry_id, RaceEntry.razorpay_order_id == payload.razorpay_order_id).first()
+    _, key_secret, fee_paise = payment_settings()
+    entry = db.query(RaceEntry).filter(
+        RaceEntry.id == payload.entry_id,
+        RaceEntry.razorpay_order_id == payload.razorpay_order_id
+    ).first()
     if not entry:
         raise HTTPException(status_code=404, detail="Race entry not found.")
+
+    # Guard against replay / double verification
+    if entry.payment_status == "paid":
+        return {"status": "paid", "entry_id": entry.id, "already_verified": True}
+
+    # Verify cryptographic signature
     expected = hmac.new(key_secret.encode(), f"{payload.razorpay_order_id}|{payload.razorpay_payment_id}".encode(), hashlib.sha256).hexdigest()
     if not hmac.compare_digest(expected, payload.razorpay_signature):
         raise HTTPException(status_code=400, detail="Payment verification failed.")
+
+    # Prevent concurrent verification collisions
+    existing_paid = db.query(RaceEntry).filter(
+        RaceEntry.razorpay_payment_id == payload.razorpay_payment_id,
+        RaceEntry.payment_status == "paid"
+    ).first()
+    if existing_paid and existing_paid.id != entry.id:
+        raise HTTPException(status_code=400, detail="Payment ID has already been applied to another entry.")
+
     entry.razorpay_payment_id = payload.razorpay_payment_id
     entry.payment_status = "paid"
     db.commit()

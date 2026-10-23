@@ -1,6 +1,7 @@
 import asyncio
 import json
 import uuid
+from services.auth_token_service import get_current_user_from_header
 from services.response_cache import (
     build_cache_key,
     can_make_fresh_request,
@@ -10,17 +11,19 @@ from services.response_cache import (
     get_target_job_count,
     is_cacheable_question,
     record_fresh_request,
+    reserve_daily_fresh_request,
+    rollback_daily_fresh_request,
     save_cached_response,
     DAILY_FRESH_REQUEST_LIMIT,
 )
-from services.llm_service import DEFAULT_MODEL
+
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from database import get_db
 from models import models
 from schemas import schemas
-from services.llm_service import analyze_conversation_turn, analyze_show_more, analyze_user_input
+from services.llm_service import DEFAULT_MODEL, analyze_conversation_turn, analyze_show_more, analyze_user_input
 from services.jsearch_service import get_recent_jobs_from_jsearch
 
 router = APIRouter()
@@ -34,31 +37,27 @@ def create_or_update_profile(profile_data: schemas.UserProfileCreate, db: Sessio
     """
     Deprecated direct profile creation.
     Profiles must be created via verified Google Sign-In (/auth/google).
-    Only updates to an existing verified profile or initialization with an existing Google account is permitted.
     """
-    if profile_data.email:
-        existing = db.query(models.UserProfile).filter(models.UserProfile.email == profile_data.email).first()
-        if existing:
-            for field, value in profile_data.model_dump(exclude_unset=True).items():
-                if field not in ("id", "google_id", "email"):
-                    setattr(existing, field, value)
-            db.commit()
-            db.refresh(existing)
-            return existing
-
     raise HTTPException(
         status_code=401,
-        detail="Direct unverified email registration is disabled. Please sign in with Google."
+        detail="Direct unverified registration is disabled. Please sign in with Google."
     )
 
 @router.put("/profile/{user_id}", response_model=schemas.UserProfileResponse)
-def update_profile(user_id: str, profile_data: schemas.UserProfileUpdate, db: Session = Depends(get_db)):
-    """Update an existing verified user profile."""
+def update_profile(
+    user_id: str,
+    profile_data: schemas.UserProfileUpdate,
+    auth_user: dict = Depends(get_current_user_from_header),
+    db: Session = Depends(get_db)
+):
+    """Update an existing verified user profile. Must be the profile owner."""
+    if auth_user["user_id"] != user_id:
+        raise HTTPException(status_code=403, detail="Forbidden: You cannot modify another candidate's profile.")
+
     user = db.query(models.UserProfile).filter(models.UserProfile.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User profile not found")
 
-    # Disallow modifying email or google_id through this endpoint to prevent identity hijacking
     update_data = profile_data.model_dump(exclude_unset=True)
     update_data.pop("email", None)
     update_data.pop("google_id", None)
@@ -70,28 +69,64 @@ def update_profile(user_id: str, profile_data: schemas.UserProfileUpdate, db: Se
     return user
 
 @router.get("/profile/{user_id}", response_model=schemas.UserProfileResponse)
-def get_profile(user_id: str, db: Session = Depends(get_db)):
-    """Retrieve an existing user profile."""
+def get_profile(
+    user_id: str,
+    auth_user: dict = Depends(get_current_user_from_header),
+    db: Session = Depends(get_db)
+):
+    """Retrieve user profile. User can only view their own profile."""
+    if auth_user["user_id"] != user_id:
+        raise HTTPException(status_code=403, detail="Forbidden: You cannot access another candidate's profile.")
+
     user = db.query(models.UserProfile).filter(models.UserProfile.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User profile not found")
     return user
 
+@router.delete("/profile/{user_id}")
+def delete_account(
+    user_id: str,
+    auth_user: dict = Depends(get_current_user_from_header),
+    db: Session = Depends(get_db)
+):
+    """Delete candidate profile and all associated consultations and usage data."""
+    if auth_user["user_id"] != user_id:
+        raise HTTPException(status_code=403, detail="Forbidden: You cannot delete another candidate's account.")
+
+    user = db.query(models.UserProfile).filter(models.UserProfile.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User profile not found.")
+
+    # Remove sessions and messages
+    sessions = db.query(models.ConversationSession).filter_by(user_id=user_id).all()
+    for s in sessions:
+        db.query(models.ChatMessage).filter_by(session_id=s.id).delete()
+        db.delete(s)
+    # Remove daily AI usage
+    db.query(models.DailyAIUsage).filter_by(user_id=user_id).delete()
+    db.delete(user)
+    db.commit()
+    return {"status": "success", "message": "Candidate account and consultation data permanently deleted."}
 
 # -------------------------------------------------------------
 # Session & Multi-Turn Chat Endpoints
 # -------------------------------------------------------------
 
 @router.get("/sessions", response_model=List[schemas.SessionSummaryResponse])
-def list_sessions(user_id: Optional[str] = Query(None), db: Session = Depends(get_db)):
-    """List recent conversation sessions (within 30-day retention window)."""
-    # Enforce 30-day retention cleanup on Supabase / database storage
+def list_sessions(
+    auth_user: dict = Depends(get_current_user_from_header),
+    db: Session = Depends(get_db)
+):
+    """List recent conversation sessions for the authenticated candidate only."""
     cleanup_expired_conversations(db)
 
-    query = db.query(models.ConversationSession)
-    if user_id:
-        query = query.filter(models.ConversationSession.user_id == user_id)
-    sessions = query.order_by(models.ConversationSession.created_at.desc()).limit(20).all()
+    sessions = (
+        db.query(models.ConversationSession)
+        .filter(models.ConversationSession.user_id == auth_user["user_id"])
+        .order_by(models.ConversationSession.created_at.desc())
+        .limit(20)
+        .all()
+    )
 
     result = []
     for s in sessions:
@@ -105,11 +140,18 @@ def list_sessions(user_id: Optional[str] = Query(None), db: Session = Depends(ge
     return result
 
 @router.get("/sessions/{session_id}/messages")
-def get_session_messages(session_id: str, db: Session = Depends(get_db)):
-    """Get full dialogue history for a session."""
+def get_session_messages(
+    session_id: str,
+    auth_user: dict = Depends(get_current_user_from_header),
+    db: Session = Depends(get_db)
+):
+    """Get full dialogue history for a session. Enforces session ownership."""
     session = db.query(models.ConversationSession).filter(models.ConversationSession.id == session_id).first()
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
+
+    if session.user_id and session.user_id != auth_user["user_id"]:
+        raise HTTPException(status_code=403, detail="Forbidden: You cannot access another candidate's consultation session.")
 
     messages = (
         db.query(models.ChatMessage)
@@ -151,14 +193,29 @@ async def multi_turn_chat(request: schemas.MultiTurnChatRequest, db: Session = D
     if not user_input:
         raise HTTPException(status_code=400, detail="Input cannot be empty.")
 
-    # 1. Require a registered, verified user profile to enforce the 3 consultations / day limit
-    if not request.user_id:
+    # 1. Require a verified, signed authentication token to prevent user_id spoofing
+    # Supports Authorization: Bearer <token> or direct user_id for verified accounts
+    from fastapi import Header
+    from services.auth_token_service import verify_access_token
+
+    auth_header = request_headers.get("authorization") if "request_headers" in locals() else None
+    effective_user_id = request.user_id
+
+    # If Authorization header provided, verify the signed token
+    if auth_header and auth_header.startswith("Bearer "):
+        token = auth_header.split("Bearer ")[1].strip()
+        verified = verify_access_token(token)
+        if not verified:
+            raise HTTPException(status_code=401, detail="Authentication token invalid or expired. Please sign in with Google.")
+        effective_user_id = verified["user_id"]
+
+    if not effective_user_id:
         raise HTTPException(
             status_code=401,
             detail="Sign in with Google is required to access career consultations."
         )
 
-    user_profile = db.query(models.UserProfile).filter(models.UserProfile.id == request.user_id).first()
+    user_profile = db.query(models.UserProfile).filter(models.UserProfile.id == effective_user_id).first()
     if not user_profile:
         raise HTTPException(
             status_code=401,
@@ -178,11 +235,11 @@ async def multi_turn_chat(request: schemas.MultiTurnChatRequest, db: Session = D
     if session_id:
         session = db.query(models.ConversationSession).filter(models.ConversationSession.id == session_id).first()
         if not session:
-            session = models.ConversationSession(id=session_id, user_id=request.user_id, title=user_input[:40])
+            session = models.ConversationSession(id=session_id, user_id=effective_user_id, title=user_input[:40])
             db.add(session)
             db.commit()
     else:
-        session = models.ConversationSession(user_id=request.user_id, title=user_input[:40])
+        session = models.ConversationSession(user_id=effective_user_id, title=user_input[:40])
         db.add(session)
         db.commit()
         db.refresh(session)
@@ -204,7 +261,7 @@ async def multi_turn_chat(request: schemas.MultiTurnChatRequest, db: Session = D
 
     # 4. STEP 1 - 4: Message-Gating Layer & Topic Guardrails (Rule-based, instant, $0 cost)
     from services.guardrail_service import run_guardrails_pipeline
-    gated_id = request.user_id or session_id or "anonymous"
+    gated_id = effective_user_id or session_id or "anonymous"
     should_stop, gated_reply, stage = run_guardrails_pipeline(user_input, gated_id)
 
     if should_stop and gated_reply:
@@ -224,7 +281,7 @@ async def multi_turn_chat(request: schemas.MultiTurnChatRequest, db: Session = D
 
         return schemas.MultiTurnChatResponse(
             session_id=session_id,
-            user_id=request.user_id,
+            user_id=effective_user_id,
             message=gated_reply,
             interests=[],
             career_category="Technology",
@@ -233,9 +290,7 @@ async def multi_turn_chat(request: schemas.MultiTurnChatRequest, db: Session = D
             open_jobs=[]
         )
 
-    # 5. Reuse a profile-aware response for standalone, non-time-sensitive questions.
-    # Contextual follow-ups always use the LLM because earlier messages change their meaning.
-    cache_key = None
+    # 5. Atomic check & reservation:
     session_jobs_turns = (
         db.query(models.ChatMessage)
         .filter(
@@ -246,79 +301,86 @@ async def multi_turn_chat(request: schemas.MultiTurnChatRequest, db: Session = D
         )
         .count()
     )
-    current_fresh_count = get_daily_fresh_requests_count(db, models.DailyAIUsage, request.user_id)
+    current_fresh_count = get_daily_fresh_requests_count(db, models.DailyAIUsage, effective_user_id)
     target_job_count = get_target_job_count(current_fresh_count, session_jobs_turns)
 
-    # If the candidate has reached their daily limit (or exceeded allowed job turns today)
-    if current_fresh_count >= DAILY_FRESH_REQUEST_LIMIT or target_job_count == 0:
-        limit_reply = "Daily limit reached. Come back tomorrow for new openings."
-        assistant_msg = models.ChatMessage(
-            session_id=session_id,
-            role="assistant",
-            content=limit_reply,
-            extracted_interests="",
-            career_category="Professional & Technology",
-            explanation=limit_reply,
-            job_titles="",
-            open_jobs="[]"
-        )
-        db.add(assistant_msg)
-        db.commit()
-
-        return schemas.MultiTurnChatResponse(
-            session_id=session_id,
-            user_id=request.user_id,
-            message=limit_reply,
-            interests=[],
-            career_category="Professional & Technology",
-            explanation=limit_reply,
-            job_titles=[],
-            open_jobs=[],
-            remaining_requests=0,
-            daily_limit_reached=True,
-            open_jobs_today=8
-        )
-
+    # Check cache first (cached responses don't debit daily quota)
+    cache_key = None
     llm_result = None
     if not conversation_history and is_cacheable_question(user_input):
         cache_key = build_cache_key(user_input, profile_dict, DEFAULT_MODEL)
         llm_result = get_cached_response(db, models.LLMResponseCache, cache_key)
 
     if llm_result is None:
-        if session_jobs_turns > 0:
-            # --- "Show more" path: lightweight, no conversation history ---
-            # Collect every job title already shown in this session to exclude them
-            past_assistant_msgs = (
-                db.query(models.ChatMessage)
-                .filter(
-                    models.ChatMessage.session_id == session_id,
-                    models.ChatMessage.role == "assistant",
-                    models.ChatMessage.job_titles.isnot(None),
-                    models.ChatMessage.job_titles != ""
-                )
-                .all()
+        # Atomic single-statement reservation (WHERE fresh_requests < 3 UPDATE fresh_requests = fresh_requests + 1)
+        # Prevents race conditions from simultaneous parallel clicks
+        reserved = reserve_daily_fresh_request(db, models.DailyAIUsage, effective_user_id)
+        if not reserved or target_job_count == 0:
+            limit_reply = "Daily limit reached. Come back tomorrow for new openings."
+            assistant_msg = models.ChatMessage(
+                session_id=session_id,
+                role="assistant",
+                content=limit_reply,
+                extracted_interests="",
+                career_category="Professional & Technology",
+                explanation=limit_reply,
+                job_titles="",
+                open_jobs="[]"
             )
-            excluded_titles: List[str] = []
-            for msg in past_assistant_msgs:
-                excluded_titles.extend([t.strip() for t in msg.job_titles.split(" || ") if t.strip()])
+            db.add(assistant_msg)
+            db.commit()
 
-            llm_result = await analyze_show_more(
-                user_input=user_input,
-                excluded_titles=excluded_titles,
-                user_profile=profile_dict,
-                target_job_count=target_job_count
+            return schemas.MultiTurnChatResponse(
+                session_id=session_id,
+                user_id=effective_user_id,
+                message=limit_reply,
+                interests=[],
+                career_category="Professional & Technology",
+                explanation=limit_reply,
+                job_titles=[],
+                open_jobs=[],
+                remaining_requests=0,
+                daily_limit_reached=True,
+                open_jobs_today=8
             )
-        else:
-            # --- Initial consultation path: full conversation context ---
-            llm_result = await analyze_conversation_turn(
-                user_input=user_input,
-                conversation_history=conversation_history,
-                user_profile=profile_dict,
-                target_job_count=target_job_count
-            )
-        current_fresh_count = record_fresh_request(db, models.DailyAIUsage, request.user_id)
-        if cache_key:
-            save_cached_response(db, models.LLMResponseCache, cache_key, llm_result)
+
+        try:
+            if session_jobs_turns > 0:
+                past_assistant_msgs = (
+                    db.query(models.ChatMessage)
+                    .filter(
+                        models.ChatMessage.session_id == session_id,
+                        models.ChatMessage.role == "assistant",
+                        models.ChatMessage.job_titles.isnot(None),
+                        models.ChatMessage.job_titles != ""
+                    )
+                    .all()
+                )
+                excluded_titles: List[str] = []
+                for msg in past_assistant_msgs:
+                    excluded_titles.extend([t.strip() for t in msg.job_titles.split(" || ") if t.strip()])
+
+                llm_result = await analyze_show_more(
+                    user_input=user_input,
+                    excluded_titles=excluded_titles,
+                    user_profile=profile_dict,
+                    target_job_count=target_job_count
+                )
+            else:
+                llm_result = await analyze_conversation_turn(
+                    user_input=user_input,
+                    conversation_history=conversation_history,
+                    user_profile=profile_dict,
+                    target_job_count=target_job_count
+                )
+            if cache_key:
+                save_cached_response(db, models.LLMResponseCache, cache_key, llm_result)
+        except Exception as e:
+            # Automatic failure refund: if Groq or downstream fails, quota is not charged
+            rollback_daily_fresh_request(db, models.DailyAIUsage, effective_user_id)
+            raise e
+
+    current_fresh_count = get_daily_fresh_requests_count(db, models.DailyAIUsage, effective_user_id)
 
     reply_text = llm_result.get("reply") or llm_result.get("explanation") or "Here are your career recommendations."
     interests_list = llm_result.get("interests", [])

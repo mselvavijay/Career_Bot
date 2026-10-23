@@ -193,5 +193,85 @@ class TestFreeTierAndRetention(unittest.TestCase):
         self.db.delete(check_user)
         self.db.commit()
 
+    def test_security_auth_and_ownership(self):
+        """Verify: Unauthenticated request returns 401; User A cannot access User B's profile or sessions."""
+        from fastapi.testclient import TestClient
+        from app import app
+        from services.auth_token_service import create_access_token
+
+        client = TestClient(app)
+
+        # 1. Calling /chat with nonexistent or empty user_id returns 401
+        res_no_user = client.post("/chat", json={"user_input": "Hello"})
+        self.assertEqual(res_no_user.status_code, 401)
+
+        res_fake_user = client.post("/chat", json={"user_input": "Hello", "user_id": "nonexistent-uuid-1234"})
+        self.assertEqual(res_fake_user.status_code, 401)
+
+        # 2. Create User A and User B
+        user_a = models.UserProfile(name="User A", email=f"user_a_{int(datetime.now().timestamp())}@example.com")
+        user_b = models.UserProfile(name="User B", email=f"user_b_{int(datetime.now().timestamp())}@example.com")
+        self.db.add_all([user_a, user_b])
+        self.db.commit()
+        self.db.refresh(user_a)
+        self.db.refresh(user_b)
+
+        token_a = create_access_token(user_a.id, user_a.email)
+        token_b = create_access_token(user_b.id, user_b.email)
+
+        # 3. User A can view own profile
+        res_own = client.get(f"/profile/{user_a.id}", headers={"Authorization": f"Bearer {token_a}"})
+        self.assertEqual(res_own.status_code, 200)
+
+        # 4. User A CANNOT view User B's profile (403 Forbidden)
+        res_cross = client.get(f"/profile/{user_b.id}", headers={"Authorization": f"Bearer {token_a}"})
+        self.assertEqual(res_cross.status_code, 403)
+
+        # 5. User A CANNOT delete User B's profile
+        res_del_cross = client.delete(f"/profile/{user_b.id}", headers={"Authorization": f"Bearer {token_a}"})
+        self.assertEqual(res_del_cross.status_code, 403)
+
+        # Cleanup
+        self.db.delete(user_a)
+        self.db.delete(user_b)
+        self.db.commit()
+
+    def test_atomic_quota_reservation_and_failure_refund(self):
+        """Verify: Atomic reservation decrements quota correctly and rollback refunds on error."""
+        from services.response_cache import reserve_daily_fresh_request, rollback_daily_fresh_request, get_daily_fresh_requests_count
+
+        test_user = models.UserProfile(name="Atomic Tester", email=f"atomic_{int(datetime.now().timestamp())}@example.com")
+        self.db.add(test_user)
+        self.db.commit()
+        self.db.refresh(test_user)
+
+        # 1st reservation -> True
+        self.assertTrue(reserve_daily_fresh_request(self.db, models.DailyAIUsage, test_user.id))
+        self.assertEqual(get_daily_fresh_requests_count(self.db, models.DailyAIUsage, test_user.id), 1)
+
+        # 2nd reservation -> True
+        self.assertTrue(reserve_daily_fresh_request(self.db, models.DailyAIUsage, test_user.id))
+        self.assertEqual(get_daily_fresh_requests_count(self.db, models.DailyAIUsage, test_user.id), 2)
+
+        # 3rd reservation -> True
+        self.assertTrue(reserve_daily_fresh_request(self.db, models.DailyAIUsage, test_user.id))
+        self.assertEqual(get_daily_fresh_requests_count(self.db, models.DailyAIUsage, test_user.id), 3)
+
+        # 4th reservation exceeds limit -> False (Atomic gate)
+        self.assertFalse(reserve_daily_fresh_request(self.db, models.DailyAIUsage, test_user.id))
+
+        # Rollback (simulate failure refund)
+        rollback_daily_fresh_request(self.db, models.DailyAIUsage, test_user.id)
+        self.assertEqual(get_daily_fresh_requests_count(self.db, models.DailyAIUsage, test_user.id), 2)
+
+        # After refund, can reserve again
+        self.assertTrue(reserve_daily_fresh_request(self.db, models.DailyAIUsage, test_user.id))
+        self.assertEqual(get_daily_fresh_requests_count(self.db, models.DailyAIUsage, test_user.id), 3)
+
+        # Cleanup
+        self.db.query(models.DailyAIUsage).filter_by(user_id=test_user.id).delete()
+        self.db.delete(test_user)
+        self.db.commit()
+
 if __name__ == "__main__":
     unittest.main()
