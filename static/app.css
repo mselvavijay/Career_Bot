@@ -555,6 +555,10 @@
             box-shadow: 0 8px 20px rgba(6, 182, 212, 0.2);
         }
 
+        .btn-hero-prep {
+            display: none;
+        }
+
         /* ===== FINTORA FLOATING HERO PROMPT BAR ===== */
         .fintora-prompt-box {
             max-width: 780px;
@@ -2449,21 +2453,16 @@
             }
 
             .header-actions {
-                gap: 6px;
+                gap: 8px;
             }
 
-            .btn-hero-cta {
-                padding: 6px 11px;
-                font-size: 0.76rem;
-                font-weight: 600;
-                gap: 5px;
-                min-height: 36px;
-                box-shadow: 0 4px 12px rgba(101, 91, 239, 0.28);
+            /* On mobile, Start Prep is placed directly below Start Consultation */
+            header .btn-hero-cta {
+                display: none;
             }
 
-            .btn-hero-cta .icon-sm {
-                width: 12px;
-                height: 12px;
+            .btn-hero-prep {
+                display: inline-flex;
             }
 
             .btn-google-auth {
