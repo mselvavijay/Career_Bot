@@ -1,7 +1,8 @@
 import asyncio
 import json
 import uuid
-from services.auth_token_service import get_current_user_from_header
+from fastapi import Request
+from services.auth_token_service import get_current_user_from_header, verify_access_token
 from services.response_cache import (
     build_cache_key,
     can_make_fresh_request,
@@ -184,36 +185,35 @@ def get_session_messages(
 
 
 @router.post("/chat", response_model=schemas.MultiTurnChatResponse)
-async def multi_turn_chat(request: schemas.MultiTurnChatRequest, db: Session = Depends(get_db)):
+async def multi_turn_chat(chat_request: schemas.MultiTurnChatRequest, http_request: Request, db: Session = Depends(get_db)):
     """
     Multi-turn career counseling endpoint with profile context & conversation memory.
     Directly uses Groq LLM for guaranteed structured open jobs recommendations.
+    user_id is ALWAYS sourced from the verified signed Bearer token — never trusted from the request body.
     """
-    user_input = request.user_input.strip()
+    user_input = chat_request.user_input.strip()
     if not user_input:
         raise HTTPException(status_code=400, detail="Input cannot be empty.")
 
-    # 1. Require a verified, signed authentication token to prevent user_id spoofing
-    # Supports Authorization: Bearer <token> or direct user_id for verified accounts
-    from fastapi import Header
-    from services.auth_token_service import verify_access_token
-
-    auth_header = request_headers.get("authorization") if "request_headers" in locals() else None
-    effective_user_id = request.user_id
-
-    # If Authorization header provided, verify the signed token
-    if auth_header and auth_header.startswith("Bearer "):
-        token = auth_header.split("Bearer ")[1].strip()
-        verified = verify_access_token(token)
-        if not verified:
-            raise HTTPException(status_code=401, detail="Authentication token invalid or expired. Please sign in with Google.")
-        effective_user_id = verified["user_id"]
-
-    if not effective_user_id:
+    # 1. Require a verified signed Bearer token — user_id from the request body is IGNORED
+    #    to prevent cross-user quota spoofing.
+    auth_header = http_request.headers.get("authorization", "")
+    if not auth_header.startswith("Bearer "):
         raise HTTPException(
             status_code=401,
             detail="Sign in with Google is required to access career consultations."
         )
+
+    token = auth_header.split("Bearer ", 1)[1].strip()
+    verified = verify_access_token(token)
+    if not verified:
+        raise HTTPException(
+            status_code=401,
+            detail="Authentication token invalid or expired. Please sign in with Google."
+        )
+
+    # effective_user_id comes ONLY from the verified token — never from request body
+    effective_user_id = verified["user_id"]
 
     user_profile = db.query(models.UserProfile).filter(models.UserProfile.id == effective_user_id).first()
     if not user_profile:
@@ -231,13 +231,16 @@ async def multi_turn_chat(request: schemas.MultiTurnChatRequest, db: Session = D
     }
 
     # 2. Retrieve or create session
-    session_id = request.session_id
+    session_id = chat_request.session_id
     if session_id:
         session = db.query(models.ConversationSession).filter(models.ConversationSession.id == session_id).first()
         if not session:
             session = models.ConversationSession(id=session_id, user_id=effective_user_id, title=user_input[:40])
             db.add(session)
             db.commit()
+        elif session.user_id and session.user_id != effective_user_id:
+            # Prevent session hijacking: token-verified user must own the session
+            raise HTTPException(status_code=403, detail="Forbidden: You cannot access another candidate's session.")
     else:
         session = models.ConversationSession(user_id=effective_user_id, title=user_input[:40])
         db.add(session)
@@ -437,7 +440,7 @@ async def multi_turn_chat(request: schemas.MultiTurnChatRequest, db: Session = D
 
     return schemas.MultiTurnChatResponse(
         session_id=session_id,
-        user_id=request.user_id,
+        user_id=effective_user_id,
         message=reply_text,
         interests=interests_list,
         career_category=career_category,
@@ -454,13 +457,14 @@ async def multi_turn_chat(request: schemas.MultiTurnChatRequest, db: Session = D
 # Legacy Endpoint: /career-bot (Maintained for backwards compatibility)
 # -------------------------------------------------------------
 @router.post("/career-bot", response_model=schemas.CareerResponse)
-async def career_bot(request: schemas.CareerRequest, db: Session = Depends(get_db)):
+async def career_bot(request: schemas.CareerRequest, http_request: Request, db: Session = Depends(get_db)):
     multi_turn_res = await multi_turn_chat(
         schemas.MultiTurnChatRequest(
             user_input=request.user_input,
             session_id=request.session_id,
             user_id=request.user_id
         ),
+        http_request=http_request,
         db=db
     )
     return schemas.CareerResponse(
