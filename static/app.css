@@ -2437,34 +2437,57 @@
         /* 640px Mobile Phone Layouts */
         @media (max-width: 640px) {
             header.site-header {
-                height: 58px;
-                padding: 0 14px;
-                padding-left: max(14px, env(safe-area-inset-left, 14px));
-                padding-right: max(14px, env(safe-area-inset-right, 14px));
+                height: 56px;
+                padding: 0 12px;
+                padding-left: max(12px, env(safe-area-inset-left, 12px));
+                padding-right: max(12px, env(safe-area-inset-right, 12px));
             }
 
             .brand-wordmark {
-                height: 24px;
-                max-width: 155px;
-            }
-
-            .btn-hero-cta {
-                padding: 8px 12px;
-                min-height: 44px;
-            }
-
-            .btn-hero-cta span {
-                display: inline;
+                height: 22px;
+                max-width: 140px;
             }
 
             .header-actions {
-                gap: 8px;
+                gap: 6px;
+            }
+
+            .btn-hero-cta {
+                padding: 6px 11px;
+                font-size: 0.76rem;
+                font-weight: 600;
+                gap: 5px;
+                min-height: 36px;
+                box-shadow: 0 4px 12px rgba(101, 91, 239, 0.28);
+            }
+
+            .btn-hero-cta .icon-sm {
+                width: 12px;
+                height: 12px;
             }
 
             .btn-google-auth {
-                padding: 8px 12px;
-                min-height: 44px;
-                font-size: 0.8rem;
+                padding: 6px 11px;
+                font-size: 0.76rem;
+                font-weight: 600;
+                gap: 6px;
+                min-height: 36px;
+                box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+            }
+
+            .btn-google-auth svg {
+                width: 14px !important;
+                height: 14px !important;
+            }
+
+            .site-mobile-menu-toggle {
+                width: 36px;
+                height: 36px;
+            }
+
+            .site-mobile-menu-toggle .icon-lg {
+                width: 18px;
+                height: 18px;
             }
 
             .hero-section {
