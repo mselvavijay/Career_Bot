@@ -1,7 +1,14 @@
 import asyncio
 import json
+import os
 import uuid
 from fastapi import Request
+
+# Admin/owner user IDs that are exempt from daily quota — for testing only.
+# Set ADMIN_USER_IDS=id1,id2 in .env or Vercel environment variables.
+_ADMIN_IDS: set[str] = {
+    uid.strip() for uid in os.getenv("ADMIN_USER_IDS", "").split(",") if uid.strip()
+}
 from services.auth_token_service import get_current_user_from_header, verify_access_token
 from services.response_cache import (
     build_cache_key,
@@ -294,6 +301,8 @@ async def multi_turn_chat(chat_request: schemas.MultiTurnChatRequest, http_reque
         )
 
     # 5. Atomic check & reservation:
+    is_admin = effective_user_id in _ADMIN_IDS  # admins skip quota entirely
+
     session_jobs_turns = (
         db.query(models.ChatMessage)
         .filter(
@@ -305,7 +314,8 @@ async def multi_turn_chat(chat_request: schemas.MultiTurnChatRequest, http_reque
         .count()
     )
     current_fresh_count = get_daily_fresh_requests_count(db, models.DailyAIUsage, effective_user_id)
-    target_job_count = get_target_job_count(current_fresh_count, session_jobs_turns)
+    # Admins always get 4 jobs per request regardless of daily usage
+    target_job_count = 4 if is_admin else get_target_job_count(current_fresh_count, session_jobs_turns)
 
     # Check cache first (cached responses don't debit daily quota)
     cache_key = None
@@ -315,10 +325,14 @@ async def multi_turn_chat(chat_request: schemas.MultiTurnChatRequest, http_reque
         llm_result = get_cached_response(db, models.LLMResponseCache, cache_key)
 
     if llm_result is None:
-        # Atomic single-statement reservation (WHERE fresh_requests < 3 UPDATE fresh_requests = fresh_requests + 1)
-        # Prevents race conditions from simultaneous parallel clicks
-        reserved = reserve_daily_fresh_request(db, models.DailyAIUsage, effective_user_id)
-        if not reserved or target_job_count == 0:
+        if is_admin:
+            # Admins bypass atomic quota reservation — their requests are never counted
+            reserved = True
+        else:
+            # Atomic single-statement reservation (WHERE fresh_requests < 3 UPDATE fresh_requests = fresh_requests + 1)
+            # Prevents race conditions from simultaneous parallel clicks
+            reserved = reserve_daily_fresh_request(db, models.DailyAIUsage, effective_user_id)
+        if not is_admin and (not reserved or target_job_count == 0):
             limit_reply = "Daily limit reached. Come back tomorrow for new openings."
             assistant_msg = models.ChatMessage(
                 session_id=session_id,
