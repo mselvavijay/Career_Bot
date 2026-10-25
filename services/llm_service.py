@@ -80,11 +80,6 @@ INDIAN_TECH_HUBS = [
     "Chennai, Tamil Nadu", "Remote (India)", "Bangalore / Hybrid", "Gurgaon / Hybrid"
 ]
 
-INDIAN_COMPANIES = [
-    "Flipkart", "Swiggy", "Zomato", "Razorpay", "PhonePe",
-    "Zepto", "CRED", "Infosys Digital", "TCS Enterprise", "Jio Platforms",
-    "Microsoft India", "Amazon India", "Google India", "Groww", "Paytm"
-]
 
 def get_linkedin_experience_code(exp_years: int) -> str:
     """
@@ -117,7 +112,7 @@ def build_filtered_linkedin_url(title: str, exp_years: int = 0) -> str:
 
 def format_job_card(title: str, category: str = "Technology", exp_years: int = 0, index: int = 0) -> dict:
     clean_title = title.split(".", 1)[-1].strip() if "." in title[:3] else title.strip()
-    company = INDIAN_COMPANIES[index % len(INDIAN_COMPANIES)]
+    # Fallback cards link to a broad, current LinkedIn search; they do not claim a specific employer.
     location = INDIAN_TECH_HUBS[index % len(INDIAN_TECH_HUBS)]
 
     if exp_years == 0:
@@ -131,7 +126,7 @@ def format_job_card(title: str, category: str = "Technology", exp_years: int = 0
 
     return {
         "title": clean_title,
-        "company": company,
+        "company": "",
         "location": location,
         "job_type": "Full-time",
         "salary_range": salary,
@@ -186,7 +181,6 @@ def sanitize_and_enrich_jobs(parsed: dict, user_profile: Optional[Dict[str, Any]
         for idx, j in enumerate(open_jobs):
             if isinstance(j, dict) and j.get("title"):
                 title = j["title"].strip()
-                company = ""
                 location = "India"
                 if "India" not in location and not any(h in location for h in ["Bangalore", "Hyderabad", "Pune", "Mumbai", "Delhi", "Gurgaon", "Noida", "Chennai"]):
                     location = f"{location} (India)"
@@ -207,7 +201,7 @@ def sanitize_and_enrich_jobs(parsed: dict, user_profile: Optional[Dict[str, Any]
 
                 enriched_jobs.append({
                     "title": title,
-                    "company": company,
+                    "company": "",
                     "location": location,
                     "job_type": job_type,
                     "salary_range": salary,
