@@ -3204,3 +3204,27 @@
                 row-gap: 8px;
             }
         }
+        .race-modal { max-width: 540px; }
+        #race_modal_meta, .race-status { margin: 5px 0 0; color: var(--text-secondary); font-size: .82rem; }
+        .race-progress { display:flex; align-items:center; justify-content:space-between; margin:22px 0 9px; color:#dce5ff; font-size:.82rem; font-weight:700; }
+        #race_timer { color:#fff; font-size:1.15rem; }
+        .race-timer-track { height:6px; overflow:hidden; border-radius:99px; background:#202e4a; }
+        .race-timer-track i { display:block; height:100%; width:100%; background:linear-gradient(90deg,#5b7cfa,#59d9e8); transition:width 1s linear; }
+        #race_question_text { margin:26px 0 18px; color:#fff; font-size:1.1rem; line-height:1.45; }
+        .race-options { display:grid; gap:10px; }
+        .race-options button { width:100%; padding:13px 15px; border:1px solid #2d3d5e; border-radius:10px; background:#111d32; color:#eaf0fb; text-align:left; font:inherit; cursor:pointer; transition:.18s ease; }
+        .race-options button:hover:not(:disabled), .race-options button:focus-visible { border-color:#6d83ff; background:#17284a; transform:translateY(-1px); }
+        .race-options button:disabled { opacity:.55; cursor:not-allowed; }
+        #race_complete { padding:22px 0 6px; text-align:center; }
+        #race_complete h4 { margin:10px 0 7px; color:#fff; font-size:1.3rem; }
+        #race_complete p { margin:0 0 20px; color:var(--text-secondary); }
+        .race-complete-icon { display:grid; place-items:center; width:50px; height:50px; margin:auto; border-radius:50%; background:#173d35; color:#71e2b2; font-size:1.45rem; font-weight:900; }
+        @media (max-width:640px) { .race-modal { max-width:calc(100vw - 24px); } .race-options button { padding:12px; } }
+        .race-leaderboard-modal { width:min(560px, calc(100vw - 24px)); max-width:560px; }
+        #race_leaderboard_date { margin:5px 0 0; color:var(--text-secondary); font-size:.8rem; }
+        .leaderboard-head, .leaderboard-row { display:grid; grid-template-columns:68px minmax(0,1fr) 74px 72px; gap:10px; align-items:center; }
+        .leaderboard-head { margin-top:22px; padding:0 12px 9px; color:#8190ab; font-size:.69rem; font-weight:800; letter-spacing:.07em; text-transform:uppercase; }
+        .leaderboard-row { padding:13px 12px; border-top:1px solid #26334d; color:#dce5f5; font-size:.88rem; }
+        .leaderboard-row strong { color:#9eb2ff; } .leaderboard-row b { color:#fff; } .leaderboard-row time { color:#aebbd0; text-align:right; }
+        .leaderboard-row-winner { background:linear-gradient(90deg,rgba(214,189,134,.18),transparent); border-color:rgba(214,189,134,.45); } .leaderboard-row-winner strong { color:#f2d68c; } .leaderboard-row-winner span { color:#fff; font-weight:800; }
+        @media (max-width:480px) { .leaderboard-head, .leaderboard-row { grid-template-columns:51px minmax(0,1fr) 57px 58px; gap:6px; padding-left:7px; padding-right:7px; font-size:.78rem; } .leaderboard-head { font-size:.59rem; } }

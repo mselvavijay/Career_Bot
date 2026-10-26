@@ -1,4 +1,4 @@
-import uuid
+﻿import uuid
 from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, UniqueConstraint
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
@@ -12,6 +12,7 @@ class UserProfile(Base):
     google_id = Column(String(255), unique=True, index=True, nullable=True)
     picture_url = Column(String(500), nullable=True)
     name = Column(String(100), nullable=True)
+    display_name = Column(String(30), nullable=True)
     education = Column(String(200), nullable=True)
     current_role = Column(String(100), nullable=True)
     years_of_experience = Column(String(50), nullable=True)
@@ -94,3 +95,54 @@ class DailyAIUsage(Base):
     fresh_requests = Column(Integer, nullable=False, default=0)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     __table_args__ = (UniqueConstraint("user_id", "usage_date", name="uq_daily_ai_usage_user_date"),)
+# Daily contest data is intentionally separate from the legacy paid-entry table.
+class RaceDailyQuiz(Base):
+    __tablename__ = "race_daily_quizzes"
+    id = Column(Integer, primary_key=True)
+    contest_date = Column(String(10), unique=True, nullable=False, index=True)
+    theme = Column(String(100), nullable=False)
+    questions_json = Column(Text, nullable=False)
+    status = Column(String(20), nullable=False, default="active")
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+class RaceAttempt(Base):
+    __tablename__ = "race_attempts"
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    contest_date = Column(String(10), nullable=False, index=True)
+    user_id = Column(String(36), ForeignKey("user_profiles.id"), nullable=False)
+    display_name = Column(String(30), nullable=False)
+    status = Column(String(20), nullable=False, default="in_progress")
+    current_question = Column(Integer, nullable=False, default=0)
+    score = Column(Integer, nullable=False, default=0)
+    total_time_ms = Column(Integer, nullable=False, default=0)
+    question_started_at = Column(DateTime(timezone=True), nullable=True)
+    completed_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    __table_args__ = (UniqueConstraint("contest_date", "user_id", name="uq_race_attempt_user_day"),)
+
+class RaceAnswer(Base):
+    __tablename__ = "race_answers"
+    id = Column(Integer, primary_key=True)
+    attempt_id = Column(String(36), ForeignKey("race_attempts.id"), nullable=False, index=True)
+    question_index = Column(Integer, nullable=False)
+    selected_index = Column(Integer, nullable=False)
+    is_correct = Column(Integer, nullable=False, default=0)
+    elapsed_ms = Column(Integer, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    __table_args__ = (UniqueConstraint("attempt_id", "question_index", name="uq_race_answer_once"),)
+
+class RaceWinner(Base):
+    __tablename__ = "race_winners"
+    id = Column(Integer, primary_key=True)
+    contest_date = Column(String(10), unique=True, nullable=False, index=True)
+    attempt_id = Column(String(36), ForeignKey("race_attempts.id"), nullable=False)
+    user_id = Column(String(36), ForeignKey("user_profiles.id"), nullable=False)
+    certificate_sent_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+class RaceQuestionArchive(Base):
+    __tablename__ = "race_question_archive"
+    id = Column(Integer, primary_key=True)
+    contest_date = Column(String(10), nullable=False, index=True)
+    question_hash = Column(String(64), unique=True, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())

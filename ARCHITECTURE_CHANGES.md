@@ -1,4 +1,4 @@
-# Project Architecture Update: Layman's Guide
+﻿# Project Architecture Update: Layman's Guide
 
 This document explains what has been updated in the HireKrkeDekho / Career Bot project, step-by-step, and **why** those changes were made. The goal of these updates is to provide an **enterprise-grade, production-ready, cost-effective, and mobile-responsive AI talent advisory platform**.
 
@@ -37,7 +37,7 @@ This document explains what has been updated in the HireKrkeDekho / Career Bot p
 **What we did:** Organized HTTP endpoints into dedicated routers:
 - `routers/career.py`: Multi-turn chat, session history, profile management, and job recommendations.
 - `routers/auth.py`: Google Identity OAuth and profile synchronization.
-- `routers/race.py`: Daily contest status and Razorpay checkout orders.
+- `routers/race.py`: authenticated daily AI Race contest endpoints and protected winner administration.
 
 ---
 
@@ -51,7 +51,7 @@ This document explains what has been updated in the HireKrkeDekho / Career Bot p
 
 ## 7. Speed Optimizations: Async & Parallel API Calls
 **What we did:** Implemented async HTTP (`httpx`) and `asyncio.gather()`.
-**Why we did it:** Reduced overall query latency by ~70% (from ~25 seconds down to ~4–7 seconds) by sending parallel requests instead of blocking sequential queries.
+**Why we did it:** Reduced overall query latency by ~70% (from ~25 seconds down to ~4â€“7 seconds) by sending parallel requests instead of blocking sequential queries.
 
 ---
 
@@ -75,7 +75,7 @@ This document explains what has been updated in the HireKrkeDekho / Career Bot p
 ## 10. Tri-Factor Grounding (Degree + Experience + Skills)
 **What we did:** Grounded AI recommendations directly in the candidate's profile:
 - **Degree:** Foundation and qualification requirements.
-- **Experience:** Seniority level and calibrated Indian tech compensation (e.g. 0 yrs: 4–9 LPA, 1–3 yrs: 8–16 LPA, 4–7 yrs: 18–32 LPA, 8+ yrs: 35–60 LPA).
+- **Experience:** Seniority level and calibrated Indian tech compensation (e.g. 0 yrs: 4â€“9 LPA, 1â€“3 yrs: 8â€“16 LPA, 4â€“7 yrs: 18â€“32 LPA, 8+ yrs: 35â€“60 LPA).
 - **Core Skills:** Specific frameworks, languages, and technical competencies.
 - **Prep Guide:** Each job listing includes a structured 3-Week Preparation Roadmap.
 

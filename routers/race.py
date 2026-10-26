@@ -1,120 +1,91 @@
-import hashlib
-import hmac
-import os
-from datetime import date
-
-import httpx
+﻿import os
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
-
 from database import get_db
-from models.models import RaceEntry
+from models.models import UserProfile, RaceAttempt, RaceAnswer, RaceWinner, RaceDailyQuiz
+from services.auth_token_service import get_current_user_from_header
+from services.race_service import contest_date, create_daily_quiz, decide_winner, leaderboard, now_ist, public_name, questions_for_player, QUESTION_SECONDS, GRACE_SECONDS
 
 router = APIRouter(prefix="/race", tags=["AI Race"])
-MAX_RACE_ENTRANTS = 20
+ADMIN_EMAILS = {email.strip().lower() for email in os.getenv("ADMIN_EMAILS", "").split(",") if email.strip()}
+class AnswerRequest(BaseModel): question_index: int = Field(ge=0, le=14); option_index: int = Field(ge=-1, le=3)
+class DisplayNameRequest(BaseModel): display_name: str
 
+def user_from_token(token, db):
+    user = db.query(UserProfile).filter_by(id=token["user_id"], email=token["email"]).first()
+    if not user: raise HTTPException(401, "Sign in with Google to continue.")
+    return user
 
-class RaceOrderRequest(BaseModel):
-    user_id: str | None = None
+def require_admin(token):
+    if not ADMIN_EMAILS or token["email"].lower() not in ADMIN_EMAILS: raise HTTPException(403, "Admin access required.")
 
+@router.get("/today")
+async def today(db: Session = Depends(get_db), token=Depends(get_current_user_from_header)):
+    user = user_from_token(token, db); day = contest_date(); quiz = await create_daily_quiz(db, day)
+    attempt = db.query(RaceAttempt).filter_by(contest_date=day, user_id=user.id).first()
+    return {"contest_date": day, "theme": quiz.theme, "question_count": 15, "seconds_per_question": QUESTION_SECONDS, "grace_seconds": GRACE_SECONDS, "attempt_status": attempt.status if attempt else "not_started", "leaderboard": leaderboard(db, day)[:10]}
 
-class RacePaymentVerification(BaseModel):
-    entry_id: str
-    razorpay_payment_id: str
-    razorpay_order_id: str
-    razorpay_signature: str
+@router.post("/start")
+async def start(db: Session = Depends(get_db), token=Depends(get_current_user_from_header)):
+    user = user_from_token(token, db); day = contest_date(); quiz = await create_daily_quiz(db, day)
+    attempt = db.query(RaceAttempt).filter_by(contest_date=day, user_id=user.id).first()
+    if attempt and attempt.status == "completed": raise HTTPException(409, "You have already completed todays contest.")
+    if not attempt:
+        name = public_name(getattr(user, "display_name", None) or (user.email or "").split("@")[0])
+        attempt = RaceAttempt(contest_date=day, user_id=user.id, display_name=name, status="in_progress", current_question=0, question_started_at=now_ist())
+        db.add(attempt); db.commit(); db.refresh(attempt)
+    return {"attempt_id": attempt.id, "questions": questions_for_player(quiz), "current_question": attempt.current_question, "expires_in_seconds": QUESTION_SECONDS + GRACE_SECONDS}
 
-
-def payment_settings() -> tuple[str, str, int]:
-    key_id = os.getenv("RAZORPAY_KEY_ID", "")
-    key_secret = os.getenv("RAZORPAY_KEY_SECRET", "")
-    try:
-        fee_paise = int(os.getenv("RACE_ENTRY_FEE_PAISE", "0"))
-    except ValueError:
-        fee_paise = 0
-    if not key_id or not key_secret or fee_paise < 100:
-        raise HTTPException(status_code=503, detail="Race payments are not configured. Add Razorpay keys and RACE_ENTRY_FEE_PAISE.")
-    return key_id, key_secret, fee_paise
-
-
-@router.get("/status")
-def race_status(db: Session = Depends(get_db)):
-    today = date.today().isoformat()
-    booked = db.query(RaceEntry).filter(RaceEntry.contest_date == today).count()
-    return {"contest_date": today, "capacity": MAX_RACE_ENTRANTS, "booked": booked, "seats_left": max(0, MAX_RACE_ENTRANTS - booked)}
-
-
-@router.post("/orders")
-async def create_race_order(payload: RaceOrderRequest, db: Session = Depends(get_db)):
-    key_id, key_secret, fee_paise = payment_settings()
-    today = date.today().isoformat()
-    booked = db.query(RaceEntry).filter(RaceEntry.contest_date == today).count()
-    if booked >= MAX_RACE_ENTRANTS:
-        raise HTTPException(status_code=409, detail="Today's AI Race is full.")
-
-    entry = RaceEntry(contest_date=today, user_id=payload.user_id, payment_status="pending")
-    db.add(entry)
+@router.post("/answer")
+async def answer(payload: AnswerRequest, db: Session = Depends(get_db), token=Depends(get_current_user_from_header)):
+    user = user_from_token(token, db); day = contest_date(); attempt = db.query(RaceAttempt).filter_by(contest_date=day, user_id=user.id).first()
+    if not attempt or attempt.status != "in_progress": raise HTTPException(409, "No active contest attempt.")
+    if payload.question_index != attempt.current_question: raise HTTPException(409, "That question is no longer active.")
+    elapsed = int((now_ist() - attempt.question_started_at).total_seconds() * 1000)
+    quiz = db.query(__import__('models.models', fromlist=['RaceDailyQuiz']).RaceDailyQuiz).filter_by(contest_date=day).first(); question = __import__('json').loads(quiz.questions_json)[payload.question_index]
+    correct = elapsed <= (QUESTION_SECONDS + GRACE_SECONDS) * 1000 and payload.option_index >= 0 and payload.option_index == question["answer_index"]
+    db.add(RaceAnswer(attempt_id=attempt.id, question_index=payload.question_index, selected_index=payload.option_index, is_correct=correct, elapsed_ms=elapsed))
+    attempt.score += int(correct); attempt.total_time_ms += min(elapsed, (QUESTION_SECONDS + GRACE_SECONDS) * 1000); attempt.current_question += 1
+    if attempt.current_question >= 15: attempt.status="completed"; attempt.completed_at=now_ist()
+    else: attempt.question_started_at=now_ist()
     db.commit()
-    db.refresh(entry)
+    return {"correct": None, "completed": attempt.status == "completed", "score": attempt.score, "next_question": attempt.current_question}
 
-    order_payload = {"amount": fee_paise, "currency": "INR", "receipt": f"race_{entry.id[:16]}", "notes": {"race_entry_id": entry.id, "contest_date": today}}
-    try:
-        async with httpx.AsyncClient(timeout=15.0) as client:
-            response = await client.post("https://api.razorpay.com/v1/orders", json=order_payload, auth=(key_id, key_secret))
-            response.raise_for_status()
-            order = response.json()
-    except httpx.HTTPError as exc:
-        db.delete(entry)
-        db.commit()
-        raise HTTPException(status_code=502, detail="Unable to create Razorpay order.") from exc
+@router.get("/leaderboard")
+def board(db: Session = Depends(get_db)):
+    return {"contest_date": contest_date(), "entries": leaderboard(db, contest_date())}
 
-    entry.razorpay_order_id = order["id"]
-    db.commit()
-    return {"entry_id": entry.id, "key_id": key_id, "order_id": order["id"], "amount": order["amount"], "currency": "INR", "seats_left": MAX_RACE_ENTRANTS - booked - 1}
+@router.get("/winner/latest")
+def latest_winner(db: Session = Depends(get_db), token=Depends(get_current_user_from_header)):
+    user = user_from_token(token, db); yesterday = (now_ist().date().fromordinal(now_ist().date().toordinal()-1)).isoformat(); winner = decide_winner(db, yesterday)
+    if not winner: return {"winner": None}
+    attempt = db.query(RaceAttempt).filter_by(id=winner.attempt_id).first(); result={"contest_date": yesterday, "display_name": attempt.display_name, "score": attempt.score, "total_time_ms": attempt.total_time_ms}
+    if winner.user_id == user.id: result["real_name"] = user.name; result["is_you"] = True
+    return {"winner": result}
 
+@router.put("/display-name")
+def display_name(payload: DisplayNameRequest, db: Session = Depends(get_db), token=Depends(get_current_user_from_header)):
+    user=user_from_token(token, db); user.display_name=public_name(payload.display_name); db.commit(); return {"display_name": user.display_name}
 
+@router.get("/admin/leaderboard")
+def admin_leaderboard(db: Session = Depends(get_db), token=Depends(get_current_user_from_header)):
+    require_admin(token); return {"contest_date": contest_date(), "entries": leaderboard(db, contest_date())}
 
-class RaceEntryCancellation(BaseModel):
-    entry_id: str
-
-
-@router.post("/cancel")
-def cancel_race_entry(payload: RaceEntryCancellation, db: Session = Depends(get_db)):
-    entry = db.query(RaceEntry).filter(RaceEntry.id == payload.entry_id, RaceEntry.payment_status == "pending").first()
-    if entry:
-        db.delete(entry)
-        db.commit()
-    return {"status": "released"}
-
-@router.post("/verify")
-def verify_race_payment(payload: RacePaymentVerification, db: Session = Depends(get_db)):
-    _, key_secret, fee_paise = payment_settings()
-    entry = db.query(RaceEntry).filter(
-        RaceEntry.id == payload.entry_id,
-        RaceEntry.razorpay_order_id == payload.razorpay_order_id
-    ).first()
-    if not entry:
-        raise HTTPException(status_code=404, detail="Race entry not found.")
-
-    # Guard against replay / double verification
-    if entry.payment_status == "paid":
-        return {"status": "paid", "entry_id": entry.id, "already_verified": True}
-
-    # Verify cryptographic signature
-    expected = hmac.new(key_secret.encode(), f"{payload.razorpay_order_id}|{payload.razorpay_payment_id}".encode(), hashlib.sha256).hexdigest()
-    if not hmac.compare_digest(expected, payload.razorpay_signature):
-        raise HTTPException(status_code=400, detail="Payment verification failed.")
-
-    # Prevent concurrent verification collisions
-    existing_paid = db.query(RaceEntry).filter(
-        RaceEntry.razorpay_payment_id == payload.razorpay_payment_id,
-        RaceEntry.payment_status == "paid"
-    ).first()
-    if existing_paid and existing_paid.id != entry.id:
-        raise HTTPException(status_code=400, detail="Payment ID has already been applied to another entry.")
-
-    entry.razorpay_payment_id = payload.razorpay_payment_id
-    entry.payment_status = "paid"
-    db.commit()
-    return {"status": "paid", "entry_id": entry.id}
+@router.get("/admin/day")
+def admin_day(date_value: str | None = None, db: Session = Depends(get_db), token=Depends(get_current_user_from_header)):
+    """Private daily audit: questions, submitted answers, ranking, and winner contact details."""
+    require_admin(token)
+    day = date_value or contest_date()
+    quiz = db.query(RaceDailyQuiz).filter_by(contest_date=day).first()
+    attempts = db.query(RaceAttempt).filter_by(contest_date=day, status="completed").order_by(RaceAttempt.score.desc(), RaceAttempt.total_time_ms.asc(), RaceAttempt.completed_at.asc()).all()
+    rows = []
+    for rank, attempt in enumerate(attempts, start=1):
+        user = db.query(UserProfile).filter_by(id=attempt.user_id).first()
+        answers = db.query(RaceAnswer).filter_by(attempt_id=attempt.id).order_by(RaceAnswer.question_index).all()
+        rows.append({"rank": rank, "display_name": attempt.display_name, "email": user.email if user else None, "score": attempt.score, "total_time_ms": attempt.total_time_ms, "completed_at": attempt.completed_at.isoformat() if attempt.completed_at else None, "answers": [{"question_index": answer.question_index, "selected_index": answer.selected_index, "is_correct": bool(answer.is_correct), "elapsed_ms": answer.elapsed_ms} for answer in answers]})
+    return {"contest_date": day, "theme": quiz.theme if quiz else None, "questions": __import__('json').loads(quiz.questions_json) if quiz else [], "top_three": rows[:3], "attempts": rows}
+@router.get("/admin/winners")
+def admin_winners(db: Session = Depends(get_db), token=Depends(get_current_user_from_header)):
+    require_admin(token); winners=db.query(RaceWinner).order_by(RaceWinner.contest_date.desc()).all(); return [{"contest_date": w.contest_date, "attempt_id": w.attempt_id, "name": db.query(UserProfile).filter_by(id=w.user_id).first().name, "email": db.query(UserProfile).filter_by(id=w.user_id).first().email} for w in winners]

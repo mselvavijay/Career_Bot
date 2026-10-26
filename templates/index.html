@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -12,8 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <link rel="stylesheet" href="/static/app.css">
+<link rel="stylesheet" href="/static/app.css?v=20261026-race-ui">
     <link rel="icon" type="image/png" href="/static/favicon.ico">
     <link rel="shortcut icon" type="image/png" href="/static/favicon.ico">
 </head>
@@ -363,7 +362,7 @@
                 <h2 class="race-title">AI Race</h2>
                 <p class="race-copy">A rapid-fire coding room built for speed, logic, and sharp AI prompting. Solve concise code traps before the clock runs out and climb the daily leaderboard.</p>
                 <div class="race-highlight"><span>DAILY CONTEST &bull; <span id="race_contest_date">Today</span></span><strong>#1 WINNER TAKES IT ALL</strong></div>
-                <div class="race-actions"><button class="btn-primary-hero" type="button" onclick="openRaceModal()">Join Contest <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" /></svg></button><button class="btn-secondary-hero btn-race-invite" type="button" onclick="shareRaceInvite()">Invite Friend</button><span class="race-note" id="race_seat_status">20/20 seats available</span></div>
+                <div class="race-actions"><button class="btn-primary-hero" type="button" onclick="openRaceModal()">Join contest <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" /></svg></button><button class="btn-secondary-hero btn-race-invite" type="button" onclick="showRaceLeaderboard()">Leaderboard</button><span class="race-note" id="race_seat_status">Sign in to join today&apos;s race</span></div>
                 <section class="race-result-card" aria-label="AI Race daily contest final result">
                     <div class="race-result-header">
                         <div><span class="race-result-brand">HireKrkeDekho</span><span class="race-result-meta">AI Race &middot; Daily Contest Result</span></div>
@@ -401,7 +400,7 @@
                     <h3>Precision Discovery Engine</h3>
                     <p>
                         <strong>HireKrkeDekho</strong> was engineered to cut through generic job boards and fragmented listings.
-                        By pairing a candidate’s exact degree, verified years of experience, and real technical proficiencies, our tri-factor matching engine pinpoints high-conviction tech openings across Tier-1 tech hubs in India (Bangalore, Hyderabad, Pune, and Delhi NCR) without resume fluff or noise.
+                        By pairing a candidateâ€™s exact degree, verified years of experience, and real technical proficiencies, our tri-factor matching engine pinpoints high-conviction tech openings across Tier-1 tech hubs in India (Bangalore, Hyderabad, Pune, and Delhi NCR) without resume fluff or noise.
                     </p>
                 </div>
                 <div class="about-card">
@@ -411,7 +410,7 @@
                     <h3>Surviving &amp; Winning the AI Race</h3>
                     <p>
                         As foundational models transform modern engineering workflows, the hiring paradigm has irreversibly shifted.
-                        It is no longer about rote syntax memorization—it is about architectural reasoning, prompt velocity, and rapid debugging. 
+                        It is no longer about rote syntax memorizationâ€”it is about architectural reasoning, prompt velocity, and rapid debugging.
                         With tailored 3-week sprint roadmaps and daily <strong>AI Race live contests</strong>, we equip candidates to stay ahead of automated displacement and dominate high-leverage technical evaluations.
                     </p>
                 </div>
@@ -472,13 +471,21 @@
     </div>
 
     <div class="modal-overlay" id="race_modal_overlay" role="dialog" aria-modal="true" aria-labelledby="race_modal_title">
-        <div class="auth-modal" style="max-width: 460px;">
-            <div class="modal-header"><div><h3 class="modal-title" id="race_modal_title">Join today&apos;s AI Race</h3><p style="font-size:.82rem; color:var(--text-secondary); margin-top:5px;">Python &bull; Medium &bull; 15 rapid-fire questions</p></div><button class="btn-modal-close" onclick="closeRaceModal()" aria-label="Close">&times;</button></div>
-            <ul class="premium-feature-list"><li>15&ndash;30 seconds per question</li><li>Accuracy first, then speed</li><li>Daily rank #1 takes it all</li></ul>
-            <button class="btn-primary-action" id="race_checkout_button" type="button" onclick="startRaceCheckout()" style="margin-top:20px;">Continue to UPI Payment</button><p id="race_payment_status" style="font-size:.76rem; color:var(--text-muted); text-align:center; margin-top:10px;"></p>
+        <div class="auth-modal race-modal">
+            <div class="modal-header"><div><h3 class="modal-title" id="race_modal_title">Join today&apos;s AI Race</h3><p id="race_modal_meta">15 questions · 15 seconds each · accuracy first</p></div><button class="btn-modal-close" onclick="closeRaceModal()" aria-label="Close">&times;</button></div>
+            <div id="race_intro"><ul class="premium-feature-list"><li>One verified attempt per day</li><li>Server-timed answers with 2-second grace</li><li>Champion card and certificate for #1</li></ul><button class="btn-primary-action" type="button" onclick="startRaceAttempt()">Continue to contest</button></div>
+            <div id="race_play" hidden><div class="race-progress"><span id="race_question_count">Question 1 of 15</span><strong id="race_timer">17</strong></div><div class="race-timer-track"><i id="race_timer_bar"></i></div><h4 id="race_question_text"></h4><div id="race_options" class="race-options"></div></div>
+            <div id="race_complete" hidden><div class="race-complete-icon">✓</div><h4>Race complete</h4><p id="race_complete_text"></p><button class="btn-primary-action" type="button" onclick="showRaceLeaderboard()">View today&apos;s leaderboard</button></div>
+            <p id="race_payment_status" class="race-status"></p>
         </div>
-    </div>
-    <div class="modal-overlay" id="premium_modal_overlay" role="dialog" aria-modal="true" aria-labelledby="premium_modal_title">
+    </div>    <div class="modal-overlay" id="race_leaderboard_overlay" role="dialog" aria-modal="true" aria-labelledby="race_leaderboard_title">
+        <div class="auth-modal race-leaderboard-modal">
+            <div class="modal-header"><div><h3 class="modal-title" id="race_leaderboard_title">Today&apos;s AI Race leaderboard</h3><p id="race_leaderboard_date">Live standings</p></div><button class="btn-modal-close" onclick="closeRaceLeaderboard()" aria-label="Close">&times;</button></div>
+            <div class="leaderboard-head"><span>Rank</span><span>Player</span><span>Score</span><span>Time</span></div>
+            <div id="race_leaderboard_rows" class="leaderboard-rows" aria-live="polite"></div>
+            <p class="race-status">Ranked by score, then total time, then earliest finish.</p>
+        </div>
+    </div>    <div class="modal-overlay" id="premium_modal_overlay" role="dialog" aria-modal="true" aria-labelledby="premium_modal_title">
         <div class="auth-modal" style="max-width: 460px;">
             <div class="modal-header">
                 <div>
@@ -584,7 +591,7 @@
     </div>
 
     <!-- Application Script -->
-    <script src="/static/app.js" defer></script>
+    <script src="/static/app.js?v=20261026-race-ui" defer></script>
 </body>
 
 </html>

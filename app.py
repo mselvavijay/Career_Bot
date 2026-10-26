@@ -1,4 +1,4 @@
-import os
+﻿import os
 from pathlib import Path
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
@@ -40,7 +40,8 @@ RATE_LIMIT_STORE = defaultdict(list)
 RATE_LIMITS = {
     "/chat": 20,
     "/auth/google": 15,
-    "/race/orders": 15,
+    "/race/start": 15,
+    "/race/answer": 60,
 }
 
 @app.middleware("http")
@@ -93,6 +94,11 @@ def home():
         return HTMLResponse(content=INDEX_HTML_PATH.read_text(encoding="utf-8"), status_code=200)
     return HTMLResponse(content="<h1>CareerBot is operational</h1>", status_code=200)
 
+
+@app.get("/race/admin", response_class=HTMLResponse)
+def race_admin():
+    path = TEMPLATES_DIR / "race_admin.html"
+    return HTMLResponse(content=path.read_text(encoding="utf-8"), status_code=200)
 
 @app.get("/consultation", response_class=HTMLResponse)
 def consultation():

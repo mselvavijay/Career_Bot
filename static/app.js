@@ -1,4 +1,4 @@
-let currentUserId = localStorage.getItem('career_bot_user_id') || null;
+﻿let currentUserId = localStorage.getItem('career_bot_user_id') || null;
         let currentUserToken = localStorage.getItem('career_bot_token') || null;
         let currentSessionId = localStorage.getItem('career_bot_session_id') || null;
         let currentUserData = null;
@@ -456,70 +456,39 @@ let currentUserId = localStorage.getItem('career_bot_user_id') || null;
             if (heroDate) heroDate.textContent = formattedDate;
         }
 
+        let raceQuestions = [], raceTimer = null;
+        const raceHeaders = () => ({ 'Content-Type': 'application/json', 'Authorization': `Bearer ${currentUserToken || ''}` });
         async function loadRaceStatus() {
+            if (!currentUserToken) return;
+            try { const r = await fetch('/race/today', {headers: raceHeaders()}); const data = await r.json(); if (!r.ok) return;
+                const label = document.getElementById('race_seat_status'); if (label) label.textContent = `${data.question_count} questions · ${data.seconds_per_question}s each · one attempt today`;
+                const meta = document.getElementById('race_modal_meta'); if (meta) meta.textContent = `${data.theme} · ${data.question_count} rapid-fire questions`;
+            } catch (e) { console.error('Unable to load race status', e); }
+        }
+        async function showRaceLeaderboard() {
+            const overlay = document.getElementById('race_leaderboard_overlay');
+            const rows = document.getElementById('race_leaderboard_rows');
+            const date = document.getElementById('race_leaderboard_date');
+            overlay.classList.add('open');
+            rows.innerHTML = '<p class="race-status">Loading live standings…</p>';
             try {
-                const response = await fetch('/race/status');
-                if (!response.ok) return;
-                const race = await response.json();
-                const label = document.getElementById('race_seat_status');
-                if (label) label.textContent = `${race.seats_left}/${race.capacity} seats available`;
-                const button = document.getElementById('race_checkout_button');
-                if (button && race.seats_left === 0) { button.disabled = true; button.textContent = 'Today\'s Race Is Full'; }
-            } catch (error) {
-                console.error('Unable to load AI Race status:', error);
-            }
+                const response = await fetch('/race/leaderboard');
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.detail || 'Unable to load the leaderboard.');
+                date.textContent = `Contest date: ${data.contest_date}`;
+                const entries = data.entries || [];
+                rows.innerHTML = entries.length ? entries.map(entry => `<article class="leaderboard-row ${entry.rank === 1 ? 'leaderboard-row-winner' : ''}"><strong>#${entry.rank}</strong><span>${escapeHtml(entry.display_name)}</span><b>${entry.score}/15</b><time>${(entry.total_time_ms / 1000).toFixed(1)}s</time></article>`).join('') : '<p class="race-status">No completed attempts yet today.</p>';
+            } catch (error) { rows.innerHTML = `<p class="race-status">${escapeHtml(error.message)}</p>`; }
         }
-
-        async function shareRaceInvite() {
-            const inviteUrl = `${window.location.origin}/#ai_race`;
-            const message = 'Join me in today\'s AI Race - only 20 seats. Rank #1 takes it all!';
-            try {
-                if (navigator.share) await navigator.share({ title: 'AI Race', text: message, url: inviteUrl });
-                else { await navigator.clipboard.writeText(inviteUrl); alert('Invite link copied to clipboard.'); }
-            } catch (error) {
-                if (error.name !== 'AbortError') console.error('Unable to share AI Race invite:', error);
-            }
+        function closeRaceLeaderboard() { document.getElementById('race_leaderboard_overlay').classList.remove('open'); }
+        async function startRaceAttempt() {
+            const status=document.getElementById('race_payment_status'); status.textContent='Loading today\'s questions…';
+            try { const r=await fetch('/race/start',{method:'POST',headers:raceHeaders()}); const data=await r.json(); if(!r.ok) throw new Error(data.detail||'Unable to start the contest.'); raceQuestions=data.questions; document.getElementById('race_intro').hidden=true; document.getElementById('race_play').hidden=false; status.textContent=''; renderRaceQuestion(data.current_question); } catch(e){status.textContent=e.message;}
         }
-
-        async function startRaceCheckout() {
-            if (!requireAuthentication(startRaceCheckout)) return;
-            const status = document.getElementById('race_payment_status');
-            const button = document.getElementById('race_checkout_button');
-            button.disabled = true;
-            status.textContent = 'Preparing secure UPI checkout...';
-            try {
-                const response = await fetch('/race/orders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: currentUserId || null }) });
-                const order = await response.json();
-                if (!response.ok) throw new Error(order.detail || 'Unable to start payment.');
-                if (!window.Razorpay) throw new Error('Razorpay Checkout did not load.');
-                const checkout = new Razorpay({
-                    key: order.key_id, amount: order.amount, currency: order.currency, name: 'HireKrkeDekho AI Race', description: 'Daily AI Race entry', order_id: order.order_id,
-                    theme: { color: '#6366f1' }, method: { upi: true },
-                    handler: async payment => {
-                        const verify = await fetch('/race/verify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ entry_id: order.entry_id, ...payment }) });
-                        const result = await verify.json();
-                        if (!verify.ok) throw new Error(result.detail || 'Payment verification failed.');
-                        status.textContent = 'Entry confirmed. You are in today\'s AI Race!';
-                        loadRaceStatus();
-        refreshRaceResultCard();
-                    },
-                    modal: { ondismiss: async () => { await fetch('/race/cancel', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ entry_id: order.entry_id }) }); button.disabled = false; status.textContent = 'Payment cancelled. Your seat was released.'; loadRaceStatus(); } }
-                });
-                checkout.open();
-            } catch (error) {
-                status.textContent = error.message;
-                button.disabled = false;
-            }
-        }
-        function openRaceModal() {
-            if (!requireAuthentication(openRaceModal)) return;
-            document.getElementById('race_modal_overlay').classList.add('open');
-        }
-
-        function closeRaceModal() {
-            document.getElementById('race_modal_overlay').classList.remove('open');
-        }
-        function openPremiumModal() {
+        function renderRaceQuestion(index) { const q=raceQuestions[index]; if(!q)return; document.getElementById('race_question_count').textContent=`Question ${index+1} of ${raceQuestions.length}`; document.getElementById('race_question_text').textContent=q.question; const options=document.getElementById('race_options'); options.innerHTML=q.options.map((o,i)=>`<button type="button" onclick="submitRaceAnswer(${index},${i})">${String.fromCharCode(65+i)}. ${escapeHtml(o)}</button>`).join(''); let remaining=17; clearInterval(raceTimer); const timer=document.getElementById('race_timer'), bar=document.getElementById('race_timer_bar'); timer.textContent=remaining; bar.style.width='100%'; raceTimer=setInterval(()=>{remaining--;timer.textContent=Math.max(0,remaining);bar.style.width=`${Math.max(0,remaining)/17*100}%`;if(remaining<=0){clearInterval(raceTimer);submitRaceAnswer(index,-1);}},1000); }
+        async function submitRaceAnswer(questionIndex, optionIndex) { clearInterval(raceTimer); document.querySelectorAll('#race_options button').forEach(b=>b.disabled=true); try {const r=await fetch('/race/answer',{method:'POST',headers:raceHeaders(),body:JSON.stringify({question_index:questionIndex,option_index:optionIndex})});const data=await r.json();if(!r.ok)throw new Error(data.detail||'Answer could not be recorded.');if(data.completed){document.getElementById('race_play').hidden=true;document.getElementById('race_complete').hidden=false;document.getElementById('race_complete_text').textContent=`Final score: ${data.score}/15. Rankings are published after the contest day ends.`;}else renderRaceQuestion(data.next_question);}catch(e){document.getElementById('race_payment_status').textContent=e.message;}}
+        function openRaceModal() { if (!requireAuthentication(openRaceModal)) return; document.getElementById('race_modal_overlay').classList.add('open'); loadRaceStatus(); }
+        function closeRaceModal() { clearInterval(raceTimer); document.getElementById('race_modal_overlay').classList.remove('open'); }        function openPremiumModal() {
             if (!requireAuthentication(openPremiumModal)) return;
             document.getElementById('premium_modal_overlay').classList.add('open');
         }
