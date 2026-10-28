@@ -1,1 +1,291 @@
-﻿<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI Race Admin</title><link rel="stylesheet" href="/static/app.css?v=20261026-race-ui"></head><body><main class="ai-race-section"><section class="race-panel"><div><div class="race-kicker">Private workspace</div><h1 class="race-title">AI Race control room</h1><p class="race-copy">Review today&apos;s standings, announcement-ready top three, complete test data, and the winner&apos;s email for certificate delivery.</p></div><aside class="race-rules"><h3>Contest control</h3><ol><li>Public leaderboard: rank, username, score, time.</li><li>Admin audit: questions and every saved response.</li><li>Emails are visible only here for certificate hand-off.</li></ol></aside></section><section class="race-result-card" style="max-width:1200px"><div class="race-result-header"><div><span class="race-result-brand">Announcement</span><span class="race-result-meta">Top three — publish after midnight IST</span></div></div><div id="podium" style="margin-top:18px;color:var(--text-secondary)">Loading top three…</div></section><section class="race-result-card" style="max-width:1200px"><div class="race-result-header"><div><span class="race-result-brand">Leaderboard</span><span class="race-result-meta">All completed attempts</span></div></div><div id="leaderboard-list" style="margin-top:18px;color:var(--text-secondary)">Loading leaderboard…</div></section><section class="race-result-card" style="max-width:1200px"><div class="race-result-header"><div><span class="race-result-brand">Test audit</span><span class="race-result-meta">Questions and saved answers — admin only</span></div></div><div id="test-audit" style="margin-top:18px;color:var(--text-secondary)">Loading test audit…</div></section></main><script>const token=localStorage.getItem('career_bot_token'),headers={Authorization:'Bearer '+token};async function load(){const ids=['podium','leaderboard-list','test-audit'];if(!token){document.getElementById('podium').textContent='Sign in with an authorized Google account from the main site first.';return}const r=await fetch('/race/admin/day',{headers}),d=await r.json();if(!r.ok){ids.forEach(id=>document.getElementById(id).textContent=d.detail||'Access denied.');return}document.getElementById('podium').innerHTML=(d.top_three||[]).map(x=>`<article class="leaderboard-row ${x.rank===1?'leaderboard-row-winner':''}"><strong>#${x.rank}</strong><span>${x.display_name}<small style="display:block;color:#aebbd0;font-weight:400">${x.email||''}</small></span><b>${x.score}/15</b><time>${(x.total_time_ms/1000).toFixed(1)}s</time></article>`).join('')||'No completed attempts yet.';document.getElementById('leaderboard-list').innerHTML=(d.attempts||[]).map(x=>`<article class="leaderboard-row ${x.rank===1?'leaderboard-row-winner':''}"><strong>#${x.rank}</strong><span>${x.display_name}</span><b>${x.score}/15</b><time>${(x.total_time_ms/1000).toFixed(1)}s</time></article>`).join('')||'No completed attempts yet.';document.getElementById('test-audit').innerHTML=(d.questions||[]).map((q,i)=>`<details style="padding:12px 0;border-bottom:1px solid #26334d"><summary style="cursor:pointer;color:#fff;font-weight:700">Q${i+1}. ${q.question}</summary><p>${q.options.map((o,n)=>`${n===q.answer_index?'✓ ':''}${String.fromCharCode(65+n)}. ${o}`).join('<br>')}</p><p>${(d.attempts||[]).map(a=>`${a.display_name}: ${a.answers[i]?(a.answers[i].is_correct?'Correct':'Incorrect'):'No answer'}`).join(' · ')}</p></details>`).join('')||'No quiz generated.'}load();</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1, viewport-fit=cover">
+<title>AI Race Admin - HireKrkeDekho</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<link rel="stylesheet" href="/static/app.css?v=20261026-race-ui">
+<link rel="icon" type="image/png" href="/static/favicon.ico">
+</head>
+<body class="page-enter">
+<div class="ambient-glow-left"></div>
+<div class="ambient-glow-right"></div>
+<header class="site-header">
+    <a href="/" class="header-brand" aria-label="HireKrkeDekho home">
+        <img class="brand-wordmark" src="/static/hirekrkedekho-logo.png" alt="HireKrkeDekho" width="220" height="36">
+    </a>
+    <nav class="nav-links">
+        <a href="/" class="nav-link">Back to Site</a>
+    </nav>
+    <div class="header-actions">
+        <button class="btn-ghost btn-icon" onclick="window.location.reload()" title="Refresh">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M1 4c0-1.1.9-2 2-2h11.5l-1.3-1.3C15.55 1.35 16.66 1 18 1s2.45.35 3.3.94L22.9 4.2c-.73-.74-1.8-1.19-2.9-1.19H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h11.5l-1.3 1.3C15.55 20.65 14.44 21 13 21s-2.45-.35-3.3-.94L1.1 19.8c.73.74 1.8 1.19 2.9 1.19H21c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2H3z" fill="currentColor"/></svg>
+        </button>
+        <button class="btn-ghost btn-icon" onclick="signOutAdmin()" title="Sign Out">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M16 17v-3H9v-4h7V7l5 5-5 5M14 2a2 2 0 0 1 2 2v2h-2V4H5v16h9v-2h2v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9z" fill="currentColor"/></svg>
+        </button>
+    </div>
+</header>
+
+<main class="ai-race-section">
+    <section class="race-panel">
+        <div>
+            <div class="race-kicker">Admin Control Room</div>
+            <h1 class="race-title text-h2">AI Race Dashboard</h1>
+            <p class="race-copy text-sm">Review today's standings, announcement-ready top three, complete test data, and winner emails for certificate delivery.</p>
+        </div>
+        <aside class="race-rules">
+            <h3>Contest Control</h3>
+            <ol>
+                <li><span class="badge badge-neutral">Public</span> Leaderboard: rank, username, score, time.</li>
+                <li><span class="badge badge-primary">Admin Only</span> Audit: questions and every saved response.</li>
+                <li><span class="badge badge-warning">Private</span> Emails visible only here for certificate hand-off.</li>
+            </ol>
+        </aside>
+    </section>
+
+    <!-- Admin Sign-in Section -->
+    <section class="race-result-card card" id="admin-auth-box">
+        <div class="race-result-header">
+            <div><span class="race-result-brand text-h3">Admin Sign In</span><span class="race-result-meta text-xs">Authorized Google account required</span></div>
+        </div>
+        <div id="admin-google-slot" class="google-login-slot" style="margin-top:var(--space-4);"></div>
+        <p id="admin-auth-note" class="race-copy text-sm text-muted" style="margin-top:var(--space-2);">Sign in with an authorized Google account to load the admin audit.</p>
+    </section>
+
+    <!-- Latest Winner -->
+    <section class="race-result-card card">
+        <div class="race-result-header">
+            <div><span class="race-result-brand text-h3">Latest Winner</span><span class="race-result-meta text-xs">Decided after midnight IST for the previous day</span></div>
+        </div>
+        <div id="latest-winner" class="text-muted">Loading winner...</div>
+    </section>
+
+    <!-- Top 3 Podium -->
+    <section class="race-result-card card">
+        <div class="race-result-header">
+            <div><span class="race-result-brand text-h3">Announcement</span><span class="race-result-meta text-xs">Top three - publish after midnight IST</span></div>
+        </div>
+        <div id="podium" class="text-muted">Loading top three...</div>
+    </section>
+
+    <!-- Leaderboard -->
+    <section class="race-result-card card">
+        <div class="race-result-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+            <div>
+                <span class="race-result-brand text-h3">Leaderboard</span>
+                <span class="race-result-meta text-xs">All completed attempts (admin only - includes email). 7-day auto-retention policy applies.</span>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;">
+                <input type="date" id="csv_date_input" style="padding:6px 10px;font-size:0.85rem;background:#1e293b;border:1px solid #334155;color:#fff;border-radius:6px;">
+                <button class="btn btn-primary btn-sm" onclick="downloadLeaderboardCSV()" title="Download Leaderboard as CSV">
+                    <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                    Download CSV
+                </button>
+            </div>
+        </div>
+        <div id="leaderboard-list" class="text-muted">Loading leaderboard...</div>
+    </section>
+
+    <!-- Winner History -->
+    <section class="race-result-card card">
+        <div class="race-result-header">
+            <div><span class="race-result-brand text-h3">Winner History</span><span class="race-result-meta text-xs">All past winners</span></div>
+        </div>
+        <div id="winner-history" class="text-muted">Loading winner history...</div>
+    </section>
+
+    <!-- Test Audit -->
+    <section class="race-result-card card">
+        <div class="race-result-header">
+            <div><span class="race-result-brand text-h3">Test Audit</span><span class="race-result-meta text-xs">Questions and saved answers - admin only</span></div>
+        </div>
+        <div id="test-audit" class="text-muted">Loading test audit...</div>
+    </section>
+</main>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast_container"></div>
+
+<script>
+const TOKEN_KEY = 'career_bot_token';
+function getToken(){ return localStorage.getItem(TOKEN_KEY); }
+function setToken(t){ localStorage.setItem(TOKEN_KEY, t); }
+function authHeaders(){ const t = getToken(); return t ? { 'Authorization': 'Bearer ' + t } : {}; }
+
+let googleClientId = '';
+let googleInitialized = false;
+
+async function initGoogle(){
+  try {
+    const r = await fetch('/auth/config');
+    if (!r.ok) return;
+    const d = await r.json();
+    googleClientId = d.google_client_id || '';
+    if (googleClientId) waitForGoogle();
+  } catch (e){ console.warn(e); }
+}
+
+function waitForGoogle(attempts){
+  if (attempts === undefined) attempts = 20;
+  if (googleClientId && window.google && google.accounts && google.accounts.id) {
+    setupGoogle();
+  } else if (attempts > 0) {
+    setTimeout(function(){ waitForGoogle(attempts - 1); }, 250);
+  }
+}
+
+function setupGoogle(){
+  if (googleInitialized) return;
+  try {
+    google.accounts.id.initialize({ client_id: googleClientId, callback: handleGoogleCredential, auto_select: false });
+    googleInitialized = true;
+    renderGoogleButton();
+  } catch (e){ console.warn(e); }
+}
+
+function renderGoogleButton(){
+  const slot = document.getElementById('admin-google-slot');
+  if (!slot || !googleInitialized) return;
+  slot.innerHTML = '';
+  google.accounts.id.renderButton(slot, { theme: 'filled_blue', size: 'large', text: 'continue_with', shape: 'pill', width: 320 });
+}
+
+async function handleGoogleCredential(response){
+  const note = document.getElementById('admin-auth-note');
+  try {
+    const r = await fetch('/auth/google', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ credential: response.credential })
+    });
+    if (!r.ok) throw new Error('Sign in failed');
+    const user = await r.json();
+    if (user.access_token) setToken(user.access_token);
+    const box = document.getElementById('admin-auth-box');
+    if (box) box.style.display = 'none';
+    await loadAll();
+  } catch (err) {
+    if (note) note.textContent = 'Authentication failed: ' + err.message;
+    if (typeof window.showToast === 'function') window.showToast('Authentication failed: ' + err.message, 'error', 5000);
+  }
+}
+async function loadDay(){
+  const r = await fetch('/race/admin/day', { headers: authHeaders() });
+  const d = await r.json();
+  if (!r.ok) throw new Error((d && d.detail) || 'Access denied');
+  const podium = document.getElementById('podium');
+  podium.innerHTML = (d.top_three || []).map(function(x){
+    return '<article class="leaderboard-row ' + (x.rank === 1 ? 'leaderboard-row-winner' : '') + '">' +
+      '<strong>#' + x.rank + '</strong>' +
+      '<span>' + x.display_name + '<small style="display:block;color:#aebbd0;font-weight:400">' + (x.email || '') + '</small></span>' +
+      '<b>' + x.score + '/15</b>' +
+      '<time>' + (x.total_time_ms / 1000).toFixed(1) + 's</time>' +
+      '</article>';
+  }).join('') || 'No completed attempts yet.';
+
+  const audit = document.getElementById('test-audit');
+  audit.innerHTML = (d.questions || []).map(function(q, i){
+    return '<details style="padding:12px 0;border-bottom:1px solid #26334d">' +
+      '<summary style="cursor:pointer;color:#fff;font-weight:700">Q' + (i + 1) + '. ' + q.question + '</summary>' +
+      '<p>' + q.options.map(function(o, n){ return (n === q.answer_index ? '✓ ' : '') + String.fromCharCode(65 + n) + '. ' + o; }).join('<br>') + '</p>' +
+      '<p>' + (d.attempts || []).map(function(a){
+        return a.display_name + ': ' + (a.answers[i] ? (a.answers[i].is_correct ? 'Correct' : 'Incorrect') : 'No answer');
+      }).join(' · ') + '</p>' +
+      '</details>';
+  }).join('') || 'No quiz generated.';
+}
+
+async function loadLeaderboard(){
+  const r = await fetch('/race/admin/leaderboard', { headers: authHeaders() });
+  const d = await r.json();
+  if (!r.ok) throw new Error((d && d.detail) || 'Access denied');
+  const lb = document.getElementById('leaderboard-list');
+  lb.innerHTML = (d.entries || []).map(function(x){
+    return '<article class="leaderboard-row ' + (x.rank === 1 ? 'leaderboard-row-winner' : '') + '">' +
+      '<strong>#' + x.rank + '</strong>' +
+      '<span>' + x.display_name + '<small style="display:block;color:#aebbd0;font-weight:400">' + (x.email || '') + '</small></span>' +
+      '<b>' + x.score + '/15</b>' +
+      '<time>' + (x.total_time_ms / 1000).toFixed(1) + 's</time>' +
+      '</article>';
+  }).join('') || 'No completed attempts yet.';
+}
+
+async function loadWinners(){
+  const r = await fetch('/race/admin/winners', { headers: authHeaders() });
+  const winners = await r.json();
+  if (!r.ok) throw new Error((winners && winners.detail) || 'Access denied');
+  const latest = (winners && winners.length) ? winners[0] : null;
+  const lw = document.getElementById('latest-winner');
+  if (lw) {
+    lw.innerHTML = latest
+      ? '<article class="leaderboard-row leaderboard-row-winner"><strong>' + latest.contest_date + '</strong><span>' + latest.name + '<small style="display:block;color:#aebbd0;font-weight:400">' + (latest.email || '') + '</small></span><b>Winner</b></article>'
+      : 'No winner decided yet (finalized after midnight IST).';
+  }
+  const wh = document.getElementById('winner-history');
+  if (wh) {
+    wh.innerHTML = (winners || []).map(function(w){
+      return '<article class="leaderboard-row"><span>' + w.contest_date + '</span><span>' + w.name + '<small style="display:block;color:#aebbd0;font-weight:400">' + (w.email || '') + '</small></span></article>';
+    }).join('') || 'No winners yet.';
+  }
+}
+
+async function downloadLeaderboardCSV() {
+  const dateVal = document.getElementById('csv_date_input').value;
+  const url = '/race/admin/leaderboard/csv' + (dateVal ? '?date_value=' + encodeURIComponent(dateVal) : '');
+  try {
+    const res = await fetch(url, { headers: authHeaders() });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || 'Download failed');
+    }
+    const blob = await res.blob();
+    const blobUrl = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = 'ai_race_leaderboard_' + (dateVal || new Date().toISOString().split('T')[0]) + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(blobUrl);
+    if (typeof window.showToast === 'function') {
+      window.showToast('Leaderboard CSV downloaded successfully', 'success');
+    }
+  } catch (err) {
+    if (typeof window.showToast === 'function') {
+      window.showToast('CSV download failed: ' + err.message, 'error');
+    } else {
+      alert('CSV download failed: ' + err.message);
+    }
+  }
+}
+
+async function loadAll(){
+  const token = getToken();
+  const authBox = document.getElementById('admin-auth-box');
+  if (!token) {
+    if (authBox) authBox.style.display = 'block';
+    document.getElementById('podium').textContent = 'Sign in with an authorized Google account to load the admin audit.';
+    document.getElementById('leaderboard-list').textContent = 'Sign in required.';
+    document.getElementById('test-audit').textContent = 'Sign in required.';
+    document.getElementById('latest-winner').textContent = 'Sign in required.';
+    document.getElementById('winner-history').textContent = 'Sign in required.';
+    return;
+  }
+  if (authBox) authBox.style.display = 'none';
+  try {
+    await Promise.all([loadDay(), loadLeaderboard(), loadWinners()]);
+  } catch (e) {
+    document.getElementById('podium').textContent = e.message;
+  }
+}
+
+initGoogle();
+loadAll();
+</script>
+</body>
+</html>

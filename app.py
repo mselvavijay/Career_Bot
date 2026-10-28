@@ -71,6 +71,8 @@ async def security_and_ratelimit_middleware(request: Request, call_next):
     response.headers["X-XSS-Protection"] = "1; mode=block"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+    if path.startswith("/race/admin"):
+        response.headers["Cache-Control"] = "no-store"
     return response
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -118,6 +120,8 @@ async def start_periodic_retention_scheduler():
                 db = SessionLocal()
                 try:
                     cleanup_expired_conversations(db)
+                    from services.race_service import cleanup_expired_race_data
+                    cleanup_expired_race_data(db, retention_days=7)
                 finally:
                     db.close()
             except Exception as exc:

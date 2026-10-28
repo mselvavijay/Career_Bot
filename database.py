@@ -47,7 +47,20 @@ def get_db():
 
 
 def init_db():
-    """Create tables and apply safe schema migrations for both SQLite and PostgreSQL."""
+    """Create tables and apply safe schema migrations for SQLite/localhost dev only.
+    On production Postgres (non-localhost), schema changes must come from Alembic only.
+    Controlled by AUTO_CREATE_TABLES env var (default: false in production).
+    """
+    auto_create = os.getenv("AUTO_CREATE_TABLES", "").strip() == "1"
+    raw_db_url = os.getenv("DATABASE_URL", "")
+    is_local = (raw_db_url.startswith("sqlite://") or
+                "localhost" in raw_db_url.lower() or
+                "127.0.0.1" in raw_db_url.lower())
+
+    # In production (non-local Postgres without explicit opt-in), never create/alter tables.
+    if not auto_create and not is_local:
+        print("init_db: AUTO_CREATE_TABLES not set and DATABASE_URL is not local; skipping table creation (Alembic manages schema).")
+        return
     from sqlalchemy import text
     Base.metadata.create_all(bind=engine)
 

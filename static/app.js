@@ -956,3 +956,37 @@
             }
             requestAnimationFrame(animate);
         })();
+
+    /* ===== TOAST NOTIFICATIONS ===== */
+    function showToast(message, type = 'info', duration = 4000) {
+        const container = document.getElementById('toast_container');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type} toast-enter`;
+        toast.innerHTML = `
+            <span class="toast-title">${type === 'success' ? 'Success' : type === 'error' ? 'Error' : type === 'warning' ? 'Warning' : 'Info'}</span>
+            <span class="toast-message">${escapeHtml(message)}</span>
+            <button class="toast-close" onclick="this.parentElement.remove()" aria-label="Dismiss"><svg class="icon" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="currentColor"/></svg></button>
+        `;
+
+        container.appendChild(toast);
+
+        if (duration > 0) {
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(10px)';
+                setTimeout(() => toast.remove(), 250);
+            }, duration);
+        }
+        return toast;
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    /* Expose globally for inline handlers */
+    window.showToast = showToast;

@@ -13,10 +13,12 @@ from services.response_cache import (
     save_cached_response,
     get_cached_response,
 )
+from services.auth_token_service import create_access_token
 
 class TestFreeTierAndRetention(unittest.TestCase):
 
     def setUp(self):
+        init_db()
         self.db = SessionLocal()
 
     def tearDown(self):
@@ -108,11 +110,12 @@ class TestFreeTierAndRetention(unittest.TestCase):
         self.db.add(usage)
         self.db.commit()
 
-        # Send request
+        # Send request with Bearer token (required by /chat)
+        token = create_access_token(test_user.id, test_user.email)
         res = client.post("/chat", json={
             "user_input": "Show more job openings",
             "user_id": test_user.id
-        })
+        }, headers={"Authorization": f"Bearer {token}"})
         self.assertEqual(res.status_code, 200)
         data = res.json()
         self.assertEqual(data["message"], "Daily limit reached. Come back tomorrow for new openings.")

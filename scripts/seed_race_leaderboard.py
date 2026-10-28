@@ -1,6 +1,23 @@
 ﻿"""Seed 20 persistent local AI Race test accounts. It never deletes data."""
 from datetime import timedelta
 import json
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+# Production safety guard: ONLY allow local databases, and only when ALLOW_SEED=1 is set.
+db_url = os.getenv('DATABASE_URL', '')
+allow_seed = os.getenv('ALLOW_SEED', '').strip() == '1'
+is_local = (
+    db_url.startswith('sqlite://') or
+    'localhost' in db_url.lower() or
+    '127.0.0.1' in db_url.lower()
+)
+if not (is_local and allow_seed):
+    raise SystemExit("ERROR: This script must not run against a production database. "
+                     "Set DATABASE_URL to a local database (sqlite://, localhost, or 127.0.0.1) "
+                     "and set ALLOW_SEED=1 before running.")
+
 from database import SessionLocal, init_db
 from models.models import UserProfile, RaceDailyQuiz, RaceAttempt, RaceAnswer
 from services.race_service import contest_date, now_ist
