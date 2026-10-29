@@ -86,6 +86,33 @@
             font-size: 15px;
         }
 
+        /* ===== GLOBAL PAGE BACKGROUND (fixed grid persists across all sections) ===== */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(31, 107, 255, 0.045) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(31, 107, 255, 0.045) 1px, transparent 1px);
+            background-size: 48px 48px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Subtle fixed center glow that persists page-wide */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: min(900px, 100vw);
+            height: 480px;
+            background: radial-gradient(ellipse 70% 55% at 50% 0%, rgba(31, 107, 255, 0.14) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
         /* Prevent image/media overflow across all viewport widths */
         img, svg, video, canvas, audio, iframe, embed, object {
             display: block;
@@ -1312,6 +1339,8 @@
             text-align: left;
             scroll-snap-align: none;
             scroll-margin-top: var(--header-height);
+            position: relative;
+            z-index: 1;
         }
 
         .how-head {
@@ -1368,21 +1397,19 @@
             flex-direction: column;
             margin: 0;
             padding: 0;
-            gap: 16px;
             flex: 1;
-            justify-content: space-between;
         }
 
         .how-input-row {
             display: flex;
             gap: 16px;
-            align-items: flex-start;
-            padding-bottom: 16px;
+            align-items: center;
+            padding: 16px 0;
             border-bottom: 1px solid var(--border-subtle);
+            flex: 1;
         }
 
         .how-input-row:last-child {
-            padding-bottom: 0;
             border-bottom: none;
         }
 
@@ -1406,6 +1433,7 @@
         .how-input-content {
             display: flex;
             flex-direction: column;
+            justify-content: center;
             gap: 4px;
             flex: 1;
         }
@@ -1493,7 +1521,7 @@
             gap: 12px;
         }
 
-        .how-role-btn {
+        .how-role-card {
             width: 100%;
             display: flex;
             align-items: center;
@@ -1503,19 +1531,9 @@
             border-radius: 8px;
             background: var(--bg-card);
             color: inherit;
-            cursor: pointer;
             text-align: left;
-            transition: border-color 0.15s ease;
-        }
-
-        .how-role-btn:hover {
-            border-color: var(--primary);
-        }
-
-        .how-role-btn:focus-visible {
-            outline: 2px solid #4c8dff;
-            outline-offset: 2px;
-            border-color: var(--primary);
+            cursor: default;
+            user-select: text;
         }
 
         .how-role-info {
@@ -1545,15 +1563,7 @@
             color: var(--text-secondary);
         }
 
-        .how-role-chevron {
-            color: var(--text-secondary);
-            flex-shrink: 0;
-            transition: color 0.15s ease;
-        }
-
-        .how-role-btn:hover .how-role-chevron {
-            color: var(--accent);
-        }
+        
 
         /* ── Horizontal 3-Step Roadmap Strip ── */
         .how-roadmap {
@@ -1650,6 +1660,34 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== DESKTOP 1-VIEWPORT FIT ===== */
+        @media (min-width: 1025px) {
+            #how_it_works.how {
+                min-height: calc(100dvh - var(--header-height));
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                padding: 40px 24px;
+                scroll-margin-top: var(--header-height);
+            }
+
+            .ai-race-section {
+                margin: 0 auto;
+                padding: 0 24px;
+            }
+
+            .race-arena-container {
+                padding: 36px 40px;
+            }
+
+            .about-section {
+                padding: 48px 24px;
+                margin: 0 auto;
+            }
         }
 
         /* ── Responsive Breakpoints ── */
