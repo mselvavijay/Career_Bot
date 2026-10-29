@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-<link rel="stylesheet" href="/static/app.css?v=20261029-job-pagination">
+<link rel="stylesheet" href="/static/app.css?v=20261030-race-interactions">
     <link rel="icon" type="image/png" href="/static/favicon.ico">
     <link rel="shortcut icon" type="image/png" href="/static/favicon.ico">
 </head>
@@ -451,46 +451,68 @@
             calculate the ideal career match:
         </p>
 
-        <div class="tri-factor-grid">
-            <div class="tri-card">
-                <div class="tri-icon-box">
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zm0 13l-8-4.36v5.86L12 21l8-3.5v-5.86L12 16z" />
-                    </svg>
+        <!-- Live-style sample output: profile on left, calibrated roles on right -->
+        <div class="calibration-sample">
+            <div class="sample-card sample-profile">
+                <span class="sample-label">Example Candidate Profile</span>
+                <div class="profile-chips">
+                    <span class="chip">B.Tech CSE</span>
+                    <span class="chip">2 years</span>
+                    <span class="chip">Python · SQL · FastAPI</span>
                 </div>
-                <h3>1. Degree &amp; Education</h3>
-                <p>
-                    Evaluates your academic foundation, qualifications, and degree discipline (B.Tech, M.S., BCA, MCA,
-                    or cross-domain conversions) to establish eligibility for specialized roles.
-                </p>
+                <p class="sample-note">Calibrated to your exact degree, experience, and technical stack.</p>
+                <button class="btn-primary-action sample-cta" type="button" onclick="openConsultation()">
+                    Try it with your profile
+                    <svg class="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true" style="margin-left:8px;">
+                        <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
             </div>
 
-            <div class="tri-card">
-                <div class="tri-icon-box">
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <path
-                            d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" />
-                    </svg>
+            <div class="sample-card sample-roles">
+                <span class="sample-label">Calibrated Role Matches</span>
+                <div class="role-list">
+                    <div class="role-item">
+                        <strong class="role-title">Backend Developer</strong>
+                        <span class="role-meta">Pune · ₹8–14 LPA</span>
+                        <button class="btn-roadmap" type="button" onclick="openConsultation()">3-Week Roadmap</button>
+                    </div>
+                    <div class="role-item">
+                        <strong class="role-title">Data Analyst</strong>
+                        <span class="role-meta">Bangalore · ₹6–10 LPA</span>
+                        <button class="btn-roadmap" type="button" onclick="openConsultation()">3-Week Roadmap</button>
+                    </div>
+                    <div class="role-item">
+                        <strong class="role-title">Junior ML Engineer</strong>
+                        <span class="role-meta">Hyderabad · ₹10–16 LPA</span>
+                        <button class="btn-roadmap" type="button" onclick="openConsultation()">3-Week Roadmap</button>
+                    </div>
                 </div>
-                <h3>2. Years of Experience</h3>
-                <p>
-                    Strictly matches job seniority. Freshers and students (0 yrs) receive entry-level and junior roles,
-                    while experienced candidates receive senior, lead, or staff architect positions.
-                </p>
             </div>
+        </div>
 
-            <div class="tri-card">
-                <div class="tri-icon-box">
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <path
-                            d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z" />
-                    </svg>
+        <!-- Three pillars as compact plain text -->
+        <div class="tri-pillars-text">
+            <div class="pillar-row">
+                <span class="pillar-num">1</span>
+                <div>
+                    <strong>Degree & Education</strong>
+                    <p>Evaluates your academic foundation, qualifications, and degree discipline (B.Tech, M.S., BCA, MCA, or cross-domain conversions) to establish eligibility for specialized roles.</p>
                 </div>
-                <h3>3. Technical Skills</h3>
-                <p>
-                    Your technical competencies directly define your target domain and job categories (e.g. Python, SQL,
-                    React, PyTorch, Docker), eliminating guesswork.
-                </p>
+            </div>
+            <div class="pillar-row">
+                <span class="pillar-num">2</span>
+                <div>
+                    <strong>Years of Experience</strong>
+                    <p>Strictly matches job seniority. Freshers and students (0 yrs) receive entry-level and junior roles, while experienced candidates receive senior, lead, or staff architect positions.</p>
+                </div>
+            </div>
+            <div class="pillar-row">
+                <span class="pillar-num">3</span>
+                <div>
+                    <strong>Technical Skills</strong>
+                    <p>Your technical competencies directly define your target domain and job categories (e.g. Python, SQL, React, PyTorch, Docker), eliminating guesswork.</p>
+                </div>
             </div>
         </div>
     </section>
@@ -862,7 +884,7 @@
     </div>
 
     <!-- Application Script -->
-    <script src="/static/app.js?v=20261029-job-pagination" defer></script>
+    <script src="/static/app.js?v=20261030-race-interactions" defer></script>
 </body>
 
     <!-- Toast Container -->
