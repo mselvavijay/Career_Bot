@@ -5,6 +5,7 @@ import time
 from fastapi import APIRouter, Depends, HTTPException, Request, Header
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
 from database import get_db
 from models.models import UserProfile, RaceAttempt, RaceAnswer, RaceWinner, RaceDailyQuiz
 from services.auth_token_service import get_current_user_from_header
@@ -85,13 +86,25 @@ async def answer(payload: AnswerRequest, db: Session = Depends(get_db), token=De
     if started_at.tzinfo is None:
         started_at = started_at.replace(tzinfo=IST)
     elapsed = int((now_ist() - started_at).total_seconds() * 1000)
-    quiz = db.query(__import__('models.models', fromlist=['RaceDailyQuiz']).RaceDailyQuiz).filter_by(contest_date=day).first(); question = __import__('json').loads(quiz.questions_json)[payload.question_index]
+    quiz = db.query(RaceDailyQuiz).filter_by(contest_date=day).first()
+    if not quiz:
+        raise HTTPException(status_code=503, detail="Today's quiz is unavailable. Please restart the contest.")
+    questions = __import__('json').loads(quiz.questions_json)
+    if payload.question_index >= len(questions):
+        raise HTTPException(status_code=409, detail="That question is unavailable.")
+    question = questions[payload.question_index]
     correct = elapsed <= (QUESTION_SECONDS + GRACE_SECONDS) * 1000 and payload.option_index >= 0 and payload.option_index == question["answer_index"]
-    db.add(RaceAnswer(attempt_id=attempt.id, question_index=payload.question_index, selected_index=payload.option_index, is_correct=correct, elapsed_ms=elapsed))
+    # is_correct is an INTEGER column; bind an integer explicitly for PostgreSQL.
+    db.add(RaceAnswer(attempt_id=attempt.id, question_index=payload.question_index, selected_index=payload.option_index, is_correct=int(correct), elapsed_ms=elapsed))
     attempt.score += int(correct); attempt.total_time_ms += min(elapsed, (QUESTION_SECONDS + GRACE_SECONDS) * 1000); attempt.current_question += 1
     if attempt.current_question >= 15: attempt.status="completed"; attempt.completed_at=now_ist()
     else: attempt.question_started_at=now_ist()
-    db.commit()
+    try:
+        db.commit()
+    except SQLAlchemyError:
+        db.rollback()
+        # Do not expose database internals, but always return JSON rather than an HTML 500 page.
+        raise HTTPException(status_code=503, detail="Unable to save your answer. Please try again.")
     return {"correct": None, "completed": attempt.status == "completed", "score": attempt.score, "next_question": attempt.current_question}
 
 @router.get("/leaderboard")
