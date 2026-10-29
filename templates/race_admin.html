@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
-<link rel="stylesheet" href="/static/app.css?v=20261026-race-ui">
+<link rel="stylesheet" href="/static/app.css?v=20261030-race-interactions">
 <link rel="icon" type="image/png" href="/static/favicon.ico">
 </head>
 <body class="page-enter">
@@ -190,13 +190,11 @@ async function loadDay(){
 
   const audit = document.getElementById('test-audit');
   audit.innerHTML = (d.questions || []).map(function(q, i){
+    const answer = q.options && q.options[q.answer_index] ? q.options[q.answer_index] : 'Unavailable';
     return '<details style="padding:12px 0;border-bottom:1px solid #26334d">' +
       '<summary style="cursor:pointer;color:#fff;font-weight:700">Q' + (i + 1) + '. ' + q.question + '</summary>' +
-      '<p>' + q.options.map(function(o, n){ return (n === q.answer_index ? '✓ ' : '') + String.fromCharCode(65 + n) + '. ' + o; }).join('<br>') + '</p>' +
-      '<p>' + (d.attempts || []).map(function(a){
-        return a.display_name + ': ' + (a.answers[i] ? (a.answers[i].is_correct ? 'Correct' : 'Incorrect') : 'No answer');
-      }).join(' · ') + '</p>' +
-      '</details>';
+      '<p><strong style="color:#71e2b2">Correct answer:</strong> ' + String.fromCharCode(65 + q.answer_index) + '. ' + answer + '</p>' +
+    '</details>';
   }).join('') || 'No quiz generated.';
 }
 
