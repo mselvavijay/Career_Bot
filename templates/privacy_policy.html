@@ -184,7 +184,11 @@
         .pp-section ul li {
             display: flex;
             align-items: flex-start;
-            gap: 10px;
+            gap: 12px;
+        }
+
+        .pp-section ul li > span {
+            flex: 1;
         }
 
         .pp-section ul li::before {
@@ -460,9 +464,18 @@
             <div class="pp-card">
                 <p><strong class="hi">Google Sign-In:</strong> We use Google Identity Services (GIS) to authenticate you. When you sign in, Google shares your name, email address, and profile picture with us. We verify the Google ID token on our server and never store your Google password or refresh token. Google's privacy policy governs data held on Google's side — see <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style="color:#818cf8;">policies.google.com/privacy</a>.</p>
                 <ul style="margin-top:14px;">
-                    <li><strong class="hi">Groq / Llama AI:</strong> Your consultation messages are sent to the Groq API to generate AI responses. Groq's data processing agreement governs this transfer. We do not share your email or account identity with Groq.</li>
-                    <li><strong class="hi">Supabase:</strong> Our PostgreSQL database is hosted on Supabase (EU region). Data is encrypted at rest and in transit. See <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer" style="color:#818cf8;">supabase.com/privacy</a>.</li>
-                    <li><strong class="hi">Vercel:</strong> Our web application is hosted on Vercel's serverless infrastructure. Vercel may collect access logs. See <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" style="color:#818cf8;">vercel.com/legal/privacy-policy</a>.</li>
+                    <li>
+                        <strong class="hi">Groq / Llama AI:</strong>
+                        <span>Your consultation messages are sent to the Groq API to generate AI responses. Groq's data processing agreement governs this transfer. We do not share your email or account identity with Groq.</span>
+                    </li>
+                    <li>
+                        <strong class="hi">Supabase:</strong>
+                        <span>Our PostgreSQL database is hosted on Supabase (EU region). Data is encrypted at rest and in transit. See <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer" style="color:#818cf8;">supabase.com/privacy</a>.</span>
+                    </li>
+                    <li>
+                        <strong class="hi">Vercel:</strong>
+                        <span>Our web application is hosted on Vercel's serverless infrastructure. Vercel may collect access logs. See <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" style="color:#818cf8;">vercel.com/legal/privacy-policy</a>.</span>
+                    </li>
                 </ul>
             </div>
         </section>
@@ -477,9 +490,18 @@
             </div>
             <div class="pp-card">
                 <ul>
-                    <li><strong class="hi">Session token (<code>career_bot_token</code>):</strong> Stored in <code>localStorage</code>. Contains a signed JWT with your Google user ID, email, and name. Used to authenticate API requests. Cleared on sign-out.</li>
-                    <li><strong class="hi">Google GIS cookies:</strong> Google's sign-in library may set its own cookies (e.g. <code>g_state</code>) governed by Google's cookie policy.</li>
-                    <li><strong class="hi">No tracking cookies:</strong> We do not use advertising, analytics, or third-party tracking cookies. We do not use Google Analytics.</li>
+                    <li>
+                        <strong class="hi">Session token (<code>career_bot_token</code>):</strong>
+                        <span>Stored in <code>localStorage</code>. Contains a signed JWT with your Google user ID, email, and name. Used to authenticate API requests. Cleared on sign-out.</span>
+                    </li>
+                    <li>
+                        <strong class="hi">Google GIS cookies:</strong>
+                        <span>Google's sign-in library may set its own cookies (e.g. <code>g_state</code>) governed by Google's cookie policy.</span>
+                    </li>
+                    <li>
+                        <strong class="hi">No tracking cookies:</strong>
+                        <span>We do not use advertising, analytics, or third-party tracking cookies. We do not use Google Analytics.</span>
+                    </li>
                 </ul>
                 <div class="pp-highlight">You can clear all site data from your browser settings at any time (<em>Settings → Privacy → Clear site data</em>). This also signs you out.</div>
             </div>
@@ -495,11 +517,26 @@
             </div>
             <div class="pp-card">
                 <ul>
-                    <li><strong class="hi">Access:</strong> Sign in and open your Profile modal to view everything stored about you — degree, skills, experience, and account identity.</li>
-                    <li><strong class="hi">Correction:</strong> Edit any profile field in the Profile modal at any time.</li>
-                    <li><strong class="hi">Deletion (Right to Erasure):</strong> Click <strong>"Delete My Account"</strong> in the Profile modal to permanently delete your candidate profile, all consultation sessions, contest records, and account identity from our database. This is irreversible.</li>
-                    <li><strong class="hi">Data portability:</strong> Contact us at <a href="mailto:hirekrkedekho@gmail.com" style="color:#818cf8;">hirekrkedekho@gmail.com</a> to request an export of your stored data.</li>
-                    <li><strong class="hi">Opt-out of AI Race leaderboard:</strong> Your display name (not email) appears on the public leaderboard. Race data is automatically purged after 7 days. You can skip the Daily Contest at any time.</li>
+                    <li>
+                        <strong class="hi">Access:</strong>
+                        <span>Sign in and open your Profile modal to view everything stored about you — degree, skills, experience, and account identity.</span>
+                    </li>
+                    <li>
+                        <strong class="hi">Correction:</strong>
+                        <span>Edit any profile field in the Profile modal at any time.</span>
+                    </li>
+                    <li>
+                        <strong class="hi">Deletion (Right to Erasure):</strong>
+                        <span>Click <strong>"Delete My Account"</strong> in the Profile modal to permanently delete your candidate profile, all consultation sessions, contest records, and account identity from our database. This is irreversible.</span>
+                    </li>
+                    <li>
+                        <strong class="hi">Data portability:</strong>
+                        <span>Contact us at <a href="mailto:hirekrkedekho@gmail.com" style="color:#818cf8;">hirekrkedekho@gmail.com</a> to request an export of your stored data.</span>
+                    </li>
+                    <li>
+                        <strong class="hi">Opt-out of AI Race leaderboard:</strong>
+                        <span>Your display name (not email) appears on the public leaderboard. Race data is automatically purged after 7 days. You can skip the Daily Contest at any time.</span>
+                    </li>
                 </ul>
             </div>
         </section>

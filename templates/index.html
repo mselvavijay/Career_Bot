@@ -444,28 +444,80 @@
 
     <!-- Tri-Factor Architecture Section -->
     <section class="features-section" id="how_it_works">
-        <div class="section-eyebrow">Smart Career Calibration</div>
-        <h3 class="section-title">The Three Pillars of Your Assessment</h3>
+        <section id="how_it_works" class="how">
+  <header class="how-head">
+        <h2>Three things decide your matches</h2>
+    <p>
+      We look at your degree, experience and skills together, so the roles fit you, not just a keyword.
+    </p>
+  </header>
+
+  <div class="how-grid">
+    <article class="how-card how-input" aria-labelledby="how-in">
+      <h3 id="how-in">You tell us</h3>
+      <dl>
+        <div>
+          <dt>Degree</dt>
+          <dd>B.Tech CSE</dd>
+        </div>
+        <div>
+          <dt>Experience</dt>
+          <dd>2 years</dd>
+        </div>
+        <div>
+          <dt>Skills</dt>
+          <dd>Python · SQL · FastAPI</dd>
+        </div>
+      </dl>
+    </article>
+
+    <div class="how-arrow" aria-hidden="true">→</div>
+
+    <article class="how-card how-output" aria-labelledby="how-out">
+      <h3 id="how-out">You get</h3>
+      <ul>
+        <li>
+          <span>Backend Developer</span>
+          <span>Pune · ₹8–14 LPA</span>
+          <a href="#" class="roadmap-btn" onclick="openConsultation()">3-week roadmap</a>
+        </li>
+        <li>
+          <span>Data Analyst</span>
+          <span>Bangalore · ₹6–10 LPA</span>
+          <a href="#" class="roadmap-btn" onclick="openConsultation()">3-week roadmap</a>
+        </li>
+        <li>
+          <span>Junior ML Engineer</span>
+          <span>Hyderabad · ₹10–16 LPA</span>
+          <a href="#" class="roadmap-btn" onclick="openConsultation()">3-week roadmap</a>
+        </li>
+      </ul>
+      <p class="how-note">
+        Sample output. Your results depend on your profile.
+      </p>
+    </article>
+  </div>
+
+  <div class="how-cta">
+    <button>Try it with your profile</button>
+    <p>Free to try. Sign in with Google.</p>
+  </div>
+</section>
         <p class="section-desc">
             Rather than generic chatbot answers, We evaluate three mandatory candidate parameters together to calculate the ideal career match:
         </p>
 
-        <!-- Unified calibration sample: profile left, roles right -->
-        <div class="calibration-sample">
-            <div class="sample-card sample-profile">
-                <span class="sample-label">Example Candidate Profile</span>
+        
                 <div class="profile-chips">
                     <span class="chip">B.Tech CSE</span>
                     <span class="chip">2 years</span>
                     <span class="chip">Python · SQL · FastAPI</span>
                 </div>
-                <p class="sample-note">Calibrated to your exact degree, experience, and technical stack.</p>
+                
             </div>
 
-            <div class="sample-card sample-roles">
-                <span class="sample-label">Calibrated Role Matches</span>
-                <div class="role-list">
-                    <div class="role-item">
+            
+                
                         <strong class="role-title">Backend Developer</strong>
                         <span class="role-meta">Pune · ₹8–14 LPA</span>
                     </div>
@@ -488,24 +540,19 @@
             </svg>
         </button>
 
-        <!-- Three pillars: short & impactful -->
-        <div class="tri-pillars-text">
-            <div class="pillar-row">
-                <span class="pillar-num">1</span>
+        
                 <div>
                     <strong>Degree &amp; Education</strong>
                     <p>Establishes eligibility for specialized roles based on your degree discipline.</p>
                 </div>
             </div>
-            <div class="pillar-row">
-                <span class="pillar-num">2</span>
+            
                 <div>
                     <strong>Years of Experience</strong>
                     <p>Matches job seniority — from fresher to staff architect.</p>
                 </div>
             </div>
-            <div class="pillar-row">
-                <span class="pillar-num">3</span>
+            
                 <div>
                     <strong>Technical Skills</strong>
                     <p>Defines your target domain — eliminating guesswork.</p>
