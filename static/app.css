@@ -1340,7 +1340,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 24px;
-            margin: 32px 0 40px;
+            margin: 32px 0 24px;
             align-items: start;
         }
 
@@ -1395,10 +1395,11 @@
             line-height: 1.5;
         }
 
-        .sample-cta {
+        .sample-cta-full {
             width: 100%;
             justify-content: center;
             gap: 8px;
+            margin-top: 8px;
         }
 
         .role-list {
@@ -1434,25 +1435,6 @@
             font-size: 0.8rem;
         }
 
-        .btn-roadmap {
-            background: transparent;
-            border: 1px solid var(--border-subtle);
-            color: var(--text-secondary);
-            font-size: 0.78rem;
-            font-weight: 600;
-            padding: 6px 14px;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-        }
-
-        .btn-roadmap:hover {
-            border-color: var(--primary);
-            color: #ffffff;
-            background: rgba(31, 107, 255, 0.1);
-        }
-
         /* ===== THREE PILLARS COMPACT TEXT ===== */
         .tri-pillars-text {
             display: flex;
@@ -1485,6 +1467,11 @@
             font-size: 0.85rem;
             color: var(--text-secondary);
             line-height: 1.5;
+        }
+
+        /* Remove roadmap button styles (no longer used in how_it_works) */
+        .btn-roadmap {
+            display: none;
         }
 
         section[id] {

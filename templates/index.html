@@ -447,11 +447,10 @@
         <div class="section-eyebrow">Smart Career Calibration</div>
         <h3 class="section-title">The Three Pillars of Your Assessment</h3>
         <p class="section-desc">
-            Rather than generic chatbot answers, CareerBot evaluates three mandatory candidate parameters together to
-            calculate the ideal career match:
+            Rather than generic chatbot answers, We evaluate three mandatory candidate parameters together to calculate the ideal career match:
         </p>
 
-        <!-- Live-style sample output: profile on left, calibrated roles on right -->
+        <!-- Unified calibration sample: profile left, roles right -->
         <div class="calibration-sample">
             <div class="sample-card sample-profile">
                 <span class="sample-label">Example Candidate Profile</span>
@@ -461,12 +460,6 @@
                     <span class="chip">Python · SQL · FastAPI</span>
                 </div>
                 <p class="sample-note">Calibrated to your exact degree, experience, and technical stack.</p>
-                <button class="btn-primary-action sample-cta" type="button" onclick="openConsultation()">
-                    Try it with your profile
-                    <svg class="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true" style="margin-left:8px;">
-                        <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </button>
             </div>
 
             <div class="sample-card sample-roles">
@@ -475,43 +468,47 @@
                     <div class="role-item">
                         <strong class="role-title">Backend Developer</strong>
                         <span class="role-meta">Pune · ₹8–14 LPA</span>
-                        <button class="btn-roadmap" type="button" onclick="openConsultation()">3-Week Roadmap</button>
                     </div>
                     <div class="role-item">
                         <strong class="role-title">Data Analyst</strong>
                         <span class="role-meta">Bangalore · ₹6–10 LPA</span>
-                        <button class="btn-roadmap" type="button" onclick="openConsultation()">3-Week Roadmap</button>
                     </div>
                     <div class="role-item">
                         <strong class="role-title">Junior ML Engineer</strong>
                         <span class="role-meta">Hyderabad · ₹10–16 LPA</span>
-                        <button class="btn-roadmap" type="button" onclick="openConsultation()">3-Week Roadmap</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Three pillars as compact plain text -->
+        <button class="btn-primary-action sample-cta-full" type="button" onclick="openConsultation()">
+            Try it with your profile
+            <svg class="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true" style="margin-left:8px;">
+                <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
+
+        <!-- Three pillars: short & impactful -->
         <div class="tri-pillars-text">
             <div class="pillar-row">
                 <span class="pillar-num">1</span>
                 <div>
-                    <strong>Degree & Education</strong>
-                    <p>Evaluates your academic foundation, qualifications, and degree discipline (B.Tech, M.S., BCA, MCA, or cross-domain conversions) to establish eligibility for specialized roles.</p>
+                    <strong>Degree &amp; Education</strong>
+                    <p>Establishes eligibility for specialized roles based on your degree discipline.</p>
                 </div>
             </div>
             <div class="pillar-row">
                 <span class="pillar-num">2</span>
                 <div>
                     <strong>Years of Experience</strong>
-                    <p>Strictly matches job seniority. Freshers and students (0 yrs) receive entry-level and junior roles, while experienced candidates receive senior, lead, or staff architect positions.</p>
+                    <p>Matches job seniority — from fresher to staff architect.</p>
                 </div>
             </div>
             <div class="pillar-row">
                 <span class="pillar-num">3</span>
                 <div>
                     <strong>Technical Skills</strong>
-                    <p>Your technical competencies directly define your target domain and job categories (e.g. Python, SQL, React, PyTorch, Docker), eliminating guesswork.</p>
+                    <p>Defines your target domain — eliminating guesswork.</p>
                 </div>
             </div>
         </div>
@@ -523,11 +520,7 @@
         <div class="race-arena-container">
             <!-- Header Briefing -->
             <div class="race-arena-header">
-                <div class="race-live-tag">
-                    <span class="pulse-indicator"></span>
-                    <span>LIVE COMPETITIVE ARENA</span>
-                </div>
-                <h2 class="race-arena-title">The AI Speed Race</h2>
+                <h2 class="race-arena-title">Daily Contest</h2>
                 <p class="race-arena-copy">
                     A high-velocity benchmark built for architectural logic, prompt agility, and rapid code debugging.
                     Solve 15 precision challenges before the clock runs out and climb the live leaderboard.
