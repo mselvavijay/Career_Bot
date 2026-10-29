@@ -9,7 +9,16 @@ config = context.config
 if config.config_file_name:
     fileConfig(config.config_file_name)
 if os.getenv("DATABASE_URL"):
-    config.set_main_option("sqlalchemy.url", os.environ["DATABASE_URL"])
+    # Keep Alembic aligned with database.py: this project installs psycopg2,
+    # while a plain postgresql:// URL makes SQLAlchemy try psycopg (v3).
+    database_url = os.environ["DATABASE_URL"]
+    if database_url.startswith("postgres://"):
+        database_url = database_url.replace("postgres://", "postgresql+psycopg2://", 1)
+    elif database_url.startswith("postgresql://"):
+        database_url = database_url.replace("postgresql://", "postgresql+psycopg2://", 1)
+    elif database_url.startswith("postgresql+psycopg://"):
+        database_url = database_url.replace("postgresql+psycopg://", "postgresql+psycopg2://", 1)
+    config.set_main_option("sqlalchemy.url", database_url)
 target_metadata = Base.metadata
 
 def run_migrations_offline():
