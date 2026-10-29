@@ -618,7 +618,7 @@
             display: block;
             font-size: clamp(1.15rem, 2.2vw, 1.85rem);
             font-weight: 600;
-            color: #94a3b8;
+            color: var(--primary);
             letter-spacing: -0.025em;
             margin-top: 4px;
         }
@@ -757,11 +757,11 @@
             transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
         }
 
-        /* Badge 1: 5000+ Companies (Top Right) */
+        /* Badge 1: 100+ Companies (Top Right, outside avatar frame) */
         .badge-companies {
-            top: 4%;
+            top: -12px;
             right: -12px;
-            padding: 12px 18px;
+            padding: 10px 16px;
             animation: badge-float-top 5s ease-in-out infinite alternate;
         }
 
@@ -1767,7 +1767,7 @@
             .race-arena-container { padding: 24px 18px; }
             .race-actions-row { flex-direction: column; width: 100%; align-items: stretch; }
             .btn-race-start, .btn-race-standings { width: 100%; justify-content: center; }
-            .badge-companies { top: 2%; right: -6px; padding: 8px 12px; }
+            .badge-companies { top: -10px; right: -10px; padding: 8px 12px; }
             .badge-companies .badge-comp-number { font-size: 1.05rem; }
             .badge-reviews { bottom: 4%; left: -6px; padding: 8px 12px; }
         }
