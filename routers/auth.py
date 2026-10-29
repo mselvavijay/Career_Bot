@@ -41,7 +41,10 @@ async def google_auth(auth_req: schemas.GoogleAuthRequest, db: Session = Depends
         if res.status_code != 200:
             raise HTTPException(status_code=401, detail="Google sign-in could not be verified.")
         data = res.json()
-        if data.get("aud") != GOOGLE_CLIENT_ID or data.get("email_verified") != "true":
+        # Google's token-info endpoint has returned both the string "true" and
+        # a boolean true for this field across client/runtime combinations.
+        email_verified = data.get("email_verified")
+        if data.get("aud") != GOOGLE_CLIENT_ID or email_verified not in (True, "true"):
             raise HTTPException(status_code=401, detail="Google sign-in could not be verified.")
         google_id, email, name, picture = data.get("sub"), data.get("email"), data.get("name"), data.get("picture")
     except HTTPException:

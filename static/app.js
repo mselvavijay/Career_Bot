@@ -136,7 +136,10 @@
                 });
 
                 if (!res.ok) {
-                    throw new Error('Failed to authenticate with Google.');
+                    // Surface the server's safe, actionable reason rather than masking it
+                    // behind a generic browser message.
+                    const errorBody = await res.json().catch(() => ({}));
+                    throw new Error(errorBody.detail || `Google sign-in failed (HTTP ${res.status}).`);
                 }
 
                 const user = await res.json();
