@@ -4041,6 +4041,19 @@
         }
         .race-modal { max-width: 540px; }
         #race_modal_meta, .race-status { margin: 5px 0 0; color: var(--text-secondary); font-size: .82rem; }
+        .race-feature-list {
+            list-style: disc inside;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin: 16px 0 24px;
+            padding: 0;
+            text-align: left;
+        }
+        .race-feature-list li {
+            margin: 0 0 10px;
+            padding-left: 4px;
+        }
         .race-progress { display:flex; align-items:center; justify-content:space-between; margin:22px 0 9px; color:#dce5ff; font-size:.82rem; font-weight:700; }
         #race_timer { color:#fff; font-size:1.15rem; }
         .race-timer-track { height:6px; overflow:hidden; border-radius:99px; background:#202e4a; }

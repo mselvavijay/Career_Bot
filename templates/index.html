@@ -107,9 +107,9 @@
                         <div class="avatar-pedestal-glow" aria-hidden="true"></div>
                         
                         <div class="avatar-interactive-wrapper">
-                            <!-- Top-Right Floating Badge: 5000+ Companies -->
-                            <div class="avatar-badge-float badge-companies" onclick="openConsultation()" role="button" tabindex="0" aria-label="Explore 5000+ companies" style="cursor:pointer;">
-                                <div class="badge-comp-number">5000+</div>
+                            <!-- Top-Right Floating Badge: 100+ Companies -->
+                            <div class="avatar-badge-float badge-companies" onclick="openConsultation()" role="button" tabindex="0" aria-label="Explore 100+ companies" style="cursor:pointer;">
+                                <div class="badge-comp-number">100+</div>
                                 <div class="badge-comp-label">Companies</div>
                             </div>
 
@@ -121,7 +121,6 @@
                             <!-- Bottom-Left Floating Badge: Join Daily Contest (No placement claims) -->
                             <div class="avatar-badge-float badge-contest-cta" onclick="openRaceModal()" role="button" tabindex="0" title="Click to enter Daily Contest">
                                 <div class="badge-contest-header">
-                                    <span class="badge-live-pulse" aria-hidden="true"></span>
                                     <span class="badge-contest-title">Join Daily Contest</span>
                                 </div>
                                 <div class="badge-contest-meta">
@@ -129,7 +128,7 @@
                                 </div>
                                 <div class="badge-contest-footer">
                                     <span class="badge-trophy" aria-hidden="true">🏆</span>
-                                    <strong>#1 Daily Champion</strong>
+                                    <strong>Daily Champion</strong>
                                     <span class="badge-arrow" aria-hidden="true">→</span>
                                 </div>
                             </div>
@@ -716,7 +715,14 @@
     <div class="modal-overlay" id="race_modal_overlay" role="dialog" aria-modal="true" aria-labelledby="race_modal_title">
         <div class="auth-modal race-modal">
             <div class="modal-header"><div><h3 class="modal-title" id="race_modal_title">Join today&apos;s AI Race</h3><p id="race_modal_meta">15 questions · 15 seconds each · accuracy first</p></div><button class="btn-modal-close" onclick="closeRaceModal()" aria-label="Close">&times;</button></div>
-            <div id="race_intro"><ul class="premium-feature-list"><li>One verified attempt per day</li><li>Server-timed answers with 2-second grace</li><li>Champion card and certificate for #1</li></ul><button class="btn-primary-action" type="button" onclick="startRaceAttempt()">Continue to contest</button></div>
+            <div id="race_intro">
+                <ul class="race-feature-list">
+                    <li>One verified attempt per day</li>
+                    <li>Server-timed answers with 2-second grace</li>
+                    <li>Champion card and certificate for #1</li>
+                </ul>
+                <button class="btn-primary-action" type="button" onclick="startRaceAttempt()">Continue to contest</button>
+            </div>
             <div id="race_play" hidden><div class="race-progress"><span id="race_question_count">Question 1 of 15</span><strong id="race_timer">17</strong></div><div class="race-timer-track"><i id="race_timer_bar"></i></div><h4 id="race_question_text"></h4><div id="race_options" class="race-options"></div></div>
             <div id="race_complete" hidden><div class="race-complete-icon">✓</div><h4>Race complete</h4><p id="race_complete_text"></p><button class="btn-primary-action" type="button" onclick="showRaceLeaderboard()">View today&apos;s leaderboard</button></div>
             <p id="race_payment_status" class="race-status"></p>
