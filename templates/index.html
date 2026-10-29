@@ -443,125 +443,203 @@
     </section>
 
     <!-- Tri-Factor Architecture Section -->
-    <section class="features-section" id="how_it_works">
-        <section id="how_it_works" class="how">
-  <header class="how-head">
-        <h2>Three things decide your matches</h2>
-    <p>
-      We look at your degree, experience and skills together, so the roles fit you, not just a keyword.
-    </p>
-  </header>
+    <section id="how_it_works" class="how">
+        <header class="how-head">
+            <h2>Three things decide your matches</h2>
+            <p>
+                We look at your degree, experience and skills together, so the roles fit you, not just a keyword.
+            </p>
+        </header>
 
-  <div class="how-grid">
-    <article class="how-card how-input" aria-labelledby="how-in">
-      <h3 id="how-in">You tell us</h3>
-      <dl>
-        <div>
-          <dt>Degree</dt>
-          <dd>B.Tech CSE</dd>
-        </div>
-        <div>
-          <dt>Experience</dt>
-          <dd>2 years</dd>
-        </div>
-        <div>
-          <dt>Skills</dt>
-          <dd>Python · SQL · FastAPI</dd>
-        </div>
-      </dl>
-    </article>
-
-    <div class="how-arrow" aria-hidden="true">→</div>
-
-    <article class="how-card how-output" aria-labelledby="how-out">
-      <h3 id="how-out">You get</h3>
-      <ul>
-        <li>
-          <span>Backend Developer</span>
-          <span>Pune · ₹8–14 LPA</span>
-          <a href="#" class="roadmap-btn" onclick="openConsultation()">3-week roadmap</a>
-        </li>
-        <li>
-          <span>Data Analyst</span>
-          <span>Bangalore · ₹6–10 LPA</span>
-          <a href="#" class="roadmap-btn" onclick="openConsultation()">3-week roadmap</a>
-        </li>
-        <li>
-          <span>Junior ML Engineer</span>
-          <span>Hyderabad · ₹10–16 LPA</span>
-          <a href="#" class="roadmap-btn" onclick="openConsultation()">3-week roadmap</a>
-        </li>
-      </ul>
-      <p class="how-note">
-        Sample output. Your results depend on your profile.
-      </p>
-    </article>
-  </div>
-
-  <div class="how-cta">
-    <button>Try it with your profile</button>
-    <p>Free to try. Sign in with Google.</p>
-  </div>
-</section>
-        <p class="section-desc">
-            Rather than generic chatbot answers, We evaluate three mandatory candidate parameters together to calculate the ideal career match:
-        </p>
-
-        
-                <div class="profile-chips">
-                    <span class="chip">B.Tech CSE</span>
-                    <span class="chip">2 years</span>
-                    <span class="chip">Python · SQL · FastAPI</span>
-                </div>
-                
-            </div>
-
-            
-                
-                        <strong class="role-title">Backend Developer</strong>
-                        <span class="role-meta">Pune · ₹8–14 LPA</span>
+        <div class="how-grid">
+            <article class="how-card how-input" aria-labelledby="how-in">
+                <h3 id="how-in">You tell us</h3>
+                <dl>
+                    <div class="how-input-row">
+                        <div class="how-icon-tile" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                                <path d="M6 12v5c0 2 3 3 6 3s6-1 6-3v-5"/>
+                            </svg>
+                        </div>
+                        <div class="how-input-content">
+                            <dt>Degree</dt>
+                            <dd class="how-val">B.Tech CSE</dd>
+                            <dd class="how-reason">Sets which roles you are eligible for</dd>
+                        </div>
                     </div>
-                    <div class="role-item">
-                        <strong class="role-title">Data Analyst</strong>
-                        <span class="role-meta">Bangalore · ₹6–10 LPA</span>
+
+                    <div class="how-input-row">
+                        <div class="how-icon-tile" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                        </div>
+                        <div class="how-input-content">
+                            <dt>Experience</dt>
+                            <dd class="how-val">2 years</dd>
+                            <dd class="how-reason">Sets the seniority, from fresher to lead</dd>
+                        </div>
                     </div>
-                    <div class="role-item">
-                        <strong class="role-title">Junior ML Engineer</strong>
-                        <span class="role-meta">Hyderabad · ₹10–16 LPA</span>
+
+                    <div class="how-input-row">
+                        <div class="how-icon-tile" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="16 18 22 12 16 6"/>
+                                <polyline points="8 6 2 12 8 18"/>
+                            </svg>
+                        </div>
+                        <div class="how-input-content">
+                            <dt>Skills</dt>
+                            <dd class="how-val how-chips">
+                                <span class="how-chip">Python</span>
+                                <span class="how-chip">SQL</span>
+                                <span class="how-chip">FastAPI</span>
+                            </dd>
+                            <dd class="how-reason">Sets the domain, so you don't have to guess</dd>
+                        </div>
                     </div>
+                </dl>
+            </article>
+
+            <div class="how-arrow" aria-hidden="true">
+                <div class="how-arrow-badge">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
                 </div>
             </div>
+
+            <article class="how-card how-output" aria-labelledby="how-out">
+                <h3 id="how-out">You get</h3>
+
+                <p class="how-label">Job openings to explore</p>
+                <ul class="how-roles">
+                    <li>
+                        <button type="button" class="how-role-btn" onclick="sendQuickPrompt('Show me Backend Developer openings in Pune with a 3-week roadmap.')">
+                            <div class="how-icon-tile" aria-hidden="true">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="2" y="2" width="20" height="8" rx="2" ry="2"/>
+                                    <rect x="2" y="14" width="20" height="8" rx="2" ry="2"/>
+                                    <line x1="6" y1="6" x2="6.01" y2="6"/>
+                                    <line x1="6" y1="18" x2="6.01" y2="18"/>
+                                </svg>
+                            </div>
+                            <div class="how-role-info">
+                                <div class="how-role-header">
+                                    <span class="how-role-title">Backend Developer</span>
+                                    <span class="how-role-meta">Pune · ₹8–14 LPA</span>
+                                </div>
+                                <div class="how-role-chips">
+                                    <span class="how-chip">Python</span>
+                                    <span class="how-chip">FastAPI</span>
+                                </div>
+                            </div>
+                            <svg class="how-role-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <polyline points="9 18 15 12 9 6"/>
+                            </svg>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="how-role-btn" onclick="sendQuickPrompt('Show me Data Analyst openings in Bangalore with a 3-week roadmap.')">
+                            <div class="how-icon-tile" aria-hidden="true">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="18" y1="20" x2="18" y2="10"/>
+                                    <line x1="12" y1="20" x2="12" y2="4"/>
+                                    <line x1="6" y1="20" x2="6" y2="14"/>
+                                </svg>
+                            </div>
+                            <div class="how-role-info">
+                                <div class="how-role-header">
+                                    <span class="how-role-title">Data Analyst</span>
+                                    <span class="how-role-meta">Bangalore · ₹6–10 LPA</span>
+                                </div>
+                                <div class="how-role-chips">
+                                    <span class="how-chip">SQL</span>
+                                    <span class="how-chip">Python</span>
+                                </div>
+                            </div>
+                            <svg class="how-role-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <polyline points="9 18 15 12 9 6"/>
+                            </svg>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="how-role-btn" onclick="sendQuickPrompt('Show me Junior ML Engineer openings in Hyderabad with a 3-week roadmap.')">
+                            <div class="how-icon-tile" aria-hidden="true">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="4" y="4" width="16" height="16" rx="2"/>
+                                    <rect x="9" y="9" width="6" height="6"/>
+                                    <line x1="9" y1="1" x2="9" y2="4"/>
+                                    <line x1="15" y1="1" x2="15" y2="4"/>
+                                    <line x1="9" y1="20" x2="9" y2="23"/>
+                                    <line x1="15" y1="20" x2="15" y2="23"/>
+                                    <line x1="20" y1="9" x2="23" y2="9"/>
+                                    <line x1="20" y1="14" x2="23" y2="14"/>
+                                    <line x1="1" y1="9" x2="4" y2="9"/>
+                                    <line x1="1" y1="14" x2="4" y2="14"/>
+                                </svg>
+                            </div>
+                            <div class="how-role-info">
+                                <div class="how-role-header">
+                                    <span class="how-role-title">Junior ML Engineer</span>
+                                    <span class="how-role-meta">Hyderabad · ₹10–16 LPA</span>
+                                </div>
+                                <div class="how-role-chips">
+                                    <span class="how-chip">Python</span>
+                                </div>
+                            </div>
+                            <svg class="how-role-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <polyline points="9 18 15 12 9 6"/>
+                            </svg>
+                        </button>
+                    </li>
+                </ul>
+
+                <p class="how-label">Plus a free 3-week roadmap from us, to prepare for each role</p>
+                <ol class="how-roadmap">
+                    <li>
+                        <span class="how-step-dot">1</span>
+                        <div class="how-step-content">
+                            <span class="how-step-week">Week 1</span>
+                            <span class="how-step-desc">Fill your skill gaps</span>
+                        </div>
+                    </li>
+                    <li class="how-step-connector" aria-hidden="true"></li>
+                    <li>
+                        <span class="how-step-dot">2</span>
+                        <div class="how-step-content">
+                            <span class="how-step-week">Week 2</span>
+                            <span class="how-step-desc">Build a project</span>
+                        </div>
+                    </li>
+                    <li class="how-step-connector" aria-hidden="true"></li>
+                    <li>
+                        <span class="how-step-dot">3</span>
+                        <div class="how-step-content">
+                            <span class="how-step-week">Week 3</span>
+                            <span class="how-step-desc">Practise interviews</span>
+                        </div>
+                    </li>
+                </ol>
+
+                <p class="how-note">
+                    Sample output. Your results depend on your profile.
+                </p>
+            </article>
         </div>
 
-        <button class="btn-primary-action sample-cta-full" type="button" onclick="openConsultation()">
-            Try it with your profile
-            <svg class="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true" style="margin-left:8px;">
-                <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-        </button>
-
-        
-                <div>
-                    <strong>Degree &amp; Education</strong>
-                    <p>Establishes eligibility for specialized roles based on your degree discipline.</p>
-                </div>
-            </div>
-            
-                <div>
-                    <strong>Years of Experience</strong>
-                    <p>Matches job seniority — from fresher to staff architect.</p>
-                </div>
-            </div>
-            
-                <div>
-                    <strong>Technical Skills</strong>
-                    <p>Defines your target domain — eliminating guesswork.</p>
-                </div>
-            </div>
+        <div class="how-cta">
+            <button class="btn-primary-hero" onclick="openConsultation()" aria-label="Try it with your profile">
+                <span>Try it with your profile</span>
+                <svg class="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+            <p>Free to try. Sign in with Google.</p>
         </div>
     </section>
-
-
 
     <section class="ai-race-section" id="ai_race" aria-label="AI Race Arena">
         <div class="race-arena-container">

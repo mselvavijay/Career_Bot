@@ -1302,178 +1302,339 @@
             font-weight: 600;
         }
 
-        /* ===== FEATURES TRI-FACTOR GRID ===== */
-        .features-section {
-            max-width: 1200px;
-            margin: 64px auto;
-            padding: 0 24px;
-            text-align: center;
+        /* ===== HOW IT WORKS SECTION ===== */
+        #how_it_works.how {
+            min-height: 0;
+            display: block;
+            padding: 96px 24px;
+            max-width: 1080px;
+            margin: 0 auto;
+            text-align: left;
+            scroll-snap-align: none;
+            scroll-margin-top: var(--header-height);
         }
 
-        .section-eyebrow {
-            font-size: 0.76rem;
-            font-weight: 700;
-            color: var(--accent);
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            margin-bottom: 8px;
+        .how-head {
+            margin-bottom: 40px;
+            text-align: left;
         }
 
-        .section-title {
-            font-size: 2.2rem;
+        .how-head h2 {
+            font-size: 2rem;
             font-weight: 800;
             letter-spacing: -0.02em;
             color: #ffffff;
-            margin-bottom: 14px;
+            margin: 0 0 12px;
         }
 
-        .section-desc {
+        .how-head p {
             font-size: 0.95rem;
             color: var(--text-secondary);
-            max-width: 600px;
-            margin: 0 auto 40px;
+            max-width: 56ch;
+            margin: 0;
             line-height: 1.6;
         }
 
-        /* ===== CALIBRATION SAMPLE OUTPUT ===== */
-        .calibration-sample {
+        .how-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 5fr auto 7fr;
             gap: 24px;
-            margin: 32px 0 24px;
-            align-items: start;
+            align-items: stretch;
         }
 
-        .sample-card {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-lg);
+        .how-card {
             padding: 24px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .sample-card.sample-profile {
-            border-left: 3px solid var(--primary);
-        }
-
-        .sample-card.sample-roles {
-            border-left: 3px solid var(--accent);
-        }
-
-        .sample-label {
-            display: block;
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--text-muted);
-            margin-bottom: 14px;
-        }
-
-        .profile-chips {
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            background: var(--bg-surface);
             display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin: 12px 0 16px;
+            flex-direction: column;
         }
 
-        .chip {
-            background: rgba(31, 107, 255, 0.12);
-            border: 1px solid rgba(31, 107, 255, 0.35);
+        .how-card.how-output {
+            border-top: 2px solid var(--primary);
+        }
+
+        .how-card h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
             color: #ffffff;
-            font-size: 0.78rem;
-            padding: 6px 12px;
-            border-radius: 99px;
-            font-weight: 600;
+            margin: 0 0 16px;
         }
 
-        .sample-note {
-            font-size: 0.85rem;
+        /* ── Left Card: You tell us ── */
+        .how-input dl {
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+            padding: 0;
+            gap: 16px;
+            flex: 1;
+            justify-content: space-between;
+        }
+
+        .how-input-row {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .how-input-row:last-child {
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .how-icon-tile {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            color: var(--accent);
+        }
+
+        .how-icon-tile svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .how-input-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+        }
+
+        .how-input-content dt {
+            font-size: 13px;
+            font-weight: 500;
             color: var(--text-secondary);
-            margin: 0 0 20px;
-            line-height: 1.5;
+            margin: 0;
         }
 
-        .sample-cta-full {
-            width: 100%;
-            justify-content: center;
+        .how-input-content dd.how-val {
+            font-size: 20px;
+            font-weight: 600;
+            color: #ffffff;
+            margin: 0;
+        }
+
+        .how-input-content dd.how-reason {
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        /* ── Chips ── */
+        .how-chips,
+        .how-role-chips {
+            display: flex;
+            flex-wrap: wrap;
             gap: 8px;
-            margin-top: 8px;
         }
 
-        .role-list {
+        .how-chip {
+            display: inline-flex;
+            align-items: center;
+            font-size: 13px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-card);
+            color: #e2e8f0;
+            line-height: 1.4;
+        }
+
+        /* ── Arrow Badge ── */
+        .how-arrow {
+            grid-column: 2;
+            align-self: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
+        }
+
+        .how-arrow-badge {
+            width: 44px;
+            height: 44px;
+            border-radius: 999px;
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-card);
+            display: grid;
+            place-items: center;
+            color: var(--accent);
+        }
+
+        /* ── Right Card: You get ── */
+        .how-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+            margin: 16px 0 12px;
+        }
+
+        .how-label:first-of-type {
+            margin-top: 0;
+        }
+
+        .how-roles {
+            list-style: none;
+            padding: 0;
+            margin: 0;
             display: flex;
             flex-direction: column;
             gap: 12px;
         }
 
-        .role-item {
+        .how-role-btn {
+            width: 100%;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-md);
+            gap: 16px;
             padding: 12px 16px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            background: var(--bg-card);
+            color: inherit;
+            cursor: pointer;
+            text-align: left;
+            transition: border-color 0.15s ease;
         }
 
-        .role-item div {
+        .how-role-btn:hover {
+            border-color: var(--primary);
+        }
+
+        .how-role-btn:focus-visible {
+            outline: 2px solid #4c8dff;
+            outline-offset: 2px;
+            border-color: var(--primary);
+        }
+
+        .how-role-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .how-role-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .how-role-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .how-role-meta {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .how-role-chevron {
+            color: var(--text-secondary);
+            flex-shrink: 0;
+            transition: color 0.15s ease;
+        }
+
+        .how-role-btn:hover .how-role-chevron {
+            color: var(--accent);
+        }
+
+        /* ── Horizontal 3-Step Roadmap Strip ── */
+        .how-roadmap {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .how-roadmap > li:not(.how-step-connector) {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            flex: 1;
+            gap: 8px;
+        }
+
+        .how-step-dot {
+            width: 28px;
+            height: 28px;
+            border-radius: 999px;
+            background: var(--primary);
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 700;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+        }
+
+        .how-step-content {
             display: flex;
             flex-direction: column;
             gap: 4px;
         }
 
-        .role-title {
+        .how-step-week {
+            font-size: 13px;
+            font-weight: 600;
             color: #ffffff;
-            font-size: 0.95rem;
-            font-weight: 700;
         }
 
-        .role-meta {
+        .how-step-desc {
+            font-size: 14px;
             color: var(--text-secondary);
-            font-size: 0.8rem;
+            line-height: 1.4;
         }
 
-        /* ===== THREE PILLARS COMPACT TEXT ===== */
-        .tri-pillars-text {
+        .how-step-connector {
+            flex: 1;
+            height: 2px;
+            background: var(--border-subtle);
+            margin-top: 13px;
+        }
+
+        .how-note {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin: 16px 0 0;
+        }
+
+        /* ── Section CTA (Button styling inherited from .btn-primary-hero) ── */
+        .how-cta {
+            margin-top: 40px;
+            text-align: center;
             display: flex;
             flex-direction: column;
-            gap: 16px;
-            margin-top: 8px;
+            align-items: center;
         }
 
-        .pillar-row {
-            display: flex;
-            gap: 14px;
-            align-items: flex-start;
-        }
-
-        .pillar-num {
-            width: 28px;
-            height: 28px;
-            flex-shrink: 0;
-            background: var(--primary);
-            color: #ffffff;
-            font-weight: 800;
-            font-size: 0.9rem;
-            display: grid;
-            place-items: center;
-            border-radius: var(--radius-sm);
-        }
-
-        .pillar-row > div p {
-            margin: 4px 0 0;
-            font-size: 0.85rem;
+        .how-cta p {
+            font-size: 13px;
             color: var(--text-secondary);
-            line-height: 1.5;
+            margin: 8px 0 0;
+            text-align: center;
         }
 
-        /* Remove roadmap button styles (no longer used in how_it_works) */
-        .btn-roadmap {
-            display: none;
-        }
-
+        /* Global Section Snap Settings */
         section[id] {
             scroll-margin-top: calc(var(--header-height) + 24px);
             scroll-snap-align: start;
@@ -1483,7 +1644,6 @@
             scroll-snap-type: y proximity;
         }
 
-        #how_it_works,
         #ai_race,
         #about_section {
             min-height: calc(100dvh - var(--header-height));
@@ -1492,6 +1652,65 @@
             justify-content: center;
         }
 
+        /* ── Responsive Breakpoints ── */
+        @media (max-width: 768px) {
+            .how-head {
+                text-align: center;
+            }
+
+            .how-head p {
+                margin: 0 auto;
+            }
+
+            .how-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+
+            .how-arrow {
+                grid-column: 1;
+                justify-self: center;
+                transform: rotate(90deg);
+                margin: 0;
+            }
+
+            .how-role-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+
+            .how-roadmap {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0;
+            }
+
+            .how-roadmap > li:not(.how-step-connector) {
+                flex-direction: row;
+                align-items: flex-start;
+                text-align: left;
+                gap: 16px;
+                padding: 8px 0;
+            }
+
+            .how-step-connector {
+                width: 2px;
+                height: 24px;
+                flex: none;
+                margin: 0 0 0 13px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            #how_it_works.how {
+                padding: 64px 16px;
+            }
+
+            .how-input-content dd.how-val {
+                font-size: 18px;
+            }
+        }
 
         /* ===== AI RACE ARENA REDESIGN (Strict Electric Blue Theme) ===== */
         .ai-race-section {
@@ -2630,8 +2849,7 @@
             margin-top: 4px;
         }
 
-        /* REMOVE original placeholder ─────────────────────────────── */
-        ._REMOVED_DAILY_LIMIT_BANNER
+        
 
         
 
