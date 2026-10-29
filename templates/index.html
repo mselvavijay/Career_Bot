@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-<link rel="stylesheet" href="/static/app.css?v=20261026-race-ui">
+<link rel="stylesheet" href="/static/app.css?v=20261029-job-pagination">
     <link rel="icon" type="image/png" href="/static/favicon.ico">
     <link rel="shortcut icon" type="image/png" href="/static/favicon.ico">
 </head>
@@ -35,7 +35,7 @@
         </nav>
 
         <div class="header-actions">
-            <button class="btn-hero-cta" onclick="openPremiumModal()"><span>Start Prep</span><svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" /></svg></button>
+            
             <div class="auth-widget" id="auth_widget">
                 <button class="btn-google-auth" id="btn_login_trigger" onclick="openAuthModal()" aria-label="Sign in">
                     <svg class="icon" style="width:16px;height:16px;" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
@@ -58,19 +58,187 @@
     <!-- Mobile Navigation Drawer Overlay -->
     <div class="site-nav-drawer-overlay" id="site_nav_drawer_overlay" onclick="closeSiteMobileNav()" aria-hidden="true"></div>
 
-    <!-- Hero Section with Immediate Live Advisory Console -->
-    <section class="hero-section" id="app_workspace">
-        <h2 class="hero-title">
-            Architect Your <span class="text-gradient-purple">Career Leap</span> with <span class="text-gradient">Next-Gen AI Intelligence</span>
-        </h2>
+    <!-- ═══════════════════════════════════════════════════════════
+         AWSMD-INSPIRED HERO SECTION — HireKrkeDekho
+         Theme: Strict Brand Electric & Navy Blue (#1F6BFF / #4C8DFF)
+         3D Avatar Stage: Levitating Candidates + Floating Glass Badges
+    ═══════════════════════════════════════════════════════════════ -->
+    <section class="hero-section" id="app_workspace" aria-label="Hero">
 
-        <p class="hero-subtitle">
-            Calibrated strictly by your <strong>Years of Experience</strong>, <strong>Core Technical Skills</strong>,
-            and <strong>Degree</strong>. Discover many curated tech opportunities across India with structured 3-week
-            preparation guides.
-        </p>
+        <!-- Subtle Tech Mesh & Ambient Blue Glows -->
+        <div class="hero-ambient-mesh" aria-hidden="true">
+            <div class="hero-blue-glow hero-glow-center"></div>
+            <div class="hero-blue-glow hero-glow-left"></div>
+            <div class="hero-blue-glow hero-glow-right"></div>
+            <div class="hero-grid-pattern"></div>
+        </div>
 
-        <!-- Live Interactive Advisory Workspace (Immediately visible to user) -->
+        <div class="hero-content-wrap">
+            <!-- Above-The-Fold Balanced Split Stage (CTA Button & Avatars simultaneously visible) -->
+            <div class="hero-stage-split">
+                <!-- Left: Headline, Shortened Copy & CTA -->
+                <div class="hero-text-col">
+                    <h1 class="hero-title" id="hero_main_title">
+                        <span class="hero-title-line">Architect Your</span>
+                        <span class="hero-title-line">
+                            <span class="text-gradient-blue">Career Leap</span>
+                            <span class="hero-title-accent">With AI</span>
+                        </span>
+                        <span class="hero-title-subline">Calibrated to Your Exact Tech Stack</span>
+                    </h1>
+
+                    <p class="hero-subtitle">
+                        The only talent discovery engine calibrated to your degree, experience, and technical skills. Get instant AI guidance, a 3-week roadmap, and daily challenges.
+                    </p>
+
+                    <div class="hero-cta-group">
+                        <button class="btn-primary-hero" onclick="openConsultation()" aria-label="Start Free AI Consultation">
+                            <span>Start Free AI Consultation</span>
+                            <svg class="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right: 3D Team Avatar Stage with Floating Badges -->
+                <div class="hero-avatar-col">
+                    <div class="hero-avatar-showcase" aria-label="Tech Community & Opportunities">
+                        <div class="avatar-pedestal-glow" aria-hidden="true"></div>
+                        
+                        <div class="avatar-interactive-wrapper">
+                            <!-- Top-Right Floating Badge: 5000+ Companies -->
+                            <div class="avatar-badge-float badge-companies" onclick="openConsultation()" role="button" tabindex="0" aria-label="Explore 5000+ companies" style="cursor:pointer;">
+                                <div class="badge-comp-number">5000+</div>
+                                <div class="badge-comp-label">Companies</div>
+                            </div>
+
+                            <!-- 3D Team Avatar Centerpiece -->
+                            <div class="avatar-3d-bobbing">
+                                <img src="/static/hirekrkedekho-hero-3d-clean.png" alt="HireKrkeDekho Tech Candidate Community" class="hero-3d-avatar-img" width="1040" height="690" loading="eager">
+                            </div>
+
+                            <!-- Bottom-Left Floating Badge: Join Daily Contest (No placement claims) -->
+                            <div class="avatar-badge-float badge-contest-cta" onclick="openRaceModal()" role="button" tabindex="0" title="Click to enter Daily Contest">
+                                <div class="badge-contest-header">
+                                    <span class="badge-live-pulse" aria-hidden="true"></span>
+                                    <span class="badge-contest-title">Join Daily Contest</span>
+                                </div>
+                                <div class="badge-contest-meta">
+                                    <span>15 Questions · 15s Round</span>
+                                </div>
+                                <div class="badge-contest-footer">
+                                    <span class="badge-trophy" aria-hidden="true">🏆</span>
+                                    <strong>#1 Daily Champion</strong>
+                                    <span class="badge-arrow" aria-hidden="true">→</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. Interactive 3 Services Grid -->
+            <div class="hero-services-grid" aria-label="HireKrkeDekho Core Services">
+
+                <!-- Service 1: Find jobs by AI consultation -->
+                <div class="service-card" onclick="openConsultation()" role="button" tabindex="0" aria-label="Find jobs by AI consultation">
+                    <div class="service-card-top">
+                        <div class="service-icon-box">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                            </svg>
+                        </div>
+                        <span class="service-tag">Live Guidance</span>
+                        <div class="service-arrow" aria-hidden="true">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </div>
+                    </div>
+                    <h3 class="service-card-title">Find Jobs by AI Consultation</h3>
+                    <p class="service-card-desc">
+                        Direct 1-on-1 dialogue with our career intelligence model. Uncover hidden openings in India matched to your exact stack and salary bracket.
+                    </p>
+                    <div class="service-card-footer">
+                        <span class="service-action-label">Launch Advisor</span>
+                        <span class="service-indicator-line"></span>
+                    </div>
+                </div>
+
+                <!-- Service 2: 3-Week Roadmap -->
+                <div class="service-card service-card-featured" onclick="openPremiumModal()" role="button" tabindex="0" aria-label="3-Week Roadmap">
+                    <div class="service-card-top">
+                        <div class="service-icon-box">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                <line x1="16" y1="2" x2="16" y2="6"/>
+                                <line x1="8" y1="2" x2="8" y2="6"/>
+                                <line x1="3" y1="10" x2="21" y2="10"/>
+                                <path d="m9 16 2 2 4-4"/>
+                            </svg>
+                        </div>
+                        <span class="service-tag service-tag-featured">Structured Prep</span>
+                        <div class="service-arrow" aria-hidden="true">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </div>
+                    </div>
+                    <h3 class="service-card-title">3-Week Action Roadmap</h3>
+                    <p class="service-card-desc">
+                        Laser-focused weekly milestones and role-specific preparation roadmaps with bullet-point execution plans to crack technical rounds.
+                    </p>
+                    <div class="service-card-footer">
+                        <span class="service-action-label">View Milestones</span>
+                        <span class="service-indicator-line"></span>
+                    </div>
+                </div>
+
+                <!-- Service 3: Daily Ranked Contest -->
+                <div class="service-card" onclick="openRaceModal()" role="button" tabindex="0" aria-label="Daily Ranked Contest">
+                    <div class="service-card-top">
+                        <div class="service-icon-box">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                            </svg>
+                        </div>
+                        <span class="service-tag">Ranked AI Race</span>
+                        <div class="service-arrow" aria-hidden="true">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </div>
+                    </div>
+                    <h3 class="service-card-title">Daily Ranked Contest</h3>
+                    <p class="service-card-desc">
+                        15 rapid-fire questions, 15 seconds each. Prove your engineering sharpness on the live leaderboard and claim the Daily Champion Card.
+                    </p>
+                    <div class="service-card-footer">
+                        <span class="service-action-label">Enter Today&apos;s Race</span>
+                        <span class="service-indicator-line"></span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 6. Trust & Metrics Telemetry Bar -->
+            <div class="hero-telemetry-strip" aria-label="Platform telemetry">
+                <div class="telemetry-stat-item">
+                    <span class="stat-bullet"></span>
+                    <strong class="stat-highlight">100% Calibrated</strong>
+                    <span class="stat-detail">Degree + Experience + Skills</span>
+                </div>
+                <div class="telemetry-stat-sep" aria-hidden="true">/</div>
+                <div class="telemetry-stat-item">
+                    <span class="stat-bullet"></span>
+                    <strong class="stat-highlight">3-Week Guides</strong>
+                    <span class="stat-detail">Role-Specific Bullet Action</span>
+                </div>
+                <div class="telemetry-stat-sep" aria-hidden="true">/</div>
+                <div class="telemetry-stat-item">
+                    <span class="stat-bullet"></span>
+                    <strong class="stat-highlight">Daily AI Race</strong>
+                    <span class="stat-detail">Live Accuracy-First Leaderboard</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Interactive Advisory Workspace (Preserved for full-screen consultation) -->
         <div class="showcase-container-outer consultation-shell" aria-hidden="true">
             <button class="consultation-close" type="button" onclick="closeConsultation()" aria-label="Close consultation">&times;</button>
             <!-- Left Telemetry Badge -->
@@ -273,32 +441,6 @@
             </div>
         </div>
 
-        <div class="hero-cta-group" style="margin-top: 32px;">
-            <button class="btn-primary-hero" onclick="openConsultation()">
-                <span>Start Free Consultation</span>
-                <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-            </button>
-            <button class="btn-secondary-hero btn-hero-prep" onclick="openPremiumModal()">
-                <span>Start Prep</span>
-                <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-            </button>
-        </div>
-
-        <!-- Metric Cards Row -->
-        <div class="stats-grid" style="margin-top: 10px;">
-            <div class="stat-card">
-                <div class="stat-value">Open Jobs</div>
-                <div class="stat-label">Calibrated to Experience &amp; Degree in India</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">3-Week Roadmaps</div>
-                <div class="stat-label">Actionable prep bullet points for each role</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">Daily Contest</div>
-                <div class="stat-label">#1 Winner Takes It All</div>
-            </div>
-        </div>
     </section>
 
     <!-- Tri-Factor Architecture Section -->
@@ -356,63 +498,179 @@
 
 
 
-    <section class="ai-race-section" id="ai_race">
-        <div class="race-panel">
-            <div>
-                <div class="race-kicker"><span class="pulse-indicator"></span> Daily Live Contest</div>
-                <h2 class="race-title">AI Race</h2>
-                <p class="race-copy">A rapid-fire coding room built for speed, logic, and sharp AI prompting. Solve concise code traps before the clock runs out and climb the daily leaderboard.</p>
-                <div class="race-highlight"><span>DAILY CONTEST &bull; <span id="race_contest_date">Today</span></span><strong>#1 WINNER TAKES IT ALL</strong></div>
-                <div class="race-actions"><button class="btn-primary-hero" type="button" onclick="openRaceModal()">Join contest <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" /></svg></button><button class="btn-secondary-hero btn-race-invite" type="button" onclick="showRaceLeaderboard()">Leaderboard</button><span class="race-note" id="race_seat_status">Sign in to join today&apos;s race</span></div>
-                <section class="race-result-card" aria-label="AI Race daily contest final result">
-                    <div class="race-result-header">
-                        <div><span class="race-result-brand">HireKrkeDekho</span><span class="race-result-meta">AI Race &middot; Daily Contest Result</span></div>
-                        <span class="race-result-date" id="race_result_date">Contest date</span>
+    <section class="ai-race-section" id="ai_race" aria-label="AI Race Arena">
+        <div class="race-arena-container">
+            <!-- Header Briefing -->
+            <div class="race-arena-header">
+                <div class="race-live-tag">
+                    <span class="pulse-indicator"></span>
+                    <span>LIVE COMPETITIVE ARENA</span>
+                </div>
+                <h2 class="race-arena-title">The AI Speed Race</h2>
+                <p class="race-arena-copy">
+                    A high-velocity benchmark built for architectural logic, prompt agility, and rapid code debugging.
+                    Solve 15 precision challenges before the clock runs out and climb the live leaderboard.
+                </p>
+                
+                <div class="race-spec-row">
+                    <div class="race-spec-pill">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <span>15s Per Question</span>
                     </div>
-                    <div class="race-result-title">Daily Contest Winner</div>
-                    <div class="race-result-main"><div class="race-result-rank">#1</div><div><h3 id="race_result_winner">Winner announced after the race</h3><p>First place takes it all.</p></div></div>
-                    <div class="race-result-stats"><span>Total contest time <strong id="race_result_time">&mdash;</strong></span><span>Total score <strong id="race_result_score">&mdash;</strong></span></div>
-                    <p class="race-result-footer">Speed. Logic. Sharp prompting.</p>
-                </section>
+                    <div class="race-spec-pill">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        <span>Single Verified Attempt</span>
+                    </div>
+                    <div class="race-spec-pill">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        <span>Accuracy-First Scoring</span>
+                    </div>
+                </div>
+
+                <div class="race-actions-row">
+                    <button class="btn-primary-hero btn-race-start" type="button" onclick="openRaceModal()" aria-label="Enter AI Race">
+                        <span>Enter Race</span>
+                        <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                    <button class="btn-secondary-hero btn-race-standings" type="button" onclick="showRaceLeaderboard()" aria-label="View Leaderboard">
+                        <span>View Standings</span>
+                    </button>
+                    <span class="race-seat-label" id="race_seat_status"></span>
+                    <span id="race_contest_date" hidden>Today</span>
+                </div>
             </div>
-            <aside class="race-rules">
-                <h3>Race Rules</h3>
-                <ol>
-                    <li>Each challenge gives you 15&ndash;30 seconds to choose one correct answer.</li>
-                    <li>Snippets are short but include traps: precedence, edge cases, and off-by-one logic.</li>
-                    <li>Exactly one option is correct; review any AI output before you lock it in.</li>
-                    <li>Rankings reward accuracy first, then the fastest total completion time.</li>
-                </ol>
-                <span class="race-rule-tag">Prize rule: #1 winner takes it all</span>
-            </aside>
+
+            <!-- Two-Column Grid: Champion Spotlight & Arena Rules -->
+            <div class="race-arena-grid">
+                <!-- 1. Champion Podium Card -->
+                <div class="champion-spotlight-card" aria-label="Leaderboard Champion">
+                    <div class="champion-card-glow" aria-hidden="true"></div>
+                    <div class="champion-card-top">
+                        <div class="champion-badge-pill">
+                            <span class="champ-crown">👑</span>
+                            <span>CURRENT #1 PODIUM</span>
+                        </div>
+                        <span class="champion-date-tag" id="race_result_date">Contest Date</span>
+                    </div>
+                    
+                    <div class="champion-main-info">
+                        <div class="champion-avatar-box">#1</div>
+                        <div class="champion-details">
+                            <h3 class="champion-name" id="race_result_winner">Awaiting Today's Winner</h3>
+                            <p class="champion-subtext">First place claims verified recognition and championship badge.</p>
+                        </div>
+                    </div>
+
+                    <div class="champion-stats-grid">
+                        <div class="champ-stat-box">
+                            <span class="champ-stat-lbl">Score</span>
+                            <strong class="champ-stat-val" id="race_result_score">&mdash;</strong>
+                        </div>
+                        <div class="champ-stat-divider"></div>
+                        <div class="champ-stat-box">
+                            <span class="champ-stat-lbl">Total Time</span>
+                            <strong class="champ-stat-val" id="race_result_time">&mdash;</strong>
+                        </div>
+                    </div>
+
+                    <div class="champion-card-footer">
+                        <span class="champ-footer-note">Ranked strictly by verified score, total completion time, then earliest submission.</span>
+                    </div>
+                </div>
+
+                <!-- 2. Arena Rules -->
+                <div class="arena-rules-card" aria-label="Arena Rules">
+                    <h3 class="rules-card-title">Tournament Rules</h3>
+                    <ul class="arena-rules-list">
+                        <li>
+                            <span class="rule-index">01</span>
+                            <div class="rule-body">
+                                <strong>Speed &amp; Precision</strong>
+                                <p>15 seconds per question with a strict 2-second grace period. Once the timer expires, the round auto-submits.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="rule-index">02</span>
+                            <div class="rule-body">
+                                <strong>Algorithmic Traps</strong>
+                                <p>Short snippets containing precedence quirks, off-by-one bounds, and edge cases. Scrutinize before selecting.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="rule-index">03</span>
+                            <div class="rule-body">
+                                <strong>Fair-Play Verification</strong>
+                                <p>Exactly one verified attempt per day per Google account. No resets or second chances.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="rule-index">04</span>
+                            <div class="rule-body">
+                                <strong>Podium Recognition</strong>
+                                <p>First place takes the Champion Card and verified credentials visible across HireKrkeDekho.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </section>
-    <!-- About Section: Application Use Case & The AI Race -->
-    <section class="about-section" id="about_section">
+    <!-- About Section: Architectural Manifesto & AI Era Career Strategy -->
+    <section class="about-section" id="about_section" aria-label="About HireKrkeDekho">
         <div class="about-container">
+
             <h2 class="about-heading">
-                Redefining Tech Careers in the <span class="text-gradient">Age of the AI Race</span>
+                Redefining Tech Careers in the <span class="text-gradient-blue">Age of the AI Race</span>
             </h2>
+            <p class="about-subtitle">
+                Traditional job boards are noisy, generic, and resume-cluttered. HireKrkeDekho replaces guesswork with precision calibration, structured execution, and competitive benchmarking.
+            </p>
+
             <div class="about-content-grid">
+                <!-- Card 1: Tri-Factor Discovery -->
                 <div class="about-card">
                     <div class="about-icon-box">
-                        <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 14.93V17a1 1 0 0 1-2 0v-.07A7.003 7.003 0 0 1 5.07 11H5a1 1 0 0 1 0-2h.07A7.003 7.003 0 0 1 11 5.07V5a1 1 0 0 1 2 0v.07A7.003 7.003 0 0 1 18.93 11H19a1 1 0 0 1 0 2h-.07A7.003 7.003 0 0 1 13 16.93zM12 8a4 4 0 1 0 4 4 4 4 0 0 0-4-4z"/></svg>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+                        </svg>
                     </div>
-                    <h3>Precision Discovery Engine</h3>
+                    <span class="about-card-badge">Calibration Engine</span>
+                    <h3>Tri-Factor Precision</h3>
                     <p>
-                        <strong>HireKrkeDekho</strong> was engineered to cut through generic job boards and fragmented listings.
-                        By pairing a candidateâ€™s exact degree, verified years of experience, and real technical proficiencies, our tri-factor matching engine pinpoints high-conviction tech openings across Tier-1 tech hubs in India (Bangalore, Hyderabad, Pune, and Delhi NCR) without resume fluff or noise.
+                        Engineered to eliminate resume noise. By indexing your verified degree, actual years of experience, and real technical proficiencies, our algorithm pinpoints high-conviction opportunities across Tier-1 hubs (Bangalore, Hyderabad, Pune, and Delhi NCR).
                     </p>
                 </div>
-                <div class="about-card">
-                    <div class="about-icon-box cyan">
-                        <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M13 2.05v3.03c3.39.49 6 3.39 6 6.92 0 .9-.18 1.75-.48 2.54l2.6 1.53c.56-1.24.88-2.62.88-4.07 0-5.18-3.95-9.45-9-9.95zM12 19c-3.87 0-7-3.13-7-7 0-3.53 2.61-6.43 6-6.92V2.05c-5.05.5-9 4.77-9 9.95 0 5.52 4.47 10 9.99 10 3.31 0 6.24-1.61 8.04-4.09l-2.48-1.46C15.44 18.04 13.84 19 12 19z"/></svg>
+
+                <!-- Card 2: 3-Week Roadmaps -->
+                <div class="about-card about-card-highlight">
+                    <div class="about-icon-box">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                            <line x1="16" y1="2" x2="16" y2="6"/>
+                            <line x1="8" y1="2" x2="8" y2="6"/>
+                            <line x1="3" y1="10" x2="21" y2="10"/>
+                            <path d="M8 14h4M8 18h6"/>
+                        </svg>
                     </div>
-                    <h3>Surviving &amp; Winning the AI Race</h3>
+                    <span class="about-card-badge">Structured Execution</span>
+                    <h3>3-Week Action Roadmaps</h3>
                     <p>
-                        As foundational models transform modern engineering workflows, the hiring paradigm has irreversibly shifted.
-                        It is no longer about rote syntax memorizationâ€”it is about architectural reasoning, prompt velocity, and rapid debugging.
-                        With tailored 3-week sprint roadmaps and daily <strong>AI Race live contests</strong>, we equip candidates to stay ahead of automated displacement and dominate high-leverage technical evaluations.
+                        No fluff or encyclopedic roadmaps. We distill role requirements into razor-sharp, actionable weekly sprint milestones with bullet-point preparation targets to help candidates dominate technical and architectural rounds.
+                    </p>
+                </div>
+
+                <!-- Card 3: AI Speed Race -->
+                <div class="about-card">
+                    <div class="about-icon-box">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                        </svg>
+                    </div>
+                    <span class="about-card-badge">Competitive Arena</span>
+                    <h3>Daily AI Race Benchmark</h3>
+                    <p>
+                        Hiring has transformed. Syntax memorization is obsolete; prompt velocity, architectural reasoning, and rapid edge-case debugging dictate value. Our daily tournament benchmarks your speed against top talent in real-time.
                     </p>
                 </div>
             </div>
@@ -425,7 +683,7 @@
             <div class="footer-brand-wrap">
                 <p class="footer-copyright">&copy; 2026 HireKrkeDekho &bull; Intelligent Talent &amp; Career Discovery</p>
                 <p style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">
-                    <a href="javascript:void(0)" onclick="openPrivacyModal()" style="color:var(--text-secondary); text-decoration:underline;">Privacy Policy (30-Day Chat Retention)</a>
+                    <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" style="color:var(--text-secondary); text-decoration:underline;">Privacy Policy</a>
                 </p>
             </div>
             <div class="footer-social-group">
@@ -453,23 +711,7 @@
         </div>
     </footer>
 
-    <div class="modal-overlay" id="privacy_modal_overlay" role="dialog" aria-modal="true" aria-labelledby="privacy_modal_title">
-        <div class="auth-modal" style="max-width: 520px;">
-            <div class="modal-header">
-                <div>
-                    <h3 class="modal-title" id="privacy_modal_title">Privacy Policy &amp; Data Retention</h3>
-                    <p style="font-size:0.8rem; color:var(--text-secondary); margin-top:4px;">Last updated: October 2026</p>
-                </div>
-                <button class="btn-modal-close" onclick="closePrivacyModal()" aria-label="Close">&times;</button>
-            </div>
-            <div style="font-size:0.86rem; color:var(--text-secondary); line-height:1.6; display:flex; flex-direction:column; gap:12px; margin-top:14px;">
-                <p><strong style="color:#fff;">30-Day Automated Chat Retention:</strong> To safeguard your privacy and minimize persistent data storage, all consultation sessions and message history are automatically purged 30 days after creation.</p>
-                <p><strong style="color:#fff;">Candidate Profiles:</strong> Your core profile (Degree, Skills, Experience) is retained permanently to ensure precision career calibration, unless you choose to delete it.</p>
-                <p><strong style="color:#fff;">Right to Erasure:</strong> You can permanently delete your candidate profile, all conversation history, and usage logs at any time via the "Delete My Account" button in your Profile modal.</p>
-                <p><strong style="color:#fff;">Google Authentication:</strong> We verify Google tokens securely on the server and never sell your personal data or email.</p>
-            </div>
-        </div>
-    </div>
+
 
     <div class="modal-overlay" id="race_modal_overlay" role="dialog" aria-modal="true" aria-labelledby="race_modal_title">
         <div class="auth-modal race-modal">
@@ -572,54 +814,52 @@
         </div>
     </div>
 
-    <!-- Auth Modal (When not yet logged in) -->
-    <div class="modal-overlay" id="auth_modal_overlay">
-        <div class="auth-modal">
-            <div class="modal-header">
-                <h3 class="modal-title">Log in to HireKrkeDekho</h3>
-                <button class="btn-modal-close" onclick="closeAuthModal()">
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <path
-                            d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
-                    </svg>
-                </button>
+    <!-- Auth Modal (Restructured with trusted security badges & clean UX) -->
+    <div class="modal-overlay" id="auth_modal_overlay" role="dialog" aria-modal="true" aria-labelledby="auth_modal_title">
+        <div class="auth-modal auth-modal-redesign">
+            <div class="modal-header auth-modal-header">
+                <div class="auth-header-brand">
+                    <img src="/static/hirekrkedekho-logo.png" alt="HireKrkeDekho" height="26">
+                </div>
+                <button class="btn-modal-close" onclick="closeAuthModal()" aria-label="Close modal">&times;</button>
             </div>
 
-            <p class="auth-login-copy">Log in with your Google account to access consultations, prep tools, and the daily contest.</p>
-            <div id="modal_google_btn_slot" class="google-login-slot"></div>
-            
+            <div class="auth-modal-body">
+
+                <h3 class="auth-modal-title" id="auth_modal_title">Welcome to HireKrkeDekho</h3>
+                <p class="auth-login-copy">
+                    Sign in with Google to calibrate your profile, save private career consultations, and compete on the live AI Race leaderboard.
+                </p>
+
+                <div class="auth-google-center-box">
+                    <div id="modal_google_btn_slot" class="google-login-slot"></div>
+                </div>
+
+                <div class="auth-benefits-strip">
+                    <div class="auth-benefit-item">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4C8DFF" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                        <span>Degree, Experience &amp; Skill Calibration</span>
+                    </div>
+                    <div class="auth-benefit-item">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4C8DFF" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                        <span>Zero Passwords · Instant One-Click Login</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="auth-modal-footer">
+                <p class="auth-privacy-disclaimer">
+                    By signing in, you agree to our <a href="/privacy-policy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>. All consultations auto-purge after 30 days.
+                </p>
+            </div>
         </div>
     </div>
 
     <!-- Application Script -->
-    <script src="/static/app.js?v=20261026-race-ui" defer></script>
+    <script src="/static/app.js?v=20261029-job-pagination" defer></script>
 </body>
 
     <!-- Toast Container -->
     <div class="toast-container" id="toast_container"></div>
-
-    <!-- Floating Action Button (Mobile) -->
-    <button class="fab" id="fab_btn" aria-label="Ask AI Career Advisor" title="Ask AI Career Advisor">
-        <svg class="icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" fill="currentColor"/></svg>
-    </button>
-
-    <!-- Bottom Navigation (Mobile) -->
-    <nav class="bottom-nav" id="bottom_nav">
-        <a href="/" class="bottom-nav-item" aria-label="Home">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" fill="currentColor"/></svg>
-            <span>Home</span>
-        </a>
-        <a href="#ai_race" class="bottom-nav-item" aria-label="Daily Contest">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm0-2 6.39 10.39L19 15l-6-3-6 3 1.61-4.61L12 0z" fill="currentColor"/></svg>
-            <span>Race</span>
-        </a>
-        <a href="#chat" class="bottom-nav-item active" aria-label="Chat">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" fill="currentColor"/></svg>
-            <span>Chat</span>
-        </a>
-        <a href="/race/admin" class="bottom-nav-item" aria-label="Admin">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M10 18h4v-2h-4v2zm0-7h4v-2h-4v2zm0-7v2h2V3h-2zM15 18h3v-2h-3v2zm0-7h3v-2h-3v2zM15 25h3v-2h-3v2zm0-7h3v-2h-3v2zM11 18h2v-2h-2v2zm0-7h2v-2h-2v2zM11 25h2v-2h-2v2zm0-7h2v-2h-2v2z" fill="currentColor"/></svg>
-            <span>Admin</span>
-        </a>
-    </nav>
 </html>
+

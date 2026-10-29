@@ -5,6 +5,20 @@
         let googleClientId = "";
         let googleIdentityInitialized = false;
         let pendingAuthAction = null;
+        /* ===== JOB CARDS PAGINATION STATE ===== */
+        // Client-side pagination: 4 shown initially, then +2, then +2, then cute limit message.
+        // All jobs from the AI response are stored; NO extra API calls are made.
+        const _jobRegistry = {};          // jobId -> job object (for roadmap lookups)
+        let _jobPageState = {
+            allJobs: [],       // all jobs in the current response batch
+            visibleCount: 0,   // how many cards are currently visible
+            gridEl: null,      // DOM reference to .job-cards-grid for this batch
+            footerEl: null,    // DOM reference to the footer slot for this batch
+            sessionTotal: 0,   // cumulative displayed cards in this page session
+        };
+        const JOB_PAGE_INITIAL = 4;
+        const JOB_PAGE_STEP    = 2;
+        const JOB_PAGE_MAX     = 8;   // 4 + 2 + 2 = maximum before limit message
 
         function getAuthHeaders() {
             const headers = { 'Content-Type': 'application/json' };
@@ -77,7 +91,8 @@
             const slot = document.getElementById('modal_google_btn_slot');
             if (!slot || !googleIdentityInitialized) return;
             slot.innerHTML = '';
-            google.accounts.id.renderButton(slot, { theme: 'filled_blue', size: 'large', text: 'continue_with', shape: 'pill', width: 320 });
+            const btnWidth = Math.min(300, Math.max(220, window.innerWidth - 64));
+            google.accounts.id.renderButton(slot, { theme: 'outline', size: 'large', text: 'continue_with', shape: 'pill', width: btnWidth });
         }
 
         function requireAuthentication(continuation) {
@@ -401,6 +416,10 @@
         function startNewSession() {
             currentSessionId = null;
             localStorage.removeItem('career_bot_session_id');
+            // Reset job pagination counters so new session gets a fresh 4+2+2 quota
+            _jobPageState.allJobs = [];
+            _jobPageState.visibleCount = 0;
+            _jobPageState.sessionTotal = 0;
             const stream = document.getElementById('messages_stream');
             if (stream) {
                 stream.innerHTML = '';
@@ -520,14 +539,27 @@
             if (shell) shell.setAttribute('aria-hidden', 'true');
         }
 
-        function openRoadmapModal(title, guide) {
+        function openRoadmapModal(jobId) {
+            const job = _jobRegistry[jobId];
+            if (!job) { console.warn('Roadmap: job not found for id', jobId); return; }
+            const title = job.title || 'Role';
+            const guide = Array.isArray(job.prep_guide) ? job.prep_guide : [];
+
             document.getElementById('roadmap_modal_title').textContent = 'Free 3-Week Roadmap';
             document.getElementById('roadmap_modal_subtitle').textContent = title;
             const list = document.getElementById('roadmap_modal_list');
-            list.innerHTML = guide.map((item, index) => {
-                const bullets = String(item).split(/\s*[,;]\s*/).filter(Boolean);
-                return `<li><span class="roadmap-week">Week ${index + 1}</span><ul>${bullets.map(bullet => `<li>${escapeHtml(bullet)}</li>`).join('')}</ul></li>`;
-            }).join('');
+
+            if (guide.length === 0) {
+                list.innerHTML = `<li style="padding:14px 0; color:var(--text-secondary,#94a3b8);">
+                    No roadmap was generated for this role. Try starting a consultation
+                    and asking: <em>"Give me a 3-week prep guide for ${escapeHtml(title)}."</em>
+                </li>`;
+            } else {
+                list.innerHTML = guide.map((item, index) => {
+                    const bullets = String(item).split(/\s*[,;]\s*/).filter(Boolean);
+                    return `<li><span class="roadmap-week">Week ${index + 1}</span><ul>${bullets.map(b => `<li>${escapeHtml(b)}</li>`).join('')}</ul></li>`;
+                }).join('');
+            }
             document.getElementById('roadmap_modal_overlay').classList.add('open');
         }
 
@@ -535,15 +567,6 @@
             document.getElementById('roadmap_modal_overlay').classList.remove('open');
         }
 
-        function openPrivacyModal() {
-            const overlay = document.getElementById('privacy_modal_overlay');
-            if (overlay) overlay.classList.add('open');
-        }
-
-        function closePrivacyModal() {
-            const overlay = document.getElementById('privacy_modal_overlay');
-            if (overlay) overlay.classList.remove('open');
-        }
 
         async function deleteCandidateAccount() {
             if (!currentUserId) return;
@@ -674,49 +697,41 @@
 
             let jobsHtml = '';
             if (hasOpenJobs) {
-                const cardsHtml = extra.open_jobs.map(job => {
-                    const skillsPills = Array.isArray(job.skills_required)
-                        ? job.skills_required.map(s => `<span class="job-skill-chip">${escapeHtml(s)}</span>`).join('')
-                        : '';
+                // ── Client-side pagination (4 → +2 → +2 → limit message) ──────────────
+                // Register every job in the registry keyed by a stable id so the
+                // roadmap button can look up the full object without JSON-in-HTML tricks.
+                const batchJobs = extra.open_jobs;
+                batchJobs.forEach((job, i) => {
+                    const jid = 'job_' + Date.now() + '_' + i;
+                    job._registryId = jid;
+                    _jobRegistry[jid] = job;
+                });
 
-                    const applyUrl = job.apply_url || `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(job.title)}&location=India&f_TPR=r604800`;
+                // Reset pagination state for this new batch
+                _jobPageState.allJobs      = batchJobs;
+                _jobPageState.visibleCount = 0;
+                _jobPageState.gridEl       = null;
+                _jobPageState.footerEl     = null;
+                // sessionTotal carries forward (accumulates across "Show More" presses)
 
-                    return `
-                        <div class="job-card">
-                            <div>
-                                <div class="job-card-top">
-                                    <div class="job-role-title">${escapeHtml(job.title)}</div>
-                                </div>
-                                <div class="job-company-meta">
-                                    <span class="meta-item">
-                                        India &middot; ${escapeHtml(job.job_type || 'Hybrid')}
-                                    </span>
-                                </div>
-                                ${job.salary_range ? `
-                                    <div class="job-salary-tag">
-                                        <span class="currency-symbol">&#8377;</span>
-                                        <span>${escapeHtml(job.salary_range.replace(/^\$+\s*/, ''))}</span>
-                                    </div>
-                                ` : ''}
-                                ${job.description ? `<div class="job-desc-snippet">${escapeHtml(job.description)}</div>` : ''}
-                                ${skillsPills ? `<div class="job-skills-list">${skillsPills}</div>` : ''}
-                            </div>
-                            <div class="job-card-actions">
-                                <button type="button" class="btn-apply-job btn-roadmap" data-title="${escapeHtml(job.title)}" data-guide="${escapeHtml(JSON.stringify(job.prep_guide || []))}" onclick="openRoadmapModal(this.dataset.title, JSON.parse(this.dataset.guide))">Free 3-Week Roadmap</button>
-                                <a href="${escapeHtml(applyUrl)}" target="_blank" rel="noopener noreferrer" class="btn-apply-job">
-                                    <span>View on LinkedIn</span>
-                                    <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
-                                </a>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
+                const initialVisible = Math.min(JOB_PAGE_INITIAL, batchJobs.length);
+                _jobPageState.visibleCount = initialVisible;
+                _jobPageState.sessionTotal += initialVisible;
 
-                let actionFooterHtml = '';
+                const visibleNow = batchJobs.slice(0, initialVisible);
+                const cardsHtml  = visibleNow.map(job => _buildJobCardHtml(job)).join('');
+
+                const hasMore = batchJobs.length > initialVisible;
+                const overLimit = _jobPageState.sessionTotal >= JOB_PAGE_MAX;
+                const footerId = 'jobs_footer_' + Date.now();
+
+                let footerHtml;
                 if (extra.daily_limit_reached || extra.remaining_requests === 0) {
-                    actionFooterHtml = `<div class="daily-limit-banner">Oops! Daily limit reached. Come back tomorrow for new openings.</div>`;
+                    footerHtml = _buildLimitBanner();
+                } else if (!hasMore || overLimit) {
+                    footerHtml = _buildLimitBanner();
                 } else {
-                    actionFooterHtml = `<button type="button" class="btn-show-more-jobs" onclick="sendQuickPrompt('Show more matching roles that are different from the previous recommendations.')">Show more openings (+2)</button>`;
+                    footerHtml = `<button type="button" class="btn-show-more-jobs" id="${footerId}" onclick="showMoreJobs('${footerId}')">Show More Openings (+2)</button>`;
                 }
 
                 jobsHtml = `
@@ -724,10 +739,12 @@
                         <div class="jobs-section-heading">
                             Curated Open Positions &amp; Roles
                         </div>
-                        <div class="job-cards-grid">
+                        <div class="job-cards-grid" id="jobs_grid_${Date.now()}">
                             ${cardsHtml}
                         </div>
-                        ${actionFooterHtml}
+                        <div class="jobs-footer-slot" id="${footerId}_slot">
+                            ${footerHtml}
+                        </div>
                     </div>
                 `;
             } else if (hasLegacyJobs) {
@@ -868,7 +885,107 @@
             }
         });
 
-        function escapeHtml(str) {
+        /* ===== JOB CARD HELPERS ===== */
+        function _buildJobCardHtml(job) {
+            const skillsPills = Array.isArray(job.skills_required)
+                ? job.skills_required.map(s => `<span class="job-skill-chip">${escapeHtml(s)}</span>`).join('')
+                : '';
+            const applyUrl = job.apply_url
+                || `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(job.title)}&location=India&f_TPR=r604800`;
+            const jid = job._registryId;
+            return `
+                <div class="job-card">
+                    <div>
+                        <div class="job-card-top">
+                            <div class="job-role-title">${escapeHtml(job.title)}</div>
+                        </div>
+                        <div class="job-company-meta">
+                            <span class="meta-item">India &middot; ${escapeHtml(job.job_type || 'Hybrid')}</span>
+                        </div>
+                        ${job.salary_range ? `
+                            <div class="job-salary-tag">
+                                <span class="currency-symbol">&#8377;</span>
+                                <span>${escapeHtml(job.salary_range.replace(/^\$+\s*/, ''))}</span>
+                            </div>` : ''}
+                        ${job.description ? `<div class="job-desc-snippet">${escapeHtml(job.description)}</div>` : ''}
+                        ${skillsPills ? `<div class="job-skills-list">${skillsPills}</div>` : ''}
+                    </div>
+                    <div class="job-card-actions">
+                        <button type="button" class="btn-apply-job btn-roadmap"
+                                onclick="openRoadmapModal('${jid}')">
+                            📋 Free 3-Week Roadmap
+                        </button>
+                        <a href="${escapeHtml(applyUrl)}" target="_blank" rel="noopener noreferrer" class="btn-apply-job">
+                            <span>View on LinkedIn</span>
+                            <svg class="icon icon-sm" viewBox="0 0 24 24">
+                                <path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>`;
+        }
+
+        function _buildLimitBanner() {
+            return `<div class="daily-limit-banner">
+                <span class="limit-emoji">🌙</span>
+                <div class="limit-text">
+                    <strong>Oops! You've explored all today's opportunities!</strong><br>
+                    Your next batch of opportunities will be ready tomorrow.<br>
+                    Come back and discover more!
+                </div>
+            </div>`;
+        }
+
+        function showMoreJobs(footerId) {
+            const state = _jobPageState;
+            const nextBatch = state.allJobs.slice(state.visibleCount, state.visibleCount + JOB_PAGE_STEP);
+            if (nextBatch.length === 0) {
+                _replaceFooter(footerId, _buildLimitBanner());
+                return;
+            }
+
+            // Append cards to the grid – find grid sibling of footer slot
+            const footerSlot = document.getElementById(footerId + '_slot');
+            if (!footerSlot) return;
+            const section = footerSlot.closest('.open-jobs-section');
+            const grid = section ? section.querySelector('.job-cards-grid') : null;
+            if (grid) {
+                nextBatch.forEach(job => {
+                    const tmp = document.createElement('div');
+                    tmp.innerHTML = _buildJobCardHtml(job).trim();
+                    const card = tmp.firstElementChild;
+                    if (card) {
+                        card.style.opacity = '0';
+                        card.style.transform = 'translateY(12px)';
+                        grid.appendChild(card);
+                        requestAnimationFrame(() => {
+                            card.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
+                            card.style.opacity = '1';
+                            card.style.transform = 'translateY(0)';
+                        });
+                    }
+                });
+            }
+
+            state.visibleCount += nextBatch.length;
+            state.sessionTotal += nextBatch.length;
+
+            const remaining = state.allJobs.length - state.visibleCount;
+            const overLimit  = state.sessionTotal >= JOB_PAGE_MAX;
+
+            if (remaining <= 0 || overLimit) {
+                _replaceFooter(footerId, _buildLimitBanner());
+            } else {
+                _replaceFooter(footerId, `<button type="button" class="btn-show-more-jobs" onclick="showMoreJobs('${footerId}')">Show More Openings (+2)</button>`);
+            }
+        }
+
+        function _replaceFooter(footerId, html) {
+            const slot = document.getElementById(footerId + '_slot');
+            if (slot) slot.innerHTML = html;
+        }
+
+                function escapeHtml(str) {
             if (str === null || str === undefined) return '';
             return String(str)
                 .replace(/&/g, '&amp;')

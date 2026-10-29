@@ -1,6 +1,5 @@
 import os
-from datetime import datetime
-from zoneinfo import ZoneInfo
+from datetime import datetime, timezone, timedelta
 from collections import defaultdict
 import time
 from fastapi import APIRouter, Depends, HTTPException, Request, Header
@@ -12,7 +11,7 @@ from services.auth_token_service import get_current_user_from_header
 from services.race_service import contest_date, create_daily_quiz, decide_winner, leaderboard, now_ist, public_name, questions_for_player, QUESTION_SECONDS, GRACE_SECONDS
 
 router = APIRouter(prefix="/race", tags=["AI Race"])
-IST = ZoneInfo("Asia/Kolkata")
+IST = timezone(timedelta(hours=5, minutes=30))
 
 RACE_ENABLED = os.getenv("RACE_ENABLED", "0").strip() == "1"
 RACE_ADMIN_SECRET = os.getenv("RACE_ADMIN_SECRET", "")
