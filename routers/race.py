@@ -9,7 +9,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from database import get_db
 from models.models import UserProfile, RaceAttempt, RaceAnswer, RaceWinner, RaceDailyQuiz
 from services.auth_token_service import get_current_user_from_header
-from services.race_service import contest_date, create_daily_quiz, decide_winner, leaderboard, now_ist, public_name, questions_for_player, QUESTION_SECONDS, GRACE_SECONDS
+from services.race_service import contest_date, create_daily_quiz, decide_winner, get_cached_quiz, leaderboard, now_ist, public_name, questions_for_player, QUESTION_SECONDS, GRACE_SECONDS
 
 router = APIRouter(prefix="/race", tags=["AI Race"])
 IST = timezone(timedelta(hours=5, minutes=30))
@@ -86,10 +86,11 @@ async def answer(payload: AnswerRequest, db: Session = Depends(get_db), token=De
     if started_at.tzinfo is None:
         started_at = started_at.replace(tzinfo=IST)
     elapsed = int((now_ist() - started_at).total_seconds() * 1000)
-    quiz = db.query(RaceDailyQuiz).filter_by(contest_date=day).first()
+    quiz = get_cached_quiz(db, day)
     if not quiz:
         raise HTTPException(status_code=503, detail="Today's quiz is unavailable. Please restart the contest.")
-    questions = __import__('json').loads(quiz.questions_json)
+    import json as _json
+    questions = _json.loads(quiz.questions_json)
     if payload.question_index >= len(questions):
         raise HTTPException(status_code=409, detail="That question is unavailable.")
     question = questions[payload.question_index]

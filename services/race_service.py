@@ -11,6 +11,21 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from models.models import RaceDailyQuiz, RaceAttempt, RaceAnswer, RaceWinner, RaceQuestionArchive
+# ── In-process cache for today's quiz (avoids DB round-trip on each answer) ──
+_quiz_cache: dict = {}
+
+
+def get_cached_quiz(db, day: str):
+    """Return today's quiz from process cache; fall back to DB and cache it."""
+    global _quiz_cache
+    if day in _quiz_cache:
+        return _quiz_cache[day]
+    quiz = db.query(RaceDailyQuiz).filter_by(contest_date=day).first()
+    if quiz:
+        _quiz_cache = {day: quiz}   # evict stale dates automatically
+    return quiz
+
+
 
 IST = timezone(timedelta(hours=5, minutes=30))
 QUESTION_SECONDS = 15

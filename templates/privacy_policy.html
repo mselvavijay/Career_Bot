@@ -1,10 +1,10 @@
-<html lang="en">
 <!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex, nofollow" />
-    <title>Privacy Policy &amp; Data Retention — HireKrkeDekho</title>
+    <title>Privacy Policy — HireKrkeDekho</title>
     <link rel="icon" href="/static/hirekrkedekho-logo.png" type="image/png" />
     <style>
         :root {
@@ -33,13 +33,9 @@
             overflow-x: hidden;
         }
 
-        body {
-            min-height: 100dvh;
-            display: flex;
-            flex-direction: column;
-        }
+        body { min-height: 100dvh; display: flex; flex-direction: column; }
 
-        /* ── Header ────────────────────────────────── */
+        /* ── Header ── */
         .pp-header {
             background: rgba(7, 13, 24, 0.96);
             backdrop-filter: blur(20px);
@@ -56,225 +52,136 @@
         }
 
         .pp-logo-wrap {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-            color: var(--text-primary);
-            font-weight: 700;
-            font-size: 1rem;
+            display: flex; align-items: center; gap: 10px;
+            text-decoration: none; color: var(--text-primary);
+            font-weight: 700; font-size: 1rem;
         }
-
         .pp-logo-wrap img { height: 28px; width: auto; }
 
         .pp-back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: var(--accent-soft);
-            border: 1px solid var(--border-hi);
-            color: #c7d2fe;
-            padding: 7px 14px;
-            border-radius: 9999px;
-            font-size: 0.82rem;
-            font-weight: 600;
-            text-decoration: none;
+            display: inline-flex; align-items: center; gap: 6px;
+            background: var(--accent-soft); border: 1px solid var(--border-hi);
+            color: #c7d2fe; padding: 7px 14px; border-radius: 9999px;
+            font-size: 0.82rem; font-weight: 600; text-decoration: none;
             transition: background 0.2s ease, border-color 0.2s ease;
         }
         .pp-back-btn:hover { background: rgba(99,102,241,0.22); border-color: var(--accent); }
         .pp-back-btn svg { width: 14px; height: 14px; }
 
-        /* ── Main ────────────────────────────────── */
+        /* ── Main ── */
         .pp-main {
             flex: 1;
             padding: 48px 24px 80px;
-            max-width: 780px;
+            max-width: 740px;
             margin: 0 auto;
             width: 100%;
         }
 
-        /* ── Hero ─────────────────────── */
-        .pp-eyebrow {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--accent-soft);
-            border: 1px solid var(--border-hi);
-            color: #c7d2fe;
-            padding: 5px 13px;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            margin-bottom: 20px;
-        }
-
         .pp-title {
-            font-size: clamp(1.9rem, 5vw, 2.8rem);
+            font-size: clamp(1.6rem, 4.5vw, 2.2rem);
             font-weight: 800;
-            letter-spacing: -0.035em;
+            letter-spacing: -0.03em;
             line-height: 1.18;
             color: var(--text-primary);
-            margin-bottom: 14px;
+            margin-bottom: 10px;
         }
 
         .pp-subtitle {
-            font-size: 0.95rem;
-            color: var(--text-secondary);
-            margin-bottom: 48px;
-            padding-bottom: 32px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+            padding-bottom: 28px;
             border-bottom: 1px solid var(--border);
         }
 
-        /* ── Sections ─────────────────── */
-        .pp-section {
-            margin-bottom: 40px;
-        }
+        /* ── Sections ── */
+        .pp-section { margin-bottom: 32px; }
 
         .pp-section-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
+            display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
         }
 
         .pp-section-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            background: var(--accent-soft);
-            border: 1px solid var(--border-hi);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            color: #818cf8;
+            width: 32px; height: 32px; border-radius: 9px;
+            background: var(--accent-soft); border: 1px solid var(--border-hi);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; color: #818cf8;
         }
-
-        .pp-section-icon svg { width: 18px; height: 18px; }
-
+        .pp-section-icon svg { width: 16px; height: 16px; }
         .pp-section-icon.cyan { background: rgba(34,211,238,0.1); border-color: rgba(34,211,238,0.25); color: var(--cyan); }
         .pp-section-icon.gold { background: rgba(251,191,36,0.1); border-color: rgba(251,191,36,0.25); color: var(--gold); }
         .pp-section-icon.green { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.25); color: #4ade80; }
-        .pp-section-icon.rose  { background: rgba(244,63,94,0.1);  border-color: rgba(244,63,94,0.25);  color: #fb7185; }
 
         .pp-section h2 {
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            letter-spacing: -0.01em;
+            font-size: 1.05rem; font-weight: 700;
+            color: var(--text-primary); letter-spacing: -0.01em;
         }
 
-        .pp-section p,
-        .pp-section li {
-            font-size: 0.93rem;
-            color: var(--text-secondary);
-            line-height: 1.7;
+        .pp-section p, .pp-section li {
+            font-size: 0.9rem; color: var(--text-secondary); line-height: 1.7;
         }
 
         .pp-section ul {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 10px;
+            list-style: none; display: flex; flex-direction: column; gap: 8px; margin-top: 10px;
         }
-
         .pp-section ul li {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
+            display: flex; align-items: flex-start; gap: 10px;
         }
-
-        .pp-section ul li > span {
-            flex: 1;
-        }
-
+        .pp-section ul li > span { flex: 1; }
         .pp-section ul li::before {
-            content: '';
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--accent);
-            margin-top: 8px;
-            flex-shrink: 0;
+            content: ''; width: 5px; height: 5px; border-radius: 50%;
+            background: var(--accent); margin-top: 9px; flex-shrink: 0;
         }
 
         .pp-card {
-            background: rgba(15, 22, 40, 0.7);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 22px 24px;
-            backdrop-filter: blur(12px);
+            background: rgba(15, 22, 40, 0.7); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 20px 22px;
         }
-
-        .pp-card p + p,
-        .pp-card p + ul,
-        .pp-card ul + p {
-            margin-top: 12px;
-        }
+        .pp-card p + p, .pp-card p + ul, .pp-card ul + p { margin-top: 10px; }
 
         strong.hi { color: var(--text-primary); font-weight: 600; }
 
         .pp-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 14px;
-            font-size: 0.88rem;
+            width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 0.85rem;
         }
         .pp-table th {
-            background: rgba(99,102,241,0.12);
-            color: #c7d2fe;
-            font-weight: 700;
-            padding: 10px 14px;
-            text-align: left;
+            background: rgba(99,102,241,0.12); color: #c7d2fe;
+            font-weight: 700; padding: 9px 12px; text-align: left;
             border: 1px solid var(--border-hi);
         }
         .pp-table td {
-            padding: 10px 14px;
-            border: 1px solid var(--border);
-            color: var(--text-secondary);
-            vertical-align: top;
+            padding: 9px 12px; border: 1px solid var(--border);
+            color: var(--text-secondary); vertical-align: top;
         }
         .pp-table tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
 
         .pp-highlight {
-            background: rgba(99,102,241,0.08);
-            border: 1px solid var(--border-hi);
-            border-left: 3px solid var(--accent);
-            border-radius: 8px;
-            padding: 14px 18px;
-            margin-top: 14px;
-            font-size: 0.89rem;
-            color: #c7d2fe;
-            line-height: 1.6;
+            background: rgba(99,102,241,0.08); border: 1px solid var(--border-hi);
+            border-left: 3px solid var(--accent); border-radius: 8px;
+            padding: 12px 16px; margin-top: 12px;
+            font-size: 0.86rem; color: #c7d2fe; line-height: 1.6;
         }
 
-        /* ── Footer ─────────────────── */
+        /* ── Footer ── */
         .pp-footer {
-            border-top: 1px solid var(--border);
-            padding: 24px;
-            text-align: center;
-            font-size: 0.82rem;
-            color: var(--text-muted);
+            border-top: 1px solid var(--border); padding: 20px 24px;
+            text-align: center; font-size: 0.8rem; color: var(--text-muted);
         }
         .pp-footer a { color: var(--text-secondary); text-decoration: underline; }
 
-        /* ── Responsive ─────────────── */
+        /* ── Responsive ── */
         @media (max-width: 640px) {
-            .pp-main { padding: 32px 16px 64px; }
+            .pp-main { padding: 28px 16px 56px; }
             .pp-header { padding: 0 16px; }
-            .pp-card { padding: 16px; }
-            .pp-title { font-size: 1.8rem; }
-            .pp-table { font-size: 0.82rem; }
-            .pp-table th, .pp-table td { padding: 8px 10px; }
+            .pp-card { padding: 14px 16px; }
+            .pp-title { font-size: 1.5rem; }
+            .pp-table { font-size: 0.79rem; }
+            .pp-table th, .pp-table td { padding: 7px 9px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Header -->
     <header class="pp-header">
         <a href="/" class="pp-logo-wrap">
             <img src="/static/hirekrkedekho-logo.png" alt="HireKrkeDekho logo" />
@@ -283,23 +190,17 @@
             <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <path d="M12 4l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            Back to Home
+            Back
         </a>
     </header>
 
-    <!-- Main content -->
     <main class="pp-main">
 
-        <span class="pp-eyebrow">
-            <svg viewBox="0 0 20 20" fill="currentColor" width="12" height="12" aria-hidden="true"><path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-            Legal
-        </span>
-
-        <h1 class="pp-title">Privacy Policy &amp; Data Retention</h1>
+        <h1 class="pp-title">Privacy Policy</h1>
 
         <p class="pp-subtitle">
-            Last updated: <strong>October 2026</strong> &nbsp;·&nbsp; Effective date: <strong>October 2026</strong><br/>
-            This policy applies to <strong>HireKrkeDekho</strong> (<em>hirekrkedekho.vercel.app</em>) and governs how we collect, use, store, and protect your data.
+            Last updated: <strong>October 2026</strong> &nbsp;·&nbsp;
+            Applies to <strong>HireKrkeDekho</strong> (<em>hirekrkedekho.vercel.app</em>)
         </p>
 
         <!-- 1. Who we are -->
@@ -311,7 +212,7 @@
                 <h2>1. Who We Are</h2>
             </div>
             <div class="pp-card">
-                <p>HireKrkeDekho is an AI-powered career intelligence platform that helps job-seekers in India with personalised career consultation, role matching, interview preparation, and daily AI quizzes. We are operated by an independent team and can be reached at <a href="mailto:hirekrkedekho@gmail.com" style="color:#818cf8;">hirekrkedekho@gmail.com</a>.</p>
+                <p>HireKrkeDekho is an AI-powered career platform for tech job-seekers in India — personalised job matching, 3-week prep roadmaps, and a daily AI quiz. Reach us at <a href="mailto:hirekrkedekho@gmail.com" style="color:#818cf8;">hirekrkedekho@gmail.com</a>.</p>
             </div>
         </section>
 
@@ -326,48 +227,17 @@
             <div class="pp-card">
                 <table class="pp-table">
                     <thead>
-                        <tr>
-                            <th>Category</th>
-                            <th>Examples</th>
-                            <th>How collected</th>
-                        </tr>
+                        <tr><th>Category</th><th>What</th><th>Source</th></tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td><strong class="hi">Account identity</strong></td>
-                            <td>Google name, email address, profile picture URL, Google user ID</td>
-                            <td>Google OAuth 2.0 sign-in</td>
-                        </tr>
-                        <tr>
-                            <td><strong class="hi">Candidate profile</strong></td>
-                            <td>Degree, skills, years of experience, target role, location, current CTC, expected CTC</td>
-                            <td>You fill in the Profile modal</td>
-                        </tr>
-                        <tr>
-                            <td><strong class="hi">Consultation messages</strong></td>
-                            <td>All chat messages exchanged in a consultation session</td>
-                            <td>Typed by you during a session</td>
-                        </tr>
-                        <tr>
-                            <td><strong class="hi">AI Race contest data</strong></td>
-                            <td>Quiz answers, time taken per question, score, attempt timestamp, display name</td>
-                            <td>Generated during a Daily Contest attempt</td>
-                        </tr>
-                        <tr>
-                            <td><strong class="hi">Usage logs</strong></td>
-                            <td>API endpoint called, timestamp, HTTP status code (no body content)</td>
-                            <td>Server logs on Vercel / Supabase</td>
-                        </tr>
-                        <tr>
-                            <td><strong class="hi">Session tokens</strong></td>
-                            <td>JWT signed with your Google sub, stored in <code>localStorage</code></td>
-                            <td>Issued by our server on sign-in</td>
-                        </tr>
+                        <tr><td><strong class="hi">Account identity</strong></td><td>Google name, email, profile picture</td><td>Google Sign-In</td></tr>
+                        <tr><td><strong class="hi">Candidate profile</strong></td><td>Degree, skills, experience, location, CTC</td><td>Profile modal</td></tr>
+                        <tr><td><strong class="hi">Consultation messages</strong></td><td>Chat messages in a session</td><td>Typed by you</td></tr>
+                        <tr><td><strong class="hi">AI Race data</strong></td><td>Answers, score, time, display name</td><td>Daily Contest</td></tr>
+                        <tr><td><strong class="hi">Session token</strong></td><td>Signed JWT in <code>localStorage</code></td><td>Issued on sign-in</td></tr>
                     </tbody>
                 </table>
-                <div class="pp-highlight">
-                    We do <strong>not</strong> collect payment information, national identity numbers, precise GPS location, or any biometric data.
-                </div>
+                <div class="pp-highlight">We do <strong>not</strong> collect payment info, national IDs, GPS location, or biometrics.</div>
             </div>
         </section>
 
@@ -381,17 +251,13 @@
             </div>
             <div class="pp-card">
                 <ul>
-                    <li>Authenticate you securely via Google and maintain your session</li>
-                    <li>Provide personalised career consultation powered by the Groq / Llama AI model, with your profile as context</li>
-                    <li>Store and retrieve your consultation history so you can continue sessions across visits</li>
-                    <li>Display your Daily Contest score on the public leaderboard (using your chosen display name, not your email)</li>
-                    <li>Enforce fair-play rules (one attempt per day per account) in the AI Race</li>
-                    <li>Generate anonymised analytics to improve the platform (no individual profiling)</li>
-                    <li>Send transactional emails only if you contact us directly via Gmail</li>
+                    <li><span>Authenticate you via Google and maintain your session</span></li>
+                    <li><span>Provide AI career consultation (via Groq / Llama) with your profile as context</span></li>
+                    <li><span>Persist consultation history across visits</span></li>
+                    <li><span>Display your Daily Contest score on the leaderboard using your display name (not email)</span></li>
+                    <li><span>Enforce fair-play (one attempt per day per account)</span></li>
                 </ul>
-                <div class="pp-highlight">
-                    We <strong>never</strong> sell, rent, or share your personal data with third-party advertisers, recruitment agencies, or data brokers.
-                </div>
+                <div class="pp-highlight">We <strong>never</strong> sell, rent, or share your data with advertisers, recruitment agencies, or data brokers.</div>
             </div>
         </section>
 
@@ -401,48 +267,18 @@
                 <div class="pp-section-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 </div>
-                <h2>4. Data Retention Policy</h2>
+                <h2>4. Data Retention</h2>
             </div>
             <div class="pp-card">
                 <table class="pp-table">
                     <thead>
-                        <tr>
-                            <th>Data type</th>
-                            <th>Retention period</th>
-                            <th>Deletion trigger</th>
-                        </tr>
+                        <tr><th>Data type</th><th>Kept for</th><th>Deleted by</th></tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>Consultation sessions &amp; messages</td>
-                            <td><strong class="hi">30 days</strong></td>
-                            <td>Automated nightly purge</td>
-                        </tr>
-                        <tr>
-                            <td>AI Race contest data (scores, answers)</td>
-                            <td><strong class="hi">7 days</strong></td>
-                            <td>Automated 12-hour cleanup job</td>
-                        </tr>
-                        <tr>
-                            <td>Candidate profile (degree, skills, etc.)</td>
-                            <td><strong class="hi">Indefinite</strong></td>
-                            <td>You delete via "Delete My Account"</td>
-                        </tr>
-                        <tr>
-                            <td>Google account identity (email, name)</td>
-                            <td><strong class="hi">Indefinite</strong></td>
-                            <td>You delete via "Delete My Account"</td>
-                        </tr>
-                        <tr>
-                            <td>Session JWT (localStorage)</td>
-                            <td>Until browser storage cleared / sign-out</td>
-                            <td>Sign-out or clear site data</td>
-                        </tr>
-                        <tr>
-                            <td>Server access logs (Vercel)</td>
-                            <td>Up to 30 days (Vercel platform policy)</td>
-                            <td>Platform automatic expiry</td>
-                        </tr>
+                        <tr><td>Consultation sessions &amp; messages</td><td><strong class="hi">30 days</strong></td><td>Automated nightly purge</td></tr>
+                        <tr><td>AI Race scores &amp; answers</td><td><strong class="hi">7 days</strong></td><td>Automated cleanup job</td></tr>
+                        <tr><td>Candidate profile &amp; account identity</td><td><strong class="hi">Until deleted</strong></td><td>"Delete My Account" in Profile</td></tr>
+                        <tr><td>Session JWT (localStorage)</td><td>Until sign-out or browser clear</td><td>Sign-out</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -459,165 +295,72 @@
                         <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
                     </svg>
                 </div>
-                <h2>5. Google Authentication &amp; Third-Party Services</h2>
-            </div>
-            <div class="pp-card">
-                <p><strong class="hi">Google Sign-In:</strong> We use Google Identity Services (GIS) to authenticate you. When you sign in, Google shares your name, email address, and profile picture with us. We verify the Google ID token on our server and never store your Google password or refresh token. Google's privacy policy governs data held on Google's side — see <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style="color:#818cf8;">policies.google.com/privacy</a>.</p>
-                <ul style="margin-top:14px;">
-                    <li>
-                        <strong class="hi">Groq / Llama AI:</strong>
-                        <span>Your consultation messages are sent to the Groq API to generate AI responses. Groq's data processing agreement governs this transfer. We do not share your email or account identity with Groq.</span>
-                    </li>
-                    <li>
-                        <strong class="hi">Supabase:</strong>
-                        <span>Our PostgreSQL database is hosted on Supabase (EU region). Data is encrypted at rest and in transit. See <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer" style="color:#818cf8;">supabase.com/privacy</a>.</span>
-                    </li>
-                    <li>
-                        <strong class="hi">Vercel:</strong>
-                        <span>Our web application is hosted on Vercel's serverless infrastructure. Vercel may collect access logs. See <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" style="color:#818cf8;">vercel.com/legal/privacy-policy</a>.</span>
-                    </li>
-                </ul>
-            </div>
-        </section>
-
-        <!-- 6. Cookies & localStorage -->
-        <section class="pp-section" id="cookies">
-            <div class="pp-section-header">
-                <div class="pp-section-icon gold">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2z"/><path d="M8.5 14s1.5 2 3.5 2 3.5-2 3.5-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
-                </div>
-                <h2>6. Cookies &amp; Browser Storage</h2>
+                <h2>5. Third-Party Services</h2>
             </div>
             <div class="pp-card">
                 <ul>
                     <li>
-                        <strong class="hi">Session token (<code>career_bot_token</code>):</strong>
-                        <span>Stored in <code>localStorage</code>. Contains a signed JWT with your Google user ID, email, and name. Used to authenticate API requests. Cleared on sign-out.</span>
+                        <strong class="hi">Google Sign-In:</strong>
+                        <span>Shares your name, email, and picture with us on sign-in. We verify the token server-side and never store your password. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style="color:#818cf8;">Google Privacy Policy ↗</a></span>
                     </li>
                     <li>
-                        <strong class="hi">Google GIS cookies:</strong>
-                        <span>Google's sign-in library may set its own cookies (e.g. <code>g_state</code>) governed by Google's cookie policy.</span>
+                        <strong class="hi">Groq / Llama AI:</strong>
+                        <span>Your consultation messages are sent to Groq to generate AI responses. Your email is never shared with Groq.</span>
                     </li>
                     <li>
-                        <strong class="hi">No tracking cookies:</strong>
-                        <span>We do not use advertising, analytics, or third-party tracking cookies. We do not use Google Analytics.</span>
+                        <strong class="hi">Supabase (PostgreSQL):</strong>
+                        <span>Database hosted in EU region, encrypted at rest and in transit. <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer" style="color:#818cf8;">Supabase Privacy ↗</a></span>
+                    </li>
+                    <li>
+                        <strong class="hi">Vercel (hosting):</strong>
+                        <span>Serverless infrastructure. Access logs retained per <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" style="color:#818cf8;">Vercel policy ↗</a>. No tracking cookies.</span>
                     </li>
                 </ul>
-                <div class="pp-highlight">You can clear all site data from your browser settings at any time (<em>Settings → Privacy → Clear site data</em>). This also signs you out.</div>
             </div>
         </section>
 
-        <!-- 7. Your rights -->
+        <!-- 6. Your rights -->
         <section class="pp-section" id="your-rights">
             <div class="pp-section-header">
                 <div class="pp-section-icon green">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
                 </div>
-                <h2>7. Your Rights &amp; Controls</h2>
+                <h2>6. Your Rights</h2>
             </div>
             <div class="pp-card">
                 <ul>
-                    <li>
-                        <strong class="hi">Access:</strong>
-                        <span>Sign in and open your Profile modal to view everything stored about you — degree, skills, experience, and account identity.</span>
-                    </li>
-                    <li>
-                        <strong class="hi">Correction:</strong>
-                        <span>Edit any profile field in the Profile modal at any time.</span>
-                    </li>
-                    <li>
-                        <strong class="hi">Deletion (Right to Erasure):</strong>
-                        <span>Click <strong>"Delete My Account"</strong> in the Profile modal to permanently delete your candidate profile, all consultation sessions, contest records, and account identity from our database. This is irreversible.</span>
-                    </li>
-                    <li>
-                        <strong class="hi">Data portability:</strong>
-                        <span>Contact us at <a href="mailto:hirekrkedekho@gmail.com" style="color:#818cf8;">hirekrkedekho@gmail.com</a> to request an export of your stored data.</span>
-                    </li>
-                    <li>
-                        <strong class="hi">Opt-out of AI Race leaderboard:</strong>
-                        <span>Your display name (not email) appears on the public leaderboard. Race data is automatically purged after 7 days. You can skip the Daily Contest at any time.</span>
-                    </li>
+                    <li><strong class="hi">Access &amp; correct:</strong> <span>Open your Profile modal to view and edit all stored data.</span></li>
+                    <li><strong class="hi">Delete:</strong> <span>Click <strong>"Delete My Account"</strong> in the Profile modal to permanently erase your profile, sessions, contest records, and identity. Irreversible.</span></li>
+                    <li><strong class="hi">Export:</strong> <span>Email <a href="mailto:hirekrkedekho@gmail.com" style="color:#818cf8;">hirekrkedekho@gmail.com</a> to request a data export.</span></li>
+                    <li><strong class="hi">Leaderboard opt-out:</strong> <span>Your display name (not email) appears publicly. Race data auto-purges after 7 days. You can skip the Daily Contest at any time.</span></li>
                 </ul>
             </div>
         </section>
 
-        <!-- 8. Security -->
-        <section class="pp-section" id="security">
-            <div class="pp-section-header">
-                <div class="pp-section-icon rose">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                </div>
-                <h2>8. Security Measures</h2>
-            </div>
-            <div class="pp-card">
-                <ul>
-                    <li>All traffic is encrypted in transit using HTTPS / TLS 1.3</li>
-                    <li>Database stored on Supabase with row-level security (RLS) and encryption at rest</li>
-                    <li>JWT tokens are signed with a secret and validated server-side on every API request</li>
-                    <li>Admin endpoints are protected by a secret key and IP-level rate-limiting (30 requests per 60 seconds)</li>
-                    <li>No plaintext passwords are ever stored — authentication is entirely delegated to Google</li>
-                    <li>Production schema changes use Alembic migrations — no ad-hoc DDL on live databases</li>
-                </ul>
-                <div class="pp-highlight">If you discover a security vulnerability, please report it responsibly to <a href="mailto:hirekrkedekho@gmail.com" style="color:#c7d2fe;">hirekrkedekho@gmail.com</a>.</div>
-            </div>
-        </section>
-
-        <!-- 9. Children -->
-        <section class="pp-section" id="children">
-            <div class="pp-section-header">
-                <div class="pp-section-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-                </div>
-                <h2>9. Children's Privacy</h2>
-            </div>
-            <div class="pp-card">
-                <p>HireKrkeDekho is designed for job-seekers aged 18 and above. We do not knowingly collect personal data from anyone under 18. If we become aware that a minor has provided us personal data, we will delete it immediately. Contact us at <a href="mailto:hirekrkedekho@gmail.com" style="color:#818cf8;">hirekrkedekho@gmail.com</a> if you believe a minor's data has been submitted.</p>
-            </div>
-        </section>
-
-        <!-- 10. Changes -->
-        <section class="pp-section" id="changes">
-            <div class="pp-section-header">
-                <div class="pp-section-icon cyan">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                </div>
-                <h2>10. Changes to This Policy</h2>
-            </div>
-            <div class="pp-card">
-                <p>We may update this Privacy Policy when we add new features, change our data practices, or when required by applicable law. The "Last updated" date at the top of this page reflects when the policy was last revised. Continued use of HireKrkeDekho after an update constitutes acceptance of the revised policy.</p>
-                <p style="margin-top:10px;">For material changes that significantly affect your rights, we will display a notice on the home page for at least 14 days before the change takes effect.</p>
-            </div>
-        </section>
-
-        <!-- 11. Contact -->
+        <!-- 7. Contact -->
         <section class="pp-section" id="contact">
             <div class="pp-section-header">
                 <div class="pp-section-icon gold">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
                 </div>
-                <h2>11. Contact Us</h2>
+                <h2>7. Contact</h2>
             </div>
             <div class="pp-card">
-                <p>For any questions, data requests, or concerns about this Privacy Policy, please contact us:</p>
+                <p>For privacy questions or data requests, contact us. We aim to reply within <strong>5 business days</strong>.</p>
                 <ul style="margin-top:12px;">
                     <li><strong class="hi">Email:</strong> <a href="mailto:hirekrkedekho@gmail.com" style="color:#818cf8;">hirekrkedekho@gmail.com</a></li>
                     <li><strong class="hi">LinkedIn:</strong> <a href="https://www.linkedin.com/company/hirekrkedekho" target="_blank" rel="noopener noreferrer" style="color:#818cf8;">linkedin.com/company/hirekrkedekho</a></li>
-                    <li><strong class="hi">Instagram:</strong> <a href="https://www.instagram.com/hirekrkedekho/" target="_blank" rel="noopener noreferrer" style="color:#818cf8;">instagram.com/hirekrkedekho</a></li>
                 </ul>
-                <div class="pp-highlight" style="margin-top:16px;">
-                    We aim to respond to all privacy-related enquiries within <strong>5 business days</strong>.
-                </div>
             </div>
         </section>
 
     </main>
 
     <footer class="pp-footer">
-        &copy; 2026 HireKrkeDekho &bull; Intelligent Talent &amp; Career Discovery &nbsp;&bull;&nbsp;
+        &copy; 2026 HireKrkeDekho &bull;
         <a href="/">Home</a> &nbsp;&bull;&nbsp;
         <a href="mailto:hirekrkedekho@gmail.com">Contact</a>
     </footer>
 
 </body>
 </html>
-

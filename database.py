@@ -1,4 +1,4 @@
-﻿from sqlalchemy import create_engine
+from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import NullPool
@@ -29,9 +29,20 @@ else:
 connect_args = {"check_same_thread": False} if SQLALCHEMY_DATABASE_URL.startswith("sqlite") else {}
 
 engine_options = {"connect_args": connect_args}
-# Serverless functions must return each connection to Supabase's transaction pool after the request.
+
 if is_serverless and not SQLALCHEMY_DATABASE_URL.startswith("sqlite"):
+    # Serverless (Vercel/Lambda): use NullPool so each request gets a fresh
+    # connection from Supabase's transaction pooler; no idle connections held.
     engine_options["poolclass"] = NullPool
+elif not SQLALCHEMY_DATABASE_URL.startswith("sqlite"):
+    # Long-running server (Render, Railway, VPS): use a small pool so
+    # connections are reused across requests, slashing per-request latency.
+    from sqlalchemy.pool import QueuePool
+    engine_options["poolclass"] = QueuePool
+    engine_options["pool_size"] = 5
+    engine_options["max_overflow"] = 10
+    engine_options["pool_pre_ping"] = True   # recycle stale connections
+    engine_options["pool_recycle"] = 1800    # recycle every 30 min
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL, **engine_options)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
